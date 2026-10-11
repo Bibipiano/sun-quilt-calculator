@@ -192,14 +192,19 @@ pre{background:#0a1120;border:1px solid var(--line);border-radius:10px;padding:1
   .tiles{grid-template-columns:repeat(2,1fr)}
   .mthGrid{grid-template-columns:repeat(6,1fr)}
 }
-/* ===== 语言切换按钮 ===== */
-.langSeg{position:fixed;top:14px;right:16px;z-index:9995;display:flex;align-items:center;gap:2px;background:rgba(13,21,38,.92);border:1px solid #2c3c5c;border-radius:999px;padding:3px;backdrop-filter:blur(6px);box-shadow:0 4px 18px rgba(0,0,0,.35)}
+/* ===== 语言切换按钮（页头内联常驻 + 右上角悬浮） ===== */
+.langSeg{display:flex;align-items:center;gap:2px;background:rgba(13,21,38,.92);border:1px solid #2c3c5c;border-radius:999px;padding:3px}
 .langSeg button{border:0;background:transparent;color:#93a2c4;font-size:12.5px;font-weight:600;font-family:inherit;line-height:1;padding:6px 12px;border-radius:999px;cursor:pointer;transition:color .15s ease,background .15s ease}
 .langSeg button:hover{color:#dbe6ff}
 .langSeg button.on{background:linear-gradient(135deg,#ff8a3c,#ffd98a);color:#1a1206}
-@media(min-width:900px){.hdrPills{margin-right:112px}}
+/* 右上角悬浮按钮：滚动过页头后出现（仅用 visibility 切换，任何渲染环境下都确定性生效） */
+.langSeg.float{position:fixed;top:14px;right:16px;z-index:9995;backdrop-filter:blur(6px);box-shadow:0 4px 18px rgba(0,0,0,.35);visibility:hidden;pointer-events:none}
+html.i18n-scrolled .langSeg.float{visibility:visible;pointer-events:auto}
+/* 页头内联按钮：与提示胶囊同排，随页面内容常驻可见 */
+.langSeg.inline{padding:2px}
+.langSeg.inline button{font-size:11.5px;padding:4px 10px}
 </style>
-<script>try{if(localStorage.getItem('quiltLang')==='en'){document.documentElement.classList.add('i18n-boot');}}catch(e){}</script><style>html.i18n-boot body{visibility:hidden!important}</style>
+<script>try{if(localStorage.getItem('quiltLang')==='en'){document.documentElement.classList.add('i18n-boot');}}catch(e){}</script><style>html.i18n-boot body{visibility:hidden;animation:i18nBootFallback 0s linear 3s forwards}@keyframes i18nBootFallback{to{visibility:visible}}</style>
 </head>
 <body>
 <div class="page">
@@ -225,6 +230,7 @@ pre{background:#0a1120;border:1px solid var(--line);border-radius:10px;padding:1
       <span class="pill">受光模型：剪影 × 入射余弦</span>
       <span class="pill">积分单位：m²·h</span>
       <span class="pill">全部本地计算</span>
+      <span class="langSeg inline" id="langSeg2" role="group" aria-label="Language / 语言"><button type="button" data-lang="zh" class="on">中文</button><button type="button" data-lang="en">English</button></span>
     </div>
   </header>
 
@@ -552,7 +558,7 @@ Q = ∫ DNI(t) × A(t) dt                （焦耳级能量，按完全吸收估
 </div>
 <div class="tip" id="tip"></div>
 
-<div class="langSeg" id="langSeg" role="group" aria-label="Language / 语言">
+<div class="langSeg float" id="langSeg" role="group" aria-label="Language / 语言">
   <button type="button" data-lang="zh" class="on">中文</button>
   <button type="button" data-lang="en">English</button>
 </div>
@@ -632,15 +638,41 @@ function __trEn(s){
   });
 })();
 
-/* 同步语言切换按钮的选中态 */
+/* 同步所有语言切换按钮组的选中态（页头内联按钮 + 右上角悬浮按钮） */
 function __syncLangBtn(){
-  var ls = document.getElementById('langSeg');
-  if(!ls) return;
-  var bs = ls.querySelectorAll('button');
-  for(var i=0;i<bs.length;i++){
-    bs[i].classList.toggle('on', bs[i].getAttribute('data-lang') === window.__LANG);
+  var groups = document.querySelectorAll('.langSeg');
+  for(var g=0;g<groups.length;g++){
+    var bs = groups[g].querySelectorAll('button');
+    for(var i=0;i<bs.length;i++){
+      bs[i].classList.toggle('on', bs[i].getAttribute('data-lang') === window.__LANG);
+    }
   }
 }
+
+/* 语言按钮点击：事件委托（页面重建后无需重新绑定；页头内联与悬浮按钮通用） */
+document.addEventListener('click',function(e){
+  var t=e.target;
+  var b=(t&&t.closest)?t.closest('.langSeg button[data-lang]'):null;
+  if(b) setLang(b.getAttribute('data-lang'));
+});
+
+/* 右上角悬浮按钮：仅当滚过页头后才出现，避免与页头内联按钮重复遮挡。
+   除 scroll/resize 事件外，另加低频轮询兜底——个别环境（无头浏览器、
+   内嵌预览）滚动事件不触发或被合并，轮询可保证状态始终正确。 */
+(function(){
+  function __updFloat(){
+    try{
+      var hdr=document.querySelector('.hdr');
+      var thr=hdr?(hdr.offsetTop+hdr.offsetHeight-30):160;
+      var y=window.pageYOffset||document.documentElement.scrollTop||0;
+      document.documentElement.classList.toggle('i18n-scrolled', y>thr);
+    }catch(e){}
+  }
+  window.addEventListener('scroll',__updFloat,{passive:true});
+  window.addEventListener('resize',__updFloat,{passive:true});
+  setInterval(__updFloat,400);
+  __updFloat();
+})();
 
 /* 切换语言：重建整页骨架 + 软重启（不刷新、不丢已填数据） */
 function setLang(lang){
@@ -3495,13 +3527,6 @@ function bindAll(){
     raf=requestAnimationFrame(step);
   });
   window.addEventListener('resize',()=>{},{passive:true});
-  const __langSegEl=$('langSeg');
-  if(__langSegEl){
-    __langSegEl.addEventListener('click',e=>{
-      const b=e.target.closest('button');
-      if(b&&b.dataset.lang)setLang(b.dataset.lang);
-    });
-  }
 }
 
 /* ---------------- 启动 ---------------- */
