@@ -1,6 +1,6 @@
 # sun-quilt-calculator
 
-A locally run web tool to maximize quilt sunlight exposure（一个本地运行的网页：结合光照、重心、风速，计算如何让被子晒到最多，给出最优折叠方案）
+A locally run web tool to maximize quilt sunlight exposure（一个本地运行的网页：结合光照、重心、计算如何让被子晒到最多，给出最优折叠方案）
 
 [English](README_EN.md) | [中文](README.md)
 
