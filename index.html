@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="dark">
-<title>Quilt Sun-Drying Simulator · Solar Geometry Lab</title>
+<title>晒被光照模拟器 · Quilt Sun Lab</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='8' fill='%23ffb454'/%3E%3Cg stroke='%23ffb454' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M16 2v4M16 26v4M2 16h4M26 16h4M6 6l3 3M23 23l3 3M26 6l-3 3M9 23l-3 3'/%3E%3C/g%3E%3C/svg%3E">
 <style>
 :root{
@@ -120,7 +120,7 @@ input[type=range]{width:100%;accent-color:var(--sun);height:20px;cursor:pointer}
 .adv b{color:#fff;font-weight:600}
 .delta{margin-left:6px;font:600 11.4px var(--mono);padding:1px 7px;border-radius:999px;border:1px solid #2c3c5c;color:#9fd6b8;white-space:nowrap}
 .delta.neg{color:#ffb0b0}
-/* ===== Recommendation card ===== */
+/* ===== 推荐结论卡 ===== */
 .recWrap{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(280px,.85fr);gap:16px;align-items:start}
 @media(max-width:1080px){.recWrap{grid-template-columns:1fr}}
 .recHead{font-size:19px;font-weight:650;line-height:1.5;color:#fff;margin:2px 0 10px}
@@ -139,7 +139,7 @@ input[type=range]{width:100%;accent-color:var(--sun);height:20px;cursor:pointer}
 .badge.bad{color:#ffb0b0;border-color:#7c3540;background:#261216}
 .recActions{display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap}
 .recDiag{background:#0b1322;border:1px solid var(--line);border-radius:12px;padding:8px;min-width:0}
-/* ===== Scheme comparison ===== */
+/* ===== 方案对比表 ===== */
 .schemeTable{width:100%;border-collapse:collapse;font-size:12.2px}
 .schemeTable th{font-weight:600;color:var(--dim2);text-align:left;padding:5px 6px;border-bottom:1px solid var(--line);white-space:nowrap;font-size:11px;letter-spacing:.03em}
 .schemeTable td{padding:7px 6px;border-bottom:1px solid #16213a;color:#c8d4ec;font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -154,12 +154,12 @@ input[type=range]{width:100%;accent-color:var(--sun);height:20px;cursor:pointer}
 .schemeTable .ok{color:#8fe3bb}
 .schemeTable .warn{color:#ffd08a}
 .schemeTable .bad{color:#ff9c9c}
-/* ===== Section divider ===== */
+/* ===== 分区标题 ===== */
 .secDiv{display:flex;align-items:center;gap:12px;color:#8a98bb;font-size:12.6px;letter-spacing:.05em;margin:6px 2px -2px}
 .secDiv span{color:var(--dim2);font-size:11.5px;letter-spacing:0}
 .secDiv::before,.secDiv::after{content:"";height:1px;background:linear-gradient(90deg,rgba(90,167,255,.35),rgba(90,167,255,.06));flex:1}
 .secDiv::before{max-width:26px}
-/* ===== Not-ready (empty state) ===== */
+/* ===== 未就绪（空状态） ===== */
 main.notready > .card:not(.emptycard), main.notready > .row2, main.notready > .secDiv{display:none}
 main:not(.notready) .emptycard{display:none}
 .stepsList{margin:0;padding:0;list-style:none}
@@ -192,7 +192,14 @@ pre{background:#0a1120;border:1px solid var(--line);border-radius:10px;padding:1
   .tiles{grid-template-columns:repeat(2,1fr)}
   .mthGrid{grid-template-columns:repeat(6,1fr)}
 }
+/* ===== 语言切换按钮 ===== */
+.langSeg{position:fixed;top:14px;right:16px;z-index:9995;display:flex;align-items:center;gap:2px;background:rgba(13,21,38,.92);border:1px solid #2c3c5c;border-radius:999px;padding:3px;backdrop-filter:blur(6px);box-shadow:0 4px 18px rgba(0,0,0,.35)}
+.langSeg button{border:0;background:transparent;color:#93a2c4;font-size:12.5px;font-weight:600;font-family:inherit;line-height:1;padding:6px 12px;border-radius:999px;cursor:pointer;transition:color .15s ease,background .15s ease}
+.langSeg button:hover{color:#dbe6ff}
+.langSeg button.on{background:linear-gradient(135deg,#ff8a3c,#ffd98a);color:#1a1206}
+@media(min-width:900px){.hdrPills{margin-right:112px}}
 </style>
+<script>try{if(localStorage.getItem('quiltLang')==='en'){document.documentElement.classList.add('i18n-boot');}}catch(e){}</script><style>html.i18n-boot body{visibility:hidden!important}</style>
 </head>
 <body>
 <div class="page">
@@ -210,131 +217,131 @@ pre{background:#0a1120;border:1px solid var(--line);border-radius:10px;padding:1
       </svg>
     </div>
     <div>
-      <h1>Quilt Sun-Drying Simulator</h1>
-      <p class="sub">Enter your location, line orientation and quilt geometry — simulate the sun's path and quantify "sunlit area × time".</p>
+      <h1>晒被光照模拟器</h1>
+      <p class="sub">输入位置、晾绳方向与被子几何，模拟太阳轨迹，量化“受光面积 × 时间”的晒被效果。</p>
     </div>
     <div class="hdrPills">
-      <span class="pill">Sun position: Spencer / NOAA formulas</span>
-      <span class="pill">Light model: silhouette × incidence cosine</span>
-      <span class="pill">Integral unit: m²·h</span>
-      <span class="pill">Fully local · offline</span>
+      <span class="pill">太阳位置：Spencer / NOAA 简化式</span>
+      <span class="pill">受光模型：剪影 × 入射余弦</span>
+      <span class="pill">积分单位：m²·h</span>
+      <span class="pill">全部本地计算</span>
     </div>
   </header>
 
   <div class="grid">
 
-    <!-- ======================= Console ======================= -->
+    <!-- ======================= 控制台 ======================= -->
     <aside class="side">
 
       <section class="card">
-        <h2>Location &amp; date <span class="h2n">01</span></h2>
+        <h2>位置与日期 <span class="h2n">01</span></h2>
         <div class="fld">
-          <label>Latitude</label>
-          <div class="inb"><input type="text" id="lat" value="" placeholder="39°54′15″ or 39.904"><span class="unit">N / S</span></div>
+          <label>纬度</label>
+          <div class="inb"><input type="text" id="lat" value="" placeholder="39°54′15″ 或 39.904"><span class="unit">北/南纬</span></div>
         </div>
         <div class="remark" id="latShow"></div>
         <div class="fld">
-          <label>Longitude</label>
-          <div class="inb"><input type="text" id="lon" value="" placeholder="116°24′27″ or 116.407"><span class="unit">E / W</span></div>
+          <label>经度</label>
+          <div class="inb"><input type="text" id="lon" value="" placeholder="116°24′27″ 或 116.407"><span class="unit">东/西经</span></div>
         </div>
         <div class="remark" id="lonShow"></div>
         <div class="fld">
-          <label>Altitude</label>
-          <div class="inb"><input type="number" id="alt" value="" step="0.1" placeholder="optional"><span class="unit">m</span></div>
+          <label>海拔</label>
+          <div class="inb"><input type="number" id="alt" value="" step="0.1" placeholder="可不填"><span class="unit">米</span></div>
         </div>
         <div class="remark" id="altShow"></div>
         <div class="fld">
-          <label>Time zone</label>
+          <label>时区</label>
           <div class="inb"><input type="number" id="tz" value="8" step="0.5" min="-12" max="14"><span class="unit">UTC</span></div>
         </div>
         <div class="fld">
-          <label>Date</label>
+          <label>日期</label>
           <div class="inb"><input type="date" id="dateInput"></div>
         </div>
         <div class="fld">
-          <label>Day of year</label>
-          <div class="inb"><input type="range" id="daySlider" min="1" max="365" value="284"><span class="unit" id="dayNo">284 d</span></div>
+          <label>一年中第</label>
+          <div class="inb"><input type="range" id="daySlider" min="1" max="365" value="284"><span class="unit" id="dayNo">284 天</span></div>
         </div>
         <div class="chips">
-          <button id="btnExample">Load demo (Beijing)</button>
-          <button id="btnGeo">Use my location</button>
-          <button id="btnToday">Back to today</button>
+          <button id="btnExample">填入演示示例（北京）</button>
+          <button id="btnGeo">一键获取本机位置</button>
+          <button id="btnToday">回到今天</button>
         </div>
       </section>
 
       <section class="card">
-        <h2>Line direction (compass) <span class="h2n">02</span></h2>
+        <h2>晾绳方向（罗盘读数） <span class="h2n">02</span></h2>
         <div class="compassBox" id="compassBox"></div>
         <div class="fld">
-          <label>Line azimuth</label>
-          <div class="inb"><input type="number" id="ropeAz" value="" min="0" max="360" step="1" placeholder="e.g. 0 or 90"><span class="unit">0–360°, cw from north</span></div>
+          <label>绳向方位角</label>
+          <div class="inb"><input type="number" id="ropeAz" value="" min="0" max="360" step="1" placeholder="如 0 或 90"><span class="unit">0–360°，正北顺时针</span></div>
         </div>
         <div class="fld" style="grid-template-columns:92px minmax(0,1fr)">
-          <label>Edge along line</label>
+          <label>沿绳边</label>
           <div class="seg" id="edgeSeg">
-            <button data-edge="auto" class="on">Auto (decided)</button>
-            <button data-edge="long">Force long</button>
-            <button data-edge="short">Force short</button>
+            <button data-edge="auto" class="on">由工具决定</button>
+            <button data-edge="long">固定长边</button>
+            <button data-edge="short">固定宽边</button>
           </div>
         </div>
         <div class="note" id="edgeNote"></div>
-        <div class="remark" style="margin-top:6px">How to measure: hold the phone compass flat and sight along the line toward the far end. The reading is just the rope's orientation — it cannot tell the long edge from the short edge. Which quilt edge goes on the line, and where to fold, are decisions the tool computes from the day's sun and your line conditions (see the conclusion at top right). Phone compasses read magnetic north, which may differ from true north by a few degrees (e.g. about 7° west in Beijing); the orientation verdict is deliberately insensitive to that much error.</div>
+        <div class="remark" style="margin-top:6px">测量方法：手机指南针平放，沿晾绳方向指向远处读数即可。读到的只是“绳的走向”，它不分辨长边宽边；至于被子哪条边搭在绳上、折点放在哪里，交给工具按当天太阳与你的晾绳条件计算推荐（见右上结论）。注意手机指南针为磁北方向，与真北可能相差数度（例如北京约西偏 7°），朝向判定对这个小量级误差不敏感。</div>
       </section>
 
       <section class="card">
-        <h2>Quilt &amp; folding <span class="h2n">03</span></h2>
+        <h2>被子与折叠 <span class="h2n">03</span></h2>
         <div class="fld">
-          <label>Length</label>
-          <div class="inb"><input type="number" id="qL" value="2.0" step="0.05" min="0.5"><span class="unit">m</span></div>
+          <label>长度</label>
+          <div class="inb"><input type="number" id="qL" value="2.0" step="0.05" min="0.5"><span class="unit">米</span></div>
         </div>
         <div class="fld">
-          <label>Width</label>
-          <div class="inb"><input type="number" id="qW" value="1.5" step="0.05" min="0.5"><span class="unit">m</span></div>
+          <label>宽度</label>
+          <div class="inb"><input type="number" id="qW" value="1.5" step="0.05" min="0.5"><span class="unit">米</span></div>
         </div>
         <div class="fld">
-          <label>Folded thickness</label>
-          <div class="inb"><input type="number" id="tCm" value="6" step="0.5" min="0.5"><span class="unit">cm (stacked on the line)</span></div>
+          <label>折叠厚度</label>
+          <div class="inb"><input type="number" id="tCm" value="6" step="0.5" min="0.5"><span class="unit">厘米（压在绳上的总厚）</span></div>
         </div>
         <div class="chips">
-          <button data-l="2.0" data-w="1.5">Single 2.0×1.5</button>
-          <button data-l="2.2" data-w="1.8">Double 2.2×1.8</button>
-          <button data-l="2.4" data-w="2.2">King 2.4×2.2</button>
+          <button data-l="2.0" data-w="1.5">单人被 2.0×1.5</button>
+          <button data-l="2.2" data-w="1.8">双人被 2.2×1.8</button>
+          <button data-l="2.4" data-w="2.2">加大 2.4×2.2</button>
         </div>
         <div class="fld" style="margin-top:10px">
-          <label>Fold position</label>
+          <label>折点位置</label>
           <div class="inb"><input type="range" id="fold" min="10" max="90" value="66" step="1"><span class="unit" id="foldVal">66 / 34</span></div>
         </div>
         <div class="foldScale" id="foldScale"></div>
         <div class="chips">
-          <button id="btnFollowRec">Use recommended fold</button>
-          <button data-f="33">Fold at 1/3</button>
-          <button data-f="50">Fold at 1/2</button>
-          <button data-f="67">Fold at 2/3</button>
-          <button data-f="70">About 7:3</button>
+          <button id="btnFollowRec">跟随推荐折点</button>
+          <button data-f="33">折在 1/3</button>
+          <button data-f="50">居中折 1/2</button>
+          <button data-f="67">折在 2/3</button>
+          <button data-f="70">约 7:3</button>
         </div>
-        <div class="kv"><span>Both-side drop</span><b id="hangTxt">-- / --</b></div>
-        <div class="note" id="foldNote">The fold point splits the two layers across the line (measured along the edge perpendicular to it). Ticks mark the friction and ground-clearance limits and the recommended spot. The recommended fold usually sits right at the friction-safety limit (about 66% with the defaults); it does not depend on location or date — the sun only decides which side the longer layer faces; it moves only when you change the friction or the line height.</div>
+        <div class="kv"><span>两侧下垂</span><b id="hangTxt">-- / --</b></div>
+        <div class="note" id="foldNote">折点决定两层在绳两侧的长度分配（按与绳垂直的那条边计算），虚线刻度会标出摩擦与拖地限制以及推荐位置。推荐折点一般紧贴摩擦安全上限（默认约 66%），不随地点、日期变化——太阳只决定「较长一侧朝哪边」；改变摩擦或绳高才会移动折点。</div>
       </section>
 
       <section class="card">
-        <h2>Line conditions <span class="h2n">04</span></h2>
+        <h2>晾绳条件 <span class="h2n">04</span></h2>
         <div class="fld">
-          <label>Line length</label>
-          <div class="inb"><input type="number" id="ropeLen" value="3.2" step="0.1" min="0.5"><span class="unit">m (between posts)</span></div>
+          <label>可用绳长</label>
+          <div class="inb"><input type="number" id="ropeLen" value="3.2" step="0.1" min="0.5"><span class="unit">米（两柱之间）</span></div>
         </div>
         <div class="fld">
-          <label>Line height</label>
-          <div class="inb"><input type="number" id="ropeH" value="1.8" step="0.05" min="0.5"><span class="unit">m (above ground)</span></div>
+          <label>绳高</label>
+          <div class="inb"><input type="number" id="ropeH" value="1.8" step="0.05" min="0.5"><span class="unit">米（离地）</span></div>
         </div>
         <div class="fld">
-          <label>Friction μ</label>
-          <div class="inb"><input type="number" id="mu" value="0.30" step="0.02" min="0.05" max="1"><span class="unit">quilt/line, ~0.2–0.5</span></div>
+          <label>摩擦系数 μ</label>
+          <div class="inb"><input type="number" id="mu" value="0.30" step="0.02" min="0.05" max="1"><span class="unit">被子/绳，约 0.2–0.5</span></div>
         </div>
         <details>
-          <summary>Sky clarity (affects energy estimate)</summary>
+          <summary>天气通透度（影响能量估算）</summary>
           <div class="fld">
-            <label>Clarity kc</label>
-            <div class="inb"><input type="number" id="kc" value="0.9" step="0.05" min="0.1" max="1"><span class="unit">1.0 = clear sky</span></div>
+            <label>通透度 kc</label>
+            <div class="inb"><input type="number" id="kc" value="0.9" step="0.05" min="0.1" max="1"><span class="unit">1.0 = 理想晴空</span></div>
           </div>
         </details>
         <div class="remark" id="fricNote"></div>
@@ -342,30 +349,30 @@ pre{background:#0a1120;border:1px solid var(--line);border-radius:10px;padding:1
 
     </aside>
 
-    <!-- ======================= Main ======================= -->
+    <!-- ======================= 主区 ======================= -->
     <main class="main">
 
       <section class="card emptycard" id="emptyCard">
-        <h2>Getting started · 3 steps <span class="h2n">no personal data pre-filled</span></h2>
+        <h2>开始使用 · 三步 <span class="h2n">本站不预填个人数据</span></h2>
         <div id="emptySteps"></div>
         <div class="recActions" style="margin-top:14px">
-          <button class="btn pri" id="btnGeo2">Use my location</button>
-          <button class="btn" id="btnExample2">Load demo (Beijing)</button>
+          <button class="btn pri" id="btnGeo2">一键获取本机位置</button>
+          <button class="btn" id="btnExample2">填入演示示例（北京）</button>
         </div>
         <div class="note" id="emptyMissing" style="margin-top:12px"></div>
-        <div class="remark" style="margin-top:8px">You can also type everything by hand: latitude / longitude accept DMS (39°54′15″ / 116°24′27″) or decimal (39.904 / 116.407) formats; for azimuth, hold the phone compass flat and sight along the line (magnetic north is fine — a few degrees of error will not change the verdict). The demo uses Beijing coordinates and a north–south line — just to try the flow; for real use, replace the azimuth with your own reading. Quilt and line parameters come with common defaults and can be edited on the left at any time.</div>
+        <div class="remark" style="margin-top:8px">位置与绳向也可直接手填：纬度和经度支持度分秒（如 39°54′15″ 与 116°24′27″）或小数（39.904 与 116.407）；绳向用手机指南针平放、沿晾绳指向远处读数（读的是磁北方向，偏差几度不影响结论）。演示示例是北京坐标 + 南北走向的晾绳，仅用于体验流程；正式使用时请把绳向换成你自己实测的数值。被子、晾绳等参数已给出常用默认值，可随时在左侧修改。</div>
       </section>
 
       <section class="card rec">
-        <h2>Recommendation <span class="h2n" id="scoreDateTag"></span></h2>
+        <h2>推荐晒法 · 结论 <span class="h2n" id="scoreDateTag"></span></h2>
         <div class="err" id="errBar"></div>
         <div class="recWrap">
           <div class="recMain">
-            <div class="recHead" id="recHead">Computing…</div>
+            <div class="recHead" id="recHead">计算中…</div>
             <ul class="recBullets" id="recBullets"></ul>
             <div class="recBadges" id="recBadges"></div>
             <div class="recActions">
-              <button class="btn pri" id="btnApplyRec">Apply recommendation</button>
+              <button class="btn pri" id="btnApplyRec">应用推荐方案</button>
               <span class="remark" id="recState"></span>
             </div>
           </div>
@@ -386,158 +393,158 @@ pre{background:#0a1120;border:1px solid var(--line);border-radius:10px;padding:1
             <text x="212" y="172" font-size="10.5" fill="#67779c" text-anchor="middle">100</text>
             <text id="gaugeNum" x="120" y="122" font-size="46" font-weight="700" fill="#e9eefb" text-anchor="middle"
                   style="font-variant-numeric:tabular-nums">--</text>
-            <text id="gaugeGrade" x="120" y="148" font-size="13" fill="#93a2c4" text-anchor="middle">Computing</text>
+            <text id="gaugeGrade" x="120" y="148" font-size="13" fill="#93a2c4" text-anchor="middle">计算中</text>
           </svg>
           <div class="tiles">
-            <div class="tile"><div class="k">Sunlit exposure G</div><div class="v" id="tG">--<small>m²·h</small></div><div class="s">area × time, cosine-weighted</div></div>
-            <div class="tile"><div class="k">Equivalent full-sun hours</div><div class="v" id="tTeq">--<small>h</small></div><div class="s">G ÷ total quilt area</div></div>
-            <div class="tile"><div class="k">Estimated absorbed energy</div><div class="v" id="tQ">--<small>MJ</small></div><div class="s">direct beam, clear sky</div></div>
-            <div class="tile"><div class="k">Effective sunlit time</div><div class="v" id="tTef">--<small>h</small></div><div class="s">accumulated where cos-incidence &gt; 0.2</div></div>
+            <div class="tile"><div class="k">有效受光量 G</div><div class="v" id="tG">--<small>m²·h</small></div><div class="s">面积×时间，含入射余弦加权</div></div>
+            <div class="tile"><div class="k">等效满照时长</div><div class="v" id="tTeq">--<small>h</small></div><div class="s">G ÷ 被面总面积</div></div>
+            <div class="tile"><div class="k">估算吸收能量</div><div class="v" id="tQ">--<small>MJ</small></div><div class="s">直射光·理想晴空</div></div>
+            <div class="tile"><div class="k">有效受光时长</div><div class="v" id="tTef">--<small>h</small></div><div class="s">入射余弦 &gt; 0.2 累计</div></div>
           </div>
         </div>
         <div class="metaChips" id="metaChips"></div>
       </section>
 
       <section class="card">
-        <h2>3D drying scene <span class="h2n">drag to rotate · drag the time cursor</span></h2>
+        <h2>晾晒示意（3D） <span class="h2n">拖动可旋转视角 · 时间游标可拖动</span></h2>
         <div id="scene"></div>
         <div class="timeRow">
-          <button class="btn pri" id="playBtn">Play the day</button>
+          <button class="btn pri" id="playBtn">播放一日</button>
           <div class="t" id="timeLabel">12:00</div>
           <div class="rangeWrap">
             <input type="range" id="timeRange" min="0" max="1439" value="720" step="1">
-            <div class="rangeEnds"><span id="riseL">Sunrise --</span><span id="setL">Sunset --</span></div>
+            <div class="rangeEnds"><span id="riseL">日出 --</span><span id="setL">日落 --</span></div>
           </div>
-          <button class="btn" id="btnNoon">Noon</button>
-          <button class="btn" id="btnNow">Now</button>
+          <button class="btn" id="btnNoon">正午</button>
+          <button class="btn" id="btnNow">此刻</button>
         </div>
         <div class="instant" id="instant"></div>
       </section>
 
       <section class="card">
-        <h2>Scheme comparison · why <span class="h2n">click a row to preview</span></h2>
+        <h2>方案对比 · 为什么这样推荐 <span class="h2n">点击任意行可预演</span></h2>
         <div id="schemeTable"></div>
       </section>
 
       <div class="row2">
         <section class="card">
-          <h2>Cross-section · will it hold <span class="h2n">forces &amp; friction</span></h2>
+          <h2>折叠剖面 · 怎么保证不掉 <span class="h2n">受力与摩擦</span></h2>
           <div id="crossDiag"></div>
         </section>
         <section class="card">
-          <h2>Plan view <span class="h2n">line · normals · sun</span></h2>
+          <h2>俯视方位图 <span class="h2n">绳 · 法线 · 太阳</span></h2>
           <div id="plan"></div>
           <div class="note" id="planNote"></div>
         </section>
       </div>
 
-      <div class="secDiv">Analysis · full picture &amp; evidence <span>(sun path · daily curve · full year · azimuth scan)</span></div>
+      <div class="secDiv">分析图表 · 受光全景与依据 <span>（太阳轨迹 · 受光曲线 · 全年分布 · 绳向扫描）</span></div>
 
       <div class="row2">
         <section class="card">
-          <h2>Sun path (today + monthly refs) <span class="h2n">azimuth × elevation</span></h2>
+          <h2>太阳轨迹（当日 + 各月参考） <span class="h2n">方位 × 高度角</span></h2>
           <div id="polar"></div>
           <div class="legend">
-            <span><i style="border-color:#ffb454"></i>Today's path</span>
-            <span><i style="border-color:#4a6ea8"></i>Monthly 21st refs</span>
-            <span><i style="border-color:#e0b27a;border-top-width:3.5px"></i>Line orientation</span>
-            <span><i style="border-color:rgba(255,180,84,.55);border-top-style:dashed"></i>Lit half-plane</span>
+            <span><i style="border-color:#ffb454"></i>当日轨迹</span>
+            <span><i style="border-color:#4a6ea8"></i>各月 21 日参考</span>
+            <span><i style="border-color:#e0b27a;border-top-width:3.5px"></i>晾绳走向</span>
+            <span><i style="border-color:rgba(255,180,84,.55);border-top-style:dashed"></i>受光半区</span>
           </div>
         </section>
         <section class="card">
-          <h2>Daily exposure curve <span class="h2n">click / drag to move the cursor</span></h2>
+          <h2>当日受光曲线 <span class="h2n">点击/拖动图内可移动游标</span></h2>
           <div id="dayC"></div>
         </section>
       </div>
 
       <section class="card">
-        <h2>Full year (365 days) <span class="h2n" id="yearTitle"></span></h2>
+        <h2>全年 365 天 <span class="h2n" id="yearTitle"></span></h2>
         <div id="yearC"></div>
         <div class="mthGrid" id="monthChips"></div>
         <div class="note" id="yearStats" style="margin-top:10px"></div>
       </section>
 
       <section class="card">
-        <h2>Azimuth scan · if the line can turn <span class="h2n">exposure vs line orientation</span></h2>
+        <h2>绳向扫描 · 若绳能调方向 <span class="h2n">把绳转到不同走向的受光量</span></h2>
         <div id="scanC"></div>
         <div id="advice"></div>
       </section>
 
       <section class="card method">
-        <h2>Model, formulas &amp; assumptions <span class="h2n">folding decision · friction · orientation</span></h2>
+        <h2>模型、公式与假设 <span class="h2n">含折叠决策、摩擦安全与方位说明</span></h2>
         <details>
-          <summary>1. Sun position (Spencer / NOAA)</summary>
-          <pre>γ = 2π(N−1)/365                                   N = day of year
-δ = 0.006918 − 0.399912cosγ + 0.070257sinγ − 0.006758cos2γ + 0.000907sin2γ − 0.002697cos3γ + 0.00148sin3γ     (declination, rad)
-EoT = 229.18×(0.000075 + 0.001868cosγ − 0.032077sinγ − 0.014615cos2γ − 0.040849sin2γ)                         (equation of time, min)
-solar time = clock time + 4×(longitude − 15×timezone) + EoT     hour angle ω = 15°×(solar time − 12)
-s = (E, N, U): E = −cosδ·sinω,  N = sinδ·cosφ − cosδ·cosω·sinφ,  U = sinφ·sinδ + cosφ·cosδ·cosω
-elevation h = asin(U), azimuth A = atan2(E, N), clockwise from north</pre>
+          <summary>1. 太阳位置（Spencer / NOAA 简化式）</summary>
+          <pre>γ = 2π(N−1)/365                                   N = 一年中第几天
+δ = 0.006918 − 0.399912cosγ + 0.070257sinγ − 0.006758cos2γ + 0.000907sin2γ − 0.002697cos3γ + 0.00148sin3γ     （赤纬，弧度）
+EoT = 229.18×(0.000075 + 0.001868cosγ − 0.032077sinγ − 0.014615cos2γ − 0.040849sin2γ)                         （时差，分钟）
+真太阳时 = 钟表时间 + 4×(经度 − 15×时区) + EoT        时角 ω = 15°×(真太阳时 − 12)
+s = (E, N, U)：E = −cosδ·sinω,  N = sinδ·cosφ − cosδ·cosω·sinφ,  U = sinφ·sinδ + cosφ·cosδ·cosω
+高度角 h = asin(U)，方位角 A = atan2(E, N)（正北顺时针）</pre>
         </details>
         <details>
-          <summary>2. Sunrise, sunset &amp; altitude correction</summary>
-          <p>cosω₀ = (sin h₀ − sinφ·sinδ) / (cosφ·cosδ), h₀ = −(0.833° + 0.0293·√altitude). The 0.833° term is atmospheric refraction; the altitude term is the horizon dip (earlier sunrise, later sunset). Higher latitudes mean more extreme seasonal swings; if cosω₀ leaves [−1,1] you get polar day or polar night.</p>
+          <summary>2. 日出、日落与海拔修正</summary>
+          <p>cosω₀ = (sin h₀ − sinφ·sinδ) / (cosφ·cosδ)，h₀ = −(0.833° + 0.0293·√海拔)。0.833° 为大气折射修正，海拔项为地平下沉（视野更开阔，日出更早、日落更晚）。纬度越高、冬夏差异越极端；若 cosω₀ 超出 [−1,1] 则出现极昼或极夜。</p>
         </details>
         <details>
-          <summary>3. Drying geometry &amp; sunlit area</summary>
-          <p>The quilt is a rectangle L × W draped over the line with folded thickness t. The crease runs parallel to the line; the fold point splits the "edge perpendicular to the line" into f and (1−f), so the two hanging depths are f·D and (1−f)·D (D = length of the perpendicular edge).</p>
-          <p>The two layers shade each other; at any instant the sunward "silhouette" is governed by the longer layer (with an under-edge leakage approximation). The instantaneous effective sunlit area is:</p>
+          <summary>3. 晾晒几何与受光面积</summary>
+          <p>被子按矩形处理（长 L × 宽 W），折叠厚度 t 压在绳上。折痕与绳平行，折点把“与绳垂直的那条边”分成 f 与 (1−f) 两段，因此两侧下垂高度为 f·D 与 (1−f)·D（D 为与绳垂直的边长）。</p>
+          <p>两层被面互为阴影，某时刻朝向太阳的“剪影”由较长的一层决定（含下缘漏光近似），于是瞬时有效受光面积为：</p>
           <pre>A(t) = S × [ Lmax × cos h(t) × |cos(A(t) − β)| + t × sin h(t) ]
-S = length unfolded along the line (L if the long edge is on the line, W otherwise)
-Lmax = max(f, 1−f) × D        β = line azimuth ± 90° (the two layer normals)
-The first term is the projected light on the panels; the second is light on the crest over the line</pre>
+S = 沿绳展开长度（长边沿绳时为 L，宽边沿绳时为 W）
+Lmax = max(f, 1−f) × D        β = 绳向方位 ± 90°（两层被面法线）
+第一项为两面被子的投影受光，第二项为绳顶折转面的受光</pre>
         </details>
         <details open>
-          <summary>4. Fold decision (scheme search) &amp; safety constraints</summary>
-          <p>The tool treats the along-line edge and the fold fraction as decision variables and searches all combinations for the highest daily exposure:</p>
-          <pre>scheme = (edge along line ∈ {long, short}) × (fold = big-side fraction f ∈ [0.5, 0.9])
-exposure G(scheme) = S × [ f × D × Icos + t × Isin ]      (S and D follow the chosen edge)
-constraint 1 · friction: f/(1−f) ≤ κ/1.3     (κ=e^(μπ), 1.3 = safety factor)
-constraint 2 · clearance: f × D ≤ line height − 0.06 m (lowest point at least 6 cm above ground)
-constraint 3 · line length: S + 0.2 m ≤ available line (tying margin included)
-Among all constraint-satisfying schemes, the largest G is recommended</pre>
-          <p><b>A notable property</b>: at the same fold fraction, "long edge on the line" and "short edge on the line" collect almost the same total light (both equal fold fraction × quilt area); only the crest length differs. The real differences are the line length required and the hanging-depth limit. With a long line and a low line height the long edge usually wins (the shallower drop allows a more asymmetric fold); with a short line, hang the short edge.</p>
-          <p><b>Why is the recommended fold almost always 66:34?</b> The sunlit area is proportional to the longer layer's drop length (with the two layers mutually shadowing, the silhouette decides), so more asymmetry always means more light — the optimum therefore sits at the maximum the constraints allow: with the defaults (μ=0.30 plus a 1.3× safety margin) that is the friction limit of 66.4%. It does not change with location, date or line direction — the sun only decides which side the longer layer faces, and the value of G. It moves only if you change the friction μ, or lower the line height until the ground-clearance constraint binds first.</p>
-          <p><b>Orientation verdict (morning / afternoon)</b>: for a north–south line the two sides are theoretically exactly symmetric (0.0 min apart when due N–S); for an east–west line the gap is huge (hours). Rule: if the two lit integrals differ by less than 0.6 h (the scale of compass error and magnetic declination), the sides are declared "equivalent" and no orientation is forced; 0.6–1.5 h is reported as "slightly better"; only larger gaps get a firm verdict. Phone compasses read magnetic north, which may differ from true north by a few degrees — this rule is deliberately desensitized to that.</p>
+          <summary>4. 折叠决策（方案寻优）与安全约束</summary>
+          <p>工具把「沿绳边」与「折点分数」当作决策变量，在全部组合中搜索当日受光量最大的方案：</p>
+          <pre>方案 = （沿绳边 ∈ {长边, 宽边}）×（折点 = 较长一侧占比 f ∈ [0.5, 0.9]）
+受光量 G(方案) = S × [ f × D × Icos + t × Isin ]      （S、D 随沿绳边切换）
+约束① 摩擦：f/(1−f) ≤ κ/1.3     （κ=e^(μπ)，1.3 为安全系数，留余量）
+约束② 离地：f × D ≤ 绳高 − 0.06 m（最低点离地不少于 6 cm）
+约束③ 绳长：S + 0.2 m ≤ 可用绳长（含打结余量）
+在满足全部约束的方案中取 G 最大者作为推荐</pre>
+          <p><b>一个值得注意的性质</b>：在相同折点下，「长边搭绳」与「宽边搭绳」的两层受光总量几乎相同（因为 S × f × D 都等于 折点比例 × 被面积），差别只在顶部折转面的长度；两者真正的区别在于所需绳长与下垂深度限制。绳长足够、绳高较低时，长边搭绳往往更优（同样折点下垂更浅，允许更大的不对称度）；绳偏短时应选择宽边搭绳。</p>
+          <p><b>为什么推荐折点几乎总是 66:34？</b>受光面积正比于「较长一层」的下垂长度（两层互遮后由剪影决定），折得越不对称受光越多，所以最优折点总是顶在约束允许的最大值上——默认 μ=0.30、留 1.3× 安全余量时即为摩擦安全上限 66.4%。它不随地点、日期、绳向变化（太阳条件只决定「较长一侧朝哪边」和 G 的数值）；改变摩擦系数 μ、或把绳高降到离地约束先起作用的程度，推荐折点才会移动。</p>
+          <p><b>朝向判定（上午/下午）</b>：南北走向的晾绳，两侧受光在理论上完全对称（正南北时相差 0.0 分钟）；东西走向则差异极大（动辄数小时）。判定规则：两侧受光积分差小于 0.6 h（约合手机指南针误差与磁偏角的影响量级）时视为「两侧相当」，不给出强制朝向；0.6–1.5 h 之间按「略优」提示；更大差异才给明确结论。手机指南针读的是磁北，与真北可能相差数度，本规则对此已做钝化处理。</p>
         </details>
         <details>
-          <summary>5. Exposure score (area × time)</summary>
-          <p><b>G = ∫ A(t) dt</b>(sunrise to sunset, unit m²·h) accumulates "how much area is sunlit at each moment" over time — the total sunlit area-time. The on-screen score = current G ÷ the best G* reachable that day by turning the line × 100.</p>
-          <p>Note: the score uses geometric exposure (cosine-weighted area × time); the energy estimate (MJ) additionally weights beam power and low-sun atmospheric attenuation — same trend, different magnitudes.</p>
+          <summary>5. 光照分数（面积 × 时间）</summary>
+          <p><b>G = ∫ A(t) dt</b>（日出到日落，单位 m²·h）。它把“某一刻被照到多大面积”沿时间累加，即“总受光照面积时间”。界面上的分数 = 当前方案 G ÷ 当日通过改变绳向所能达到的最优 G* × 100。</p>
+          <p>注意：分数按几何受光量（面积×时间的余弦加权）计算；能量估算（MJ）另行加权了直射光功率与低角度大气衰减，两者趋势一致但数值差异不同。</p>
         </details>
         <details>
-          <summary>6. Uniform-mass assumption &amp; "will it slip"</summary>
-          <p>The quilt is treated as uniform in mass: the weight ratio across the crease is f : (1−f). The fabric wraps the line over about π radians; under the capstan friction model the no-slip condition is:</p>
-          <pre>T₁/T₂ ≤ e^(μ·π)   →   f/(1−f) ≤ κ, κ = e^(μ·π)   →   fold limit f ≤ κ/(1+κ)</pre>
-          <p>At the default μ = 0.30 the theoretical limit is about 72:28; the recommended fold keeps a 1.3× safety margin (about 66:34). In practice, wrap anti-slip tape at the crease or add clothespins to further reduce slipping.</p>
+          <summary>6. 质量均匀假设与“会不会滑落”</summary>
+          <p>被子视为质量均匀分布：折点两侧重量比为 f : (1−f)。布面绕过晾绳的接触弧约 π，按卡普斯坦（capstan）摩擦模型，不滑落条件为：</p>
+          <pre>T₁/T₂ ≤ e^(μ·π)   →   f/(1−f) ≤ κ，κ = e^(μ·π)   →   折点上限 f ≤ κ/(1+κ)</pre>
+          <p>默认 μ = 0.30 时理论极限约 72:28；推荐折点另留 1.3× 安全余量（约 66:34）。实际使用中可在折痕压绳处缠防滑胶带或用晒衣夹，进一步降低滑落风险。</p>
         </details>
         <details>
-          <summary>7. Energy estimate (air mass &amp; beam intensity)</summary>
-          <pre>AM = 1 / [cos z + 0.50572·(96.07995 − z)^(−1.6364)] × (P/P₀), z = zenith angle
-P/P₀ = (1 − 2.25577×10⁻⁵ × altitude)^5.25588
-DNI = 1353 × 0.7^(AM^0.678) × kc      (W/m², kc = sky clarity)
-Q = ∫ DNI(t) × A(t) dt                (energy, assuming full absorption)</pre>
+          <summary>7. 能量估算（大气质量与直射强度）</summary>
+          <pre>AM = 1 / [cos z + 0.50572·(96.07995 − z)^(−1.6364)] × (P/P₀)，z = 天顶角
+P/P₀ = (1 − 2.25577×10⁻⁵ × 海拔)^5.25588
+DNI = 1353 × 0.7^(AM^0.678) × kc      （W/m²，kc 为天气通透度）
+Q = ∫ DNI(t) × A(t) dt                （焦耳级能量，按完全吸收估算）</pre>
         </details>
         <details>
-          <summary>8. Location, altitude &amp; compass reading</summary>
-          <p><b>Latitude, longitude and altitude</b> describe the drying site and determine the sun's path (elevation, azimuth, sunrise/sunset, atmospheric attenuation). They have nothing to do with the quilt's long or short edge.</p>
-          <p><b>The compass reading</b> (e.g. 90°) only describes the rope's orientation. Which quilt edge lies along the line and where to fold are "how to dry" decisions this tool computes (top conclusion); you can also pin an edge in the sidebar for comparison. Hold the phone level, sight along the line and read; pointing the opposite way gives a reading 180° apart, which is equivalent.</p>
+          <summary>8. 关于经纬度、海拔与罗盘方位读数</summary>
+          <p><b>经纬度与海拔</b>描述晾晒地点，决定太阳的轨迹（高度角、方位角、日出日落时刻、大气衰减），与被子的长边、宽边无关。</p>
+          <p><b>罗盘方位读数</b>（如 90°）描述的只是晾绳的走向。被子哪条边与绳平行、折点放在哪里，是“怎么晒”的决策，由本工具计算推荐（首屏结论），你也可以在侧栏固定某条边做对比。测量时手机水平、沿绳方向指向远端读取即可；指向相反方向读数相差 180°，等效。</p>
         </details>
         <details>
-          <summary>9. Assumptions &amp; limitations</summary>
+          <summary>9. 假设与局限</summary>
           <ul>
-            <li>Direct sunlight only. Diffuse sky light, ground reflection, clouds, humidity and wind are not modeled — they strongly affect real drying speed on overcast and cold days.</li>
-            <li>The quilt is idealized as rigid flat panels, ignoring bulging, draping curvature and layer contact; mutual shading uses a silhouette approximation with under-edge leakage.</li>
-            <li>No buildings, trees or railings; assumed open ground with no reflection.</li>
-            <li>Energy assumes full absorption (no fabric reflectance) — magnitude reference only.</li>
-            <li>The friction model is an idealized uniform-contact capstan approximation; real rope and fabric vary, and wind load is not included.</li>
-            <li>Results compare drying methods, windows and seasons — they are not a measured drying time.</li>
+            <li>只统计太阳直射光。天空漫射光、地面反射、云层动态、湿度与风速未纳入，这些在阴天与低温环境下会显著影响实际干燥速度。</li>
+            <li>被子被理想化为“刚性平面悬挂”，忽略织物的鼓包、下垂弧度与层间贴合变化；两层互遮按剪影（含下缘漏光）几何近似。</li>
+            <li>无建筑、树木、阳台栏杆等遮挡；假定空旷且地面无反射。</li>
+            <li>能量按完全吸收估算（未扣面料反射率），属量级参考。</li>
+            <li>摩擦模型为均匀接触的理想化 capstan 近似，实际绳材与被套材质差异较大；风载未计入。</li>
+            <li>结论适合比较不同晒法、时段与季节的相对优劣，不等同于实测干燥时间。</li>
           </ul>
         </details>
       </section>
 
       <footer class="foot">
-        Quilt Sun-Drying Simulator · single file, fully local, no external dependencies · for relative comparison and magnitude only, not a measurement guarantee.
+        晒被光照模拟器 · 单文件本地运行，无外部依赖 · 模型用于相对比较与量级参考，不构成实测承诺。
       </footer>
 
     </main>
@@ -545,7 +552,113 @@ Q = ∫ DNI(t) × A(t) dt                (energy, assuming full absorption)</pre
 </div>
 <div class="tip" id="tip"></div>
 
+<div class="langSeg" id="langSeg" role="group" aria-label="Language / 语言">
+  <button type="button" data-lang="zh" class="on">中文</button>
+  <button type="button" data-lang="en">English</button>
+</div>
+
 <script>
+const __I18N_DATA=[["\u003Ctitle>晒被光照模拟器 · Quilt Sun Lab\u003C/title>","\u003Ctitle>Quilt Sun-Drying Simulator · Solar Geometry Lab\u003C/title>"],["/* ===== 推荐结论卡 ===== */","/* ===== Recommendation card ===== */"],["/* ===== 方案对比表 ===== */","/* ===== Scheme comparison ===== */"],["/* ===== 分区标题 ===== */","/* ===== Section divider ===== */"],["/* ===== 未就绪（空状态） ===== */","/* ===== Not-ready (empty state) ===== */"],["\u003Ch1>晒被光照模拟器\u003C/h1>","\u003Ch1>Quilt Sun-Drying Simulator\u003C/h1>"],["输入位置、晾绳方向与被子几何，模拟太阳轨迹，量化“受光面积 × 时间”的晒被效果。","Enter your location, line orientation and quilt geometry — simulate the sun's path and quantify \"sunlit area × time\"."],["太阳位置：Spencer / NOAA 简化式","Sun position: Spencer / NOAA formulas"],["受光模型：剪影 × 入射余弦","Light model: silhouette × incidence cosine"],["积分单位：m²·h","Integral unit: m²·h"],["全部本地计算","Fully local · offline"],["位置与日期 \u003Cspan class=\"h2n\">01\u003C/span>","Location &amp; date \u003Cspan class=\"h2n\">01\u003C/span>"],["\u003Clabel>纬度\u003C/label>","\u003Clabel>Latitude\u003C/label>"],["placeholder=\"39°54′15″ 或 39.904\"","placeholder=\"39°54′15″ or 39.904\""],["\u003Cspan class=\"unit\">北/南纬\u003C/span>","\u003Cspan class=\"unit\">N / S\u003C/span>"],["\u003Clabel>经度\u003C/label>","\u003Clabel>Longitude\u003C/label>"],["placeholder=\"116°24′27″ 或 116.407\"","placeholder=\"116°24′27″ or 116.407\""],["\u003Cspan class=\"unit\">东/西经\u003C/span>","\u003Cspan class=\"unit\">E / W\u003C/span>"],["\u003Clabel>海拔\u003C/label>","\u003Clabel>Altitude\u003C/label>"],["placeholder=\"可不填\"","placeholder=\"optional\""],["\u003Clabel>时区\u003C/label>","\u003Clabel>Time zone\u003C/label>"],["\u003Clabel>日期\u003C/label>","\u003Clabel>Date\u003C/label>"],["\u003Clabel>一年中第\u003C/label>","\u003Clabel>Day of year\u003C/label>"],[">284 天\u003C",">284 d\u003C"],["填入演示示例（北京）","Load demo (Beijing)"],["一键获取本机位置","Use my location"],["回到今天","Back to today"],["晾绳方向（罗盘读数） \u003Cspan class=\"h2n\">02\u003C/span>","Line direction (compass) \u003Cspan class=\"h2n\">02\u003C/span>"],["\u003Clabel>绳向方位角\u003C/label>","\u003Clabel>Line azimuth\u003C/label>"],["placeholder=\"如 0 或 90\"","placeholder=\"e.g. 0 or 90\""],["\u003Cspan class=\"unit\">0–360°，正北顺时针\u003C/span>","\u003Cspan class=\"unit\">0–360°, cw from north\u003C/span>"],["\u003Clabel>沿绳边\u003C/label>","\u003Clabel>Edge along line\u003C/label>"],[">由工具决定\u003C",">Auto (decided)\u003C"],[">固定长边\u003C",">Force long\u003C"],[">固定宽边\u003C",">Force short\u003C"],["测量方法：手机指南针平放，沿晾绳方向指向远处读数即可。读到的只是“绳的走向”，它不分辨长边宽边；至于被子哪条边搭在绳上、折点放在哪里，交给工具按当天太阳与你的晾绳条件计算推荐（见右上结论）。注意手机指南针为磁北方向，与真北可能相差数度（例如北京约西偏 7°），朝向判定对这个小量级误差不敏感。","How to measure: hold the phone compass flat and sight along the line toward the far end. The reading is just the rope's orientation — it cannot tell the long edge from the short edge. Which quilt edge goes on the line, and where to fold, are decisions the tool computes from the day's sun and your line conditions (see the conclusion at top right). Phone compasses read magnetic north, which may differ from true north by a few degrees (e.g. about 7° west in Beijing); the orientation verdict is deliberately insensitive to that much error."],["被子与折叠 \u003Cspan class=\"h2n\">03\u003C/span>","Quilt &amp; folding \u003Cspan class=\"h2n\">03\u003C/span>"],["\u003Clabel>长度\u003C/label>","\u003Clabel>Length\u003C/label>"],["\u003Clabel>宽度\u003C/label>","\u003Clabel>Width\u003C/label>"],["\u003Clabel>折叠厚度\u003C/label>","\u003Clabel>Folded thickness\u003C/label>"],["\u003Cspan class=\"unit\">厘米（压在绳上的总厚）\u003C/span>","\u003Cspan class=\"unit\">cm (stacked on the line)\u003C/span>"],["单人被 2.0×1.5","Single 2.0×1.5"],["双人被 2.2×1.8","Double 2.2×1.8"],["加大 2.4×2.2","King 2.4×2.2"],["\u003Clabel>折点位置\u003C/label>","\u003Clabel>Fold position\u003C/label>"],["跟随推荐折点","Use recommended fold"],["折在 1/3","Fold at 1/3"],["居中折 1/2","Fold at 1/2"],["折在 2/3","Fold at 2/3"],["约 7:3","About 7:3"],["\u003Cspan>两侧下垂\u003C/span>","\u003Cspan>Both-side drop\u003C/span>"],["折点决定两层在绳两侧的长度分配（按与绳垂直的那条边计算），虚线刻度会标出摩擦与拖地限制以及推荐位置。推荐折点一般紧贴摩擦安全上限（默认约 66%），不随地点、日期变化——太阳只决定「较长一侧朝哪边」；改变摩擦或绳高才会移动折点。","The fold point splits the two layers across the line (measured along the edge perpendicular to it). Ticks mark the friction and ground-clearance limits and the recommended spot. The recommended fold usually sits right at the friction-safety limit (about 66% with the defaults); it does not depend on location or date — the sun only decides which side the longer layer faces; it moves only when you change the friction or the line height."],["晾绳条件 \u003Cspan class=\"h2n\">04\u003C/span>","Line conditions \u003Cspan class=\"h2n\">04\u003C/span>"],["\u003Clabel>可用绳长\u003C/label>","\u003Clabel>Line length\u003C/label>"],["\u003Cspan class=\"unit\">米（两柱之间）\u003C/span>","\u003Cspan class=\"unit\">m (between posts)\u003C/span>"],["\u003Clabel>绳高\u003C/label>","\u003Clabel>Line height\u003C/label>"],["\u003Cspan class=\"unit\">米（离地）\u003C/span>","\u003Cspan class=\"unit\">m (above ground)\u003C/span>"],["\u003Clabel>摩擦系数 μ\u003C/label>","\u003Clabel>Friction μ\u003C/label>"],["\u003Cspan class=\"unit\">被子/绳，约 0.2–0.5\u003C/span>","\u003Cspan class=\"unit\">quilt/line, ~0.2–0.5\u003C/span>"],["\u003Csummary>天气通透度（影响能量估算）\u003C/summary>","\u003Csummary>Sky clarity (affects energy estimate)\u003C/summary>"],["\u003Clabel>通透度 kc\u003C/label>","\u003Clabel>Clarity kc\u003C/label>"],["\u003Cspan class=\"unit\">1.0 = 理想晴空\u003C/span>","\u003Cspan class=\"unit\">1.0 = clear sky\u003C/span>"],["开始使用 · 三步 \u003Cspan class=\"h2n\">本站不预填个人数据\u003C/span>","Getting started · 3 steps \u003Cspan class=\"h2n\">no personal data pre-filled\u003C/span>"],["位置与绳向也可直接手填：纬度和经度支持度分秒（如 39°54′15″ 与 116°24′27″）或小数（39.904 与 116.407）；绳向用手机指南针平放、沿晾绳指向远处读数（读的是磁北方向，偏差几度不影响结论）。演示示例是北京坐标 + 南北走向的晾绳，仅用于体验流程；正式使用时请把绳向换成你自己实测的数值。被子、晾绳等参数已给出常用默认值，可随时在左侧修改。","You can also type everything by hand: latitude / longitude accept DMS (39°54′15″ / 116°24′27″) or decimal (39.904 / 116.407) formats; for azimuth, hold the phone compass flat and sight along the line (magnetic north is fine — a few degrees of error will not change the verdict). The demo uses Beijing coordinates and a north–south line — just to try the flow; for real use, replace the azimuth with your own reading. Quilt and line parameters come with common defaults and can be edited on the left at any time."],["推荐晒法 · 结论","Recommendation"],["计算中…","Computing…"],[">计算中\u003C",">Computing\u003C"],["应用推荐方案","Apply recommendation"],["有效受光量 G","Sunlit exposure G"],["面积×时间，含入射余弦加权","area × time, cosine-weighted"],["等效满照时长","Equivalent full-sun hours"],["G ÷ 被面总面积","G ÷ total quilt area"],["估算吸收能量","Estimated absorbed energy"],["直射光·理想晴空","direct beam, clear sky"],["有效受光时长","Effective sunlit time"],["入射余弦 &gt; 0.2 累计","accumulated where cos-incidence &gt; 0.2"],["晾晒示意（3D）","3D drying scene"],["拖动可旋转视角 · 时间游标可拖动","drag to rotate · drag the time cursor"],[">播放一日\u003C",">Play the day\u003C"],["\u003Cspan id=\"riseL\">日出 --\u003C/span>\u003Cspan id=\"setL\">日落 --\u003C/span>","\u003Cspan id=\"riseL\">Sunrise --\u003C/span>\u003Cspan id=\"setL\">Sunset --\u003C/span>"],[">正午\u003C",">Noon\u003C"],[">此刻\u003C",">Now\u003C"],["方案对比 · 为什么这样推荐","Scheme comparison · why"],["点击任意行可预演","click a row to preview"],["折叠剖面 · 怎么保证不掉","Cross-section · will it hold"],["受力与摩擦","forces &amp; friction"],["俯视方位图","Plan view"],["绳 · 法线 · 太阳","line · normals · sun"],["分析图表 · 受光全景与依据","Analysis · full picture &amp; evidence"],["（太阳轨迹 · 受光曲线 · 全年分布 · 绳向扫描）","(sun path · daily curve · full year · azimuth scan)"],["太阳轨迹（当日 + 各月参考）","Sun path (today + monthly refs)"],["方位 × 高度角","azimuth × elevation"],[">当日轨迹\u003C",">Today's path\u003C"],[">各月 21 日参考\u003C",">Monthly 21st refs\u003C"],[">晾绳走向\u003C",">Line orientation\u003C"],[">受光半区\u003C",">Lit half-plane\u003C"],["当日受光曲线","Daily exposure curve"],["点击/拖动图内可移动游标","click / drag to move the cursor"],["\u003Ch2>全年 365 天 ","\u003Ch2>Full year (365 days) "],["绳向扫描 · 若绳能调方向","Azimuth scan · if the line can turn"],["把绳转到不同走向的受光量","exposure vs line orientation"],["模型、公式与假设","Model, formulas &amp; assumptions"],["含折叠决策、摩擦安全与方位说明","folding decision · friction · orientation"],["1. 太阳位置（Spencer / NOAA 简化式）","1. Sun position (Spencer / NOAA)"],["N = 一年中第几天","N = day of year"],["（赤纬，弧度）","(declination, rad)"],["（时差，分钟）","(equation of time, min)"],["真太阳时 = 钟表时间 + 4×(经度 − 15×时区) + EoT        时角 ω = 15°×(真太阳时 − 12)","solar time = clock time + 4×(longitude − 15×timezone) + EoT     hour angle ω = 15°×(solar time − 12)"],["高度角 h = asin(U)，方位角 A = atan2(E, N)（正北顺时针）","elevation h = asin(U), azimuth A = atan2(E, N), clockwise from north"],["2. 日出、日落与海拔修正","2. Sunrise, sunset &amp; altitude correction"],["cosω₀ = (sin h₀ − sinφ·sinδ) / (cosφ·cosδ)，h₀ = −(0.833° + 0.0293·√海拔)。0.833° 为大气折射修正，海拔项为地平下沉（视野更开阔，日出更早、日落更晚）。纬度越高、冬夏差异越极端；若 cosω₀ 超出 [−1,1] 则出现极昼或极夜。","cosω₀ = (sin h₀ − sinφ·sinδ) / (cosφ·cosδ), h₀ = −(0.833° + 0.0293·√altitude). The 0.833° term is atmospheric refraction; the altitude term is the horizon dip (earlier sunrise, later sunset). Higher latitudes mean more extreme seasonal swings; if cosω₀ leaves [−1,1] you get polar day or polar night."],["3. 晾晒几何与受光面积","3. Drying geometry &amp; sunlit area"],["被子按矩形处理（长 L × 宽 W），折叠厚度 t 压在绳上。折痕与绳平行，折点把“与绳垂直的那条边”分成 f 与 (1−f) 两段，因此两侧下垂高度为 f·D 与 (1−f)·D（D 为与绳垂直的边长）。","The quilt is a rectangle L × W draped over the line with folded thickness t. The crease runs parallel to the line; the fold point splits the \"edge perpendicular to the line\" into f and (1−f), so the two hanging depths are f·D and (1−f)·D (D = length of the perpendicular edge)."],["两层被面互为阴影，某时刻朝向太阳的“剪影”由较长的一层决定（含下缘漏光近似），于是瞬时有效受光面积为：","The two layers shade each other; at any instant the sunward \"silhouette\" is governed by the longer layer (with an under-edge leakage approximation). The instantaneous effective sunlit area is:"],["S = 沿绳展开长度（长边沿绳时为 L，宽边沿绳时为 W）","S = length unfolded along the line (L if the long edge is on the line, W otherwise)"],["Lmax = max(f, 1−f) × D        β = 绳向方位 ± 90°（两层被面法线）","Lmax = max(f, 1−f) × D        β = line azimuth ± 90° (the two layer normals)"],["第一项为两面被子的投影受光，第二项为绳顶折转面的受光","The first term is the projected light on the panels; the second is light on the crest over the line"],["4. 折叠决策（方案寻优）与安全约束","4. Fold decision (scheme search) &amp; safety constraints"],["工具把「沿绳边」与「折点分数」当作决策变量，在全部组合中搜索当日受光量最大的方案：","The tool treats the along-line edge and the fold fraction as decision variables and searches all combinations for the highest daily exposure:"],["方案 = （沿绳边 ∈ {长边, 宽边}）×（折点 = 较长一侧占比 f ∈ [0.5, 0.9]）","scheme = (edge along line ∈ {long, short}) × (fold = big-side fraction f ∈ [0.5, 0.9])"],["受光量 G(方案) = S × [ f × D × Icos + t × Isin ]      （S、D 随沿绳边切换）","exposure G(scheme) = S × [ f × D × Icos + t × Isin ]      (S and D follow the chosen edge)"],["约束① 摩擦：f/(1−f) ≤ κ/1.3     （κ=e^(μπ)，1.3 为安全系数，留余量）","constraint 1 · friction: f/(1−f) ≤ κ/1.3     (κ=e^(μπ), 1.3 = safety factor)"],["约束② 离地：f × D ≤ 绳高 − 0.06 m（最低点离地不少于 6 cm）","constraint 2 · clearance: f × D ≤ line height − 0.06 m (lowest point at least 6 cm above ground)"],["约束③ 绳长：S + 0.2 m ≤ 可用绳长（含打结余量）","constraint 3 · line length: S + 0.2 m ≤ available line (tying margin included)"],["在满足全部约束的方案中取 G 最大者作为推荐","Among all constraint-satisfying schemes, the largest G is recommended"],["\u003Cb>一个值得注意的性质\u003C/b>","\u003Cb>A notable property\u003C/b>"],["：在相同折点下，「长边搭绳」与「宽边搭绳」的两层受光总量几乎相同（因为 S × f × D 都等于 折点比例 × 被面积），差别只在顶部折转面的长度；两者真正的区别在于所需绳长与下垂深度限制。绳长足够、绳高较低时，长边搭绳往往更优（同样折点下垂更浅，允许更大的不对称度）；绳偏短时应选择宽边搭绳。",": at the same fold fraction, \"long edge on the line\" and \"short edge on the line\" collect almost the same total light (both equal fold fraction × quilt area); only the crest length differs. The real differences are the line length required and the hanging-depth limit. With a long line and a low line height the long edge usually wins (the shallower drop allows a more asymmetric fold); with a short line, hang the short edge."],["\u003Cb>朝向判定（上午/下午）\u003C/b>","\u003Cb>Orientation verdict (morning / afternoon)\u003C/b>"],["：南北走向的晾绳，两侧受光在理论上完全对称（正南北时相差 0.0 分钟）；东西走向则差异极大（动辄数小时）。判定规则：两侧受光积分差小于 0.6 h（约合手机指南针误差与磁偏角的影响量级）时视为「两侧相当」，不给出强制朝向；0.6–1.5 h 之间按「略优」提示；更大差异才给明确结论。手机指南针读的是磁北，与真北可能相差数度，本规则对此已做钝化处理。",": for a north–south line the two sides are theoretically exactly symmetric (0.0 min apart when due N–S); for an east–west line the gap is huge (hours). Rule: if the two lit integrals differ by less than 0.6 h (the scale of compass error and magnetic declination), the sides are declared \"equivalent\" and no orientation is forced; 0.6–1.5 h is reported as \"slightly better\"; only larger gaps get a firm verdict. Phone compasses read magnetic north, which may differ from true north by a few degrees — this rule is deliberately desensitized to that."],["5. 光照分数（面积 × 时间）","5. Exposure score (area × time)"],["（日出到日落，单位 m²·h）。它把“某一刻被照到多大面积”沿时间累加，即“总受光照面积时间”。界面上的分数 = 当前方案 G ÷ 当日通过改变绳向所能达到的最优 G* × 100。","(sunrise to sunset, unit m²·h) accumulates \"how much area is sunlit at each moment\" over time — the total sunlit area-time. The on-screen score = current G ÷ the best G* reachable that day by turning the line × 100."],["注意：分数按几何受光量（面积×时间的余弦加权）计算；能量估算（MJ）另行加权了直射光功率与低角度大气衰减，两者趋势一致但数值差异不同。","Note: the score uses geometric exposure (cosine-weighted area × time); the energy estimate (MJ) additionally weights beam power and low-sun atmospheric attenuation — same trend, different magnitudes."],["6. 质量均匀假设与“会不会滑落”","6. Uniform-mass assumption &amp; \"will it slip\""],["被子视为质量均匀分布：折点两侧重量比为 f : (1−f)。布面绕过晾绳的接触弧约 π，按卡普斯坦（capstan）摩擦模型，不滑落条件为：","The quilt is treated as uniform in mass: the weight ratio across the crease is f : (1−f). The fabric wraps the line over about π radians; under the capstan friction model the no-slip condition is:"],["默认 μ = 0.30 时理论极限约 72:28；推荐折点另留 1.3× 安全余量（约 66:34）。实际使用中可在折痕压绳处缠防滑胶带或用晒衣夹，进一步降低滑落风险。","At the default μ = 0.30 the theoretical limit is about 72:28; the recommended fold keeps a 1.3× safety margin (about 66:34). In practice, wrap anti-slip tape at the crease or add clothespins to further reduce slipping."],["7. 能量估算（大气质量与直射强度）","7. Energy estimate (air mass &amp; beam intensity)"],["z = 天顶角","z = zenith angle"],["× 海拔)^5.25588","× altitude)^5.25588"],["（W/m²，kc 为天气通透度）","(W/m², kc = sky clarity)"],["（焦耳级能量，按完全吸收估算）","(energy, assuming full absorption)"],["8. 关于经纬度、海拔与罗盘方位读数","8. Location, altitude &amp; compass reading"],["\u003Cb>经纬度与海拔\u003C/b>描述晾晒地点","\u003Cb>Latitude, longitude and altitude\u003C/b> describe the drying site"],["，决定太阳的轨迹（高度角、方位角、日出日落时刻、大气衰减），与被子的长边、宽边无关。"," and determine the sun's path (elevation, azimuth, sunrise/sunset, atmospheric attenuation). They have nothing to do with the quilt's long or short edge."],["\u003Cb>罗盘方位读数\u003C/b>（如 90°）描述的只是晾绳的走向","\u003Cb>The compass reading\u003C/b> (e.g. 90°) only describes the rope's orientation"],["。被子哪条边与绳平行、折点放在哪里，是“怎么晒”的决策，由本工具计算推荐（首屏结论），你也可以在侧栏固定某条边做对比。测量时手机水平、沿绳方向指向远端读取即可；指向相反方向读数相差 180°，等效。",". Which quilt edge lies along the line and where to fold are \"how to dry\" decisions this tool computes (top conclusion); you can also pin an edge in the sidebar for comparison. Hold the phone level, sight along the line and read; pointing the opposite way gives a reading 180° apart, which is equivalent."],["9. 假设与局限","9. Assumptions &amp; limitations"],["\u003Cli>只统计太阳直射光。天空漫射光、地面反射、云层动态、湿度与风速未纳入，这些在阴天与低温环境下会显著影响实际干燥速度。\u003C/li>","\u003Cli>Direct sunlight only. Diffuse sky light, ground reflection, clouds, humidity and wind are not modeled — they strongly affect real drying speed on overcast and cold days.\u003C/li>"],["\u003Cli>被子被理想化为“刚性平面悬挂”，忽略织物的鼓包、下垂弧度与层间贴合变化；两层互遮按剪影（含下缘漏光）几何近似。\u003C/li>","\u003Cli>The quilt is idealized as rigid flat panels, ignoring bulging, draping curvature and layer contact; mutual shading uses a silhouette approximation with under-edge leakage.\u003C/li>"],["\u003Cli>无建筑、树木、阳台栏杆等遮挡；假定空旷且地面无反射。\u003C/li>","\u003Cli>No buildings, trees or railings; assumed open ground with no reflection.\u003C/li>"],["\u003Cli>能量按完全吸收估算（未扣面料反射率），属量级参考。\u003C/li>","\u003Cli>Energy assumes full absorption (no fabric reflectance) — magnitude reference only.\u003C/li>"],["\u003Cli>摩擦模型为均匀接触的理想化 capstan 近似，实际绳材与被套材质差异较大；风载未计入。\u003C/li>","\u003Cli>The friction model is an idealized uniform-contact capstan approximation; real rope and fabric vary, and wind load is not included.\u003C/li>"],["\u003Cli>结论适合比较不同晒法、时段与季节的相对优劣，不等同于实测干燥时间。\u003C/li>","\u003Cli>Results compare drying methods, windows and seasons — they are not a measured drying time.\u003C/li>"],["晒被光照模拟器 · 单文件本地运行，无外部依赖 · 模型用于相对比较与量级参考，不构成实测承诺。","Quilt Sun-Drying Simulator · single file, fully local, no external dependencies · for relative comparison and magnitude only, not a measurement guarantee."],["const DIR8=['北','东北','东','东南','南','西南','西','西北'];","const DIR8=['N','NE','E','SE','S','SW','W','NW'];"],["const n=['北','北北东','东北','东北东','东','东南东','东南','南南东','南','南南西','西南','西南西','西','西北西','西北','北北西'];","const n=['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];"],["(v>=0?'N 北纬':'S 南纬')","(v>=0?'N':'S')"],["(v>=0?'E 东经':'W 西经')","(v>=0?'E':'W')"],["/* ---- 方案寻优：沿绳边 × 折点分数，在约束内取受光量最大 ---- */","/* ---- Scheme search: edge × fold fraction, maximizing exposure within constraints ---- */"],["// 最长一侧下垂不得超过（绳高−离地余量）","// deepest drop limit (line height − clearance margin)"],["// 对折也会拖地","// even a center fold would drag"],["// 上午/下午差异判定：南北向绳两侧理论对称，差值小于 0.6 h","// morning/afternoon verdict: N–S lines are symmetric; gap below 0.6 h counts as equal"],["// （约相当于手机指南针误差与磁偏角带来的影响）视为“两侧相当”","// (scale of compass error + magnetic declination) → \"equivalent sides\""],["// 下午受晒的一侧（用于“经验偏好”提示）","// afternoon-sun side (for the empirical-preference note)"],["+' 天';","+' d';"],["$('latShow').innerHTML='\u003Cspan style=\"color:#67779c\">未填写，支持 39°54′15″ 或 39.904 两种格式\u003C/span>';","$('latShow').innerHTML='\u003Cspan style=\"color:#67779c\">Not filled — accepts 39°54′15″ or 39.904\u003C/span>';"],["$('latShow').innerHTML='\u003Cspan style=\"color:#ff9c9c\">无法解析纬度，请用 39°54′15″ 或 39.904 格式\u003C/span>';","$('latShow').innerHTML='\u003Cspan style=\"color:#ff9c9c\">Cannot parse latitude — use 39°54′15″ or 39.904\u003C/span>';"],["$('lonShow').innerHTML='\u003Cspan style=\"color:#67779c\">未填写，支持 116°24′27″ 或 116.407 两种格式\u003C/span>';","$('lonShow').innerHTML='\u003Cspan style=\"color:#67779c\">Not filled — accepts 116°24′27″ or 116.407\u003C/span>';"],["$('lonShow').innerHTML='\u003Cspan style=\"color:#ff9c9c\">无法解析经度，请用 116°24′27″ 或 116.407 格式\u003C/span>';","$('lonShow').innerHTML='\u003Cspan style=\"color:#ff9c9c\">Cannot parse longitude — use 116°24′27″ or 116.407\u003C/span>';"],["$('altShow').innerHTML='\u003Cspan style=\"color:#67779c\">留空按 0 米计，对结果影响很小\u003C/span>';","$('altShow').innerHTML='\u003Cspan style=\"color:#67779c\">Blank counts as 0 m — negligible effect\u003C/span>';"],["eb.textContent='计算出错：'","eb.textContent='Compute error: '"],["/* 空状态：提示还缺哪些输入 */","/* Empty state: list the missing inputs */"],["(ok?'✓':'待填')","(ok?'✓':'○')"],["'\u003Cli>'+st(hasLat&&hasLon)+'\u003Cdiv>\u003Cb>第 1 步 · 晾晒地点\u003C/b>\u003Cbr>纬度'+(hasLat?' 已填 ':' 未填，')+'经度'+(hasLon?'已填':'未填')+","'\u003Cli>'+st(hasLat&&hasLon)+'\u003Cdiv>\u003Cb>Step 1 · Drying site\u003C/b>\u003Cbr>Latitude '+(hasLat?'filled':'missing')+', longitude '+(hasLon?'filled':'missing')+"],["'。可点下方按钮自动获取本机位置，也可手动输入；海拔可留空（按 0 米计）。\u003C/div>\u003C/li>');","'. Use the button below to auto-locate, or type it in; altitude is optional (0 m if blank).\u003C/div>\u003C/li>');"],["'\u003Cli>\u003Cspan class=\"st ok\">✓\u003C/span>\u003Cdiv>\u003Cb>第 2 步 · 时区与日期\u003C/b>\u003Cbr>时区已自动读取本机（UTC'+((state.tz>=0?'+':'')+state.tz)+'），日期默认今天（'+state.y+'年'+state.m+'月'+state.d+'日），均可修改。\u003C/div>\u003C/li>');","'\u003Cli>\u003Cspan class=\"st ok\">✓\u003C/span>\u003Cdiv>\u003Cb>Step 2 · Time zone &amp; date\u003C/b>\u003Cbr>Time zone read from this device (UTC'+((state.tz>=0?'+':'')+state.tz)+'); date defaults to today ('+state.y+'-'+String(state.m).padStart(2,'0')+'-'+String(state.d).padStart(2,'0')+'). Both editable.\u003C/div>\u003C/li>');"],["'\u003Cli>'+st(hasAz)+'\u003Cdiv>\u003Cb>第 3 步 · 晾绳走向\u003C/b>\u003Cbr>'+(hasAz?'绳向已填（'+Math.round(state.ropeAz)+'°）。':'用手机指南针沿晾绳方向读数后填入，或直接拖动左侧罗盘圆点。')+'\u003C/div>\u003C/li>');","'\u003Cli>'+st(hasAz)+'\u003Cdiv>\u003Cb>Step 3 · Line orientation\u003C/b>\u003Cbr>'+(hasAz?'Azimuth set ('+Math.round(state.ropeAz)+'°).':'Read it with the phone compass along the line, or drag the compass dot on the left.')+'\u003C/div>\u003C/li>');"],["missing.push('纬度'); if(!hasLon)missing.push('经度'); if(!hasAz)missing.push('绳向方位角');","missing.push('latitude'); if(!hasLon)missing.push('longitude'); if(!hasAz)missing.push('line azimuth');"],["missing.join('、')","missing.join(', ')"],["'还缺：\u003Cb>'","'Missing: \u003Cb>'"],["'\u003C/b>。三项填齐后自动开始计算并给出推荐晒法。'","'\u003C/b> — once all three are set, the computation starts automatically.'"],["'已就绪，正在计算…'","'Ready — computing…'"],["/* ---------------- 时间游标 ---------------- */","/* ---------------- Time cursor ---------------- */"],["/* ---------------- 渲染：罗盘（侧栏输入） ---------------- */","/* ---------------- Render: compass (sidebar) ---------------- */"],["// 法线（-90/+90，注意“+90°”对应 az+90）","// normals (−90/+90; \"+90°\" means az+90)"],["// 绳","// rope"],["// 方位字：深色底片压在线之上，避免与绳线重叠","// compass letters: dark pills drawn over the rope line"],["[['北',0,'#ffb3b3'],['东',90,'#93a2c4'],['南',180,'#93a2c4'],['西',270,'#93a2c4']]","[['N',0,'#ffb3b3'],['E',90,'#93a2c4'],['S',180,'#93a2c4'],['W',270,'#93a2c4']]"],["p.push(txS([cx,cy+15],dirName8(az)+'—'+dirName8(norm360(az+180))+'走向',","p.push(txS([cx,cy+15],dirName8(az)+'–'+dirName8(norm360(az+180))+' line',"],["p.push(txS([cx,cy+15],'未设置',","p.push(txS([cx,cy+15],'not set',"],["az==null?'拖动表盘或填写方位角':'拖动圆点调整绳向'","az==null?'drag the dial or type an azimuth':'drag the dot to set direction'"],["/* ---------------- 渲染：推荐结论（首屏） ---------------- */","/* ---------------- Render: recommendation (hero) ---------------- */"],["=>e==='long'?'长边':'宽边';","=>e==='long'?'long edge':'short edge';"],["// 头部：朝向按“相当 / 略优 / 明显”三档措辞","// headline: three tiers — equal / slightly better / clear"],["dirSeg='较长一侧（'+rec.deepest.toFixed(2)+' m）朝 '+dirName8(sideA)+' 或 '+dirName8(sideB)+' 一侧均可';","dirSeg='bigger side ('+rec.deepest.toFixed(2)+' m) toward '+dirName8(sideA)+' or '+dirName8(sideB)+' — either works';"],["dirSeg='较长一侧（'+rec.deepest.toFixed(2)+' m）朝 '+dirName8(sm.bigDir)+' 略优';","dirSeg='bigger side ('+rec.deepest.toFixed(2)+' m) toward '+dirName8(sm.bigDir)+' — slightly better';"],["dirSeg='较长一侧（'+rec.deepest.toFixed(2)+' m）朝 '+dirName8(sm.bigDir)+' 垂下';","dirSeg='bigger side ('+rec.deepest.toFixed(2)+' m) hangs toward '+dirName8(sm.bigDir);"],["'推荐：\u003Cspan class=\"hl\">'+nm(rec.edge)+'搭在绳上\u003C/span> ｜ 折点 \u003Cspan class=\"hl\">'","'Recommended: \u003Cspan class=\"hl\">'+nm(rec.edge)+' on the line\u003C/span> | fold \u003Cspan class=\"hl\">'"],["'沿绳展开 \u003Cb>'","'Along the line: \u003Cb>'"],["' m\u003C/b>（'+nm(rec.edge)+'与绳平行），需要绳长至少 '","' m\u003C/b> ('+nm(rec.edge)+' parallel to the line); needs a line of at least '"],["' m（含打结余量 0.2 m），你填写的绳长 '+state.ropeLen.toFixed(1)+' m '","' m (incl. 0.2 m tying margin); your line is '+state.ropeLen.toFixed(1)+' m '"],["'\u003Cspan class=\"good\">✓ 够用\u003C/span>'","'\u003Cspan class=\"good\">✓ long enough\u003C/span>'"],["'\u003Cspan class=\"bad\">✗ 不够，请看下方对比表选另一种搭法\u003C/span>'","'\u003Cspan class=\"bad\">✗ too short — pick another scheme below\u003C/span>'"],["bl.push('折在「'+(rec.edge==='long'?'宽':'长')+'」的 '","bl.push('Fold at '+(fSmall*100).toFixed(0)+'% of the '+(rec.edge==='long'?'width':'length')+' edge: hanging depths '"],["(fSmall*100).toFixed(0)+'% 处：两侧下垂 '+rec.deepest.toFixed(2)+' m 与 '+(rec.D-rec.deepest).toFixed(2)+","rec.deepest.toFixed(2)+' m and '+(rec.D-rec.deepest).toFixed(2)+"],["' m，最低点距地 '+rec.clear.toFixed(2)+' m '","' m; lowest point '+rec.clear.toFixed(2)+' m '"],["'\u003Cspan class=\"good\">✓ 不拖地\u003C/span>'","'\u003Cspan class=\"good\">✓ clear of ground\u003C/span>'"],["'\u003Cspan class=\"bad\">✗ 会拖地\u003C/span>'","'\u003Cspan class=\"bad\">✗ drags on ground\u003C/span>'"],["'两侧重量比（按质量均匀）\u003Cb>'","'Weight ratio (uniform mass) \u003Cb>'"],["'\u003C/b>，摩擦极限 '+sm.kappa.toFixed(2)+'（μ='+state.mu.toFixed(2)+'），余量 \u003Cb>'+margin.toFixed(2)+'×\u003C/b>'","'\u003C/b>, friction limit '+sm.kappa.toFixed(2)+' (μ='+state.mu.toFixed(2)+'), margin \u003Cb>'+margin.toFixed(2)+'×\u003C/b>'"],["'\u003Cspan class=\"good\"> ✓ 能保持住\u003C/span>'","'\u003Cspan class=\"good\"> ✓ holds\u003C/span>'"],["'\u003Cspan class=\"bad\"> ✗ 可能滑落\u003C/span>'","'\u003Cspan class=\"bad\"> ✗ may slip\u003C/span>'"],["+'。担心滑动可在折痕压绳处缠两圈防滑胶带或用两个晒衣夹'","+'. If worried about slipping, wrap anti-slip tape at the crease or add two clothespins'"],["bl.push('当天上午与下午的受光\u003Cb>基本相当\u003C/b>（'+dirName8(sideA)+'侧 '+sm.hist.Lp.toFixed(2)+' h，'+dirName8(sideB)+'侧 '+sm.hist.Lm.toFixed(2)+","bl.push('Morning and afternoon light are \u003Cb>essentially equal\u003C/b> ('+dirName8(sideA)+' side '+sm.hist.Lp.toFixed(2)+' h vs '+dirName8(sideB)+' side '+sm.hist.Lm.toFixed(2)+"],["' h，相差约 '+dTxt+' 分钟，在指南针误差量级内），较长一侧垂向哪边都可以。经验上下午气温更高、湿度更低，干燥往往更快；若你有此偏好，可把较长一侧朝 '+dirName8(sm.afterDir)+","' h; gap ≈ '+dTxt+' min — within compass error), so either side works for the bigger panel. Empirically afternoons are warmer and drier and things dry faster; if you prefer that, hang the bigger side toward '+dirName8(sm.afterDir)+"],["'（下午受晒的一侧），本模型对此不加分也不扣分。');","' (the afternoon-sun side). The model neither rewards nor penalizes this choice.');"],["bl.push('当天两侧受光\u003Cb>略有差异\u003C/b>（'+dirName8(sm.bigDir)+'侧多约 '+dTxt+' 分钟），较长一侧朝 '+dirName8(sm.bigDir)+","bl.push('The two sides differ \u003Cb>slightly\u003C/b> ('+dirName8(sm.bigDir)+' side leads by ≈ '+dTxt+' min); prefer '+dirName8(sm.bigDir)+"],["' 略优；差距不大，若按经验偏好下午（'+dirName8(sm.afterDir)+'）来，损失也有限。');","' slightly. The gap is small — if you prefer the afternoon side ('+dirName8(sm.afterDir)+'), the cost is minor.');"],["bl.push('当天阳光主要落在 \u003Cb>'+dirName8(sm.bigDir)+'\u003C/b> 一侧（受光积分 '+Math.max(sm.hist.Lp,sm.hist.Lm).toFixed(1)+' h，另一侧 '+","bl.push('Most light lands on the \u003Cb>'+dirName8(sm.bigDir)+'\u003C/b> side (lit integral '+Math.max(sm.hist.Lp,sm.hist.Lm).toFixed(1)+' h vs '+"],["Math.min(sm.hist.Lp,sm.hist.Lm).toFixed(1)+' h），把较长的一侧朝 '+dirName8(sm.bigDir)+'，外露被面晒得最多；另一侧朝 '+dirName8(norm360(sm.bigDir+180)));","Math.min(sm.hist.Lp,sm.hist.Lm).toFixed(1)+' h). Hang the bigger side toward '+dirName8(sm.bigDir)+' to sun the most fabric; the other side toward '+dirName8(norm360(sm.bigDir+180)));"],["bl.push('受光量 \u003Cb>'+rec.G.toFixed(2)+' m²·h\u003C/b>，比同边居中对折多 \u003Cb>+'+gain50.toFixed(0)+'%\u003C/b>'+","bl.push('Exposure \u003Cb>'+rec.G.toFixed(2)+' m²·h\u003C/b> — \u003Cb>+'+gain50.toFixed(0)+'%\u003C/b> vs the same edge folded at center'+"],["'；相对你当前的手动设置 '+(gainCur>=0?'+':'')+gainCur.toFixed(0)+'%'","'; vs your manual setting '+(gainCur>=0?'+':'')+gainCur.toFixed(0)+'%'"],["badges.push(['绳长 '+(rec.ropeOK?'够用':'不足')+'（需 '","badges.push(['Line '+(rec.ropeOK?'OK':'too short')+' (needs '"],["badges.push([(rec.dragSymmetric?'会拖地':'不拖地')+'（距地 '+rec.clear.toFixed(2)+' m）'","badges.push([(rec.dragSymmetric?'drags':'clears ground')+' (clearance '+rec.clear.toFixed(2)+' m)'"],["badges.push(['摩擦余量 '+margin.toFixed(2)+'×'","badges.push(['Friction margin '+margin.toFixed(2)+'×'"],["badges.push(['受光量 +'+gain50.toFixed(0)+'%','ok']);","badges.push(['Exposure +'+gain50.toFixed(0)+'%','ok']);"],["stt.push('你已固定沿'+nm(state.edgePref)+'搭绳'+(sm.rec.edge!==state.edgePref?'（工具最优为沿'+nm(sm.rec.edge)+'）':''));","stt.push('Pinned to the '+nm(state.edgePref)+(sm.rec.edge!==state.edgePref?' (tool optimum: '+nm(sm.rec.edge)+')':''));"],["stt.push('当前为手动折点 '+(Math.max(state.fold,1-state.fold)*100).toFixed(0)+':'+((1-Math.max(state.fold,1-state.fold))*100).toFixed(0)+'（推荐 '+Math.round(rec.fRec*100)+':'+Math.round((1-rec.fRec)*100)+'）');","stt.push('Manual fold '+(Math.max(state.fold,1-state.fold)*100).toFixed(0)+':'+((1-Math.max(state.fold,1-state.fold))*100).toFixed(0)+' (recommended '+Math.round(rec.fRec*100)+':'+Math.round((1-rec.fRec)*100)+')');"],["stt.join('；')+'。点击「应用推荐方案」恢复。':'当前示意即为推荐方案（自动模式）。'","stt.join('; ')+'. Click \"Apply recommendation\" to reset.':'The scene shows the recommended scheme (auto mode).'"],["/* ---------------- 渲染：折叠示意图 ---------------- */","/* ---------------- Render: fold diagram ---------------- */"],["// 上带=短侧，下带=长侧","// top band = shorter side, bottom band = longer side"],["// 两个折带","// two fold bands"],["// 折痕 + 绳","// crease + rope"],["// 折带标注","// band labels"],["p.push(txS([cxM,y0+(foldY-y0)/2-4],'较短一侧  '+(fSmall*depM).toFixed(2)+' m'","p.push(txS([cxM,y0+(foldY-y0)/2-4],'Shorter side  '+(fSmall*depM).toFixed(2)+' m'"],["tieT?'垂在任一侧均可':'朝 '+dirName8(norm360(sm.bigDir+180))+' 垂下'","tieT?'either side works':'toward '+dirName8(norm360(sm.bigDir+180))"],["p.push(txS([cxM,foldY+(y0+rh-foldY)/2-3],'较长一侧  '+rec.deepest.toFixed(2)+' m'","p.push(txS([cxM,foldY+(y0+rh-foldY)/2-3],'Longer side  '+rec.deepest.toFixed(2)+' m'"],["tieT?'垂在任一侧均可（两侧相当）':(softT?'朝 '+dirName8(sm.bigDir)+' 垂下（略多）':'朝 '+dirName8(sm.bigDir)+' 垂下（当天阳光更多）')","tieT?'either side (equal)':(softT?'toward '+dirName8(sm.bigDir)+' (slightly more)':'toward '+dirName8(sm.bigDir)+' (more sun today)')"],["// 对折箭头","// fold arrow"],["txS([x0-52,(y0+rh)/2],'对折'","txS([x0-52,(y0+rh)/2],'fold'"],["// 尺寸标注","// dimensions"],["txS([cxM,y0+rh+36],'沿绳 '+spanM.toFixed(2)+' m（需绳 ≥ '+rec.ropeNeed.toFixed(2)+' m）'","txS([cxM,y0+rh+36],'Along line '+spanM.toFixed(2)+' m (line ≥ '+rec.ropeNeed.toFixed(2)+' m)'"],["// 折点比例竖标","// fold fraction scale"],["y0+rh/2,'折点 '+Math.round(fBig*100)+':'+Math.round(fSmall*100)","y0+rh/2,'fold '+Math.round(fBig*100)+':'+Math.round(fSmall*100)"],["// 顶部信息","// top info"],["pillS(96,20,'被子平铺 '+state.L.toFixed(2)+'×'+state.W.toFixed(2)+' m'","pillS(96,20,'Quilt flat '+state.L.toFixed(2)+'×'+state.W.toFixed(2)+' m'"],["pillS(W-88,20,'折痕搭在绳上（与绳平行）'","pillS(W-88,20,'crease rests on the line (parallel)'"],["fn.innerHTML='折点决定两层在绳两侧的长度分配（按与绳垂直的「'+(rec.edge==='long'?'宽':'长')+'」计算）。左右对称，30% 与 70% 是同一种折法；虚线刻度标出摩擦与拖地限制及推荐位置。推荐折点一般紧贴摩擦安全上限（默认约 66%），不随地点、日期变化——太阳只决定「较长一侧朝哪边」；改变摩擦或绳高才会移动折点。';","fn.innerHTML='The fold point splits the two layers across the line, measured along the '+(rec.edge==='long'?'width':'length')+' edge. Left and right are symmetric — 30% and 70% are the same fold. Ticks show the friction / clearance limits and the recommended spot. The recommended fold usually sits right at the friction-safety limit (about 66% with the defaults) and does not depend on location or date — the sun only decides which side the longer layer faces; it moves only when the friction or line height changes.';"],["/* ---------------- 渲染：方案对比表 ---------------- */","/* ---------------- Render: scheme comparison ---------------- */"],["label:nm(o.edge)+'搭绳 · 推荐折点'","label:nm(o.edge)+' · recommended fold'"],["label:nm(o.edge)+'搭绳 · 居中对折'","label:nm(o.edge)+' · center fold'"],["label:'你当前的手动设置'","label:'Your manual setting'"],["const th='\u003Ctr>\u003Cth>方案\u003C/th>\u003Cth>折点\u003C/th>\u003Cth>受光量 G（相对）\u003C/th>\u003Cth>需绳长\u003C/th>\u003Cth>最低点距地\u003C/th>\u003Cth>摩擦余量\u003C/th>\u003C/tr>';","const th='\u003Ctr>\u003Cth>Scheme\u003C/th>\u003Cth>Fold\u003C/th>\u003Cth>Exposure G (rel.)\u003C/th>\u003Cth>Line needed\u003C/th>\u003Cth>Clearance\u003C/th>\u003Cth>Friction margin\u003C/th>\u003C/tr>';"],["const tag=r.rec?'\u003Cspan class=\"tagRec\">推荐\u003C/span>':(r.cur?'\u003Cspan class=\"tagCur\">当前\u003C/span>':'');","const tag=r.rec?'\u003Cspan class=\"tagRec\">REC\u003C/span>':(r.cur?'\u003Cspan class=\"tagCur\">NOW\u003C/span>':'');"],["title=\"点击载入该方案\"","title=\"click to load\""],["'\u003Cdiv class=\"remark\" style=\"margin-top:8px\">点击任意行可把该方案载入上方 3D 示意。推荐行已按 1.3× 摩擦安全余量与离地 6 cm 限制优选；'+","'\u003Cdiv class=\"remark\" style=\"margin-top:8px\">Click any row to load that scheme into the 3D scene above. The recommended row is chosen under a 1.3× friction margin and 6 cm ground clearance. '+"],["'「相对」为相对表中最高受光量。注：相同折点下，长边/宽边搭绳的两层受光总量几乎相同（差别只在顶部折转面长度），真正的区别在所需绳长与下垂深度限制。\u003C/div>';","'\"rel.\" is relative to the best exposure in the table. Note: at the same fold fraction both edge choices collect nearly equal total light (only crest length differs); the real differences are line length needed and hanging-depth limits.\u003C/div>';"],["/* ---------------- 渲染：折叠剖面与受力 ---------------- */","/* ---------------- Render: cross-section & forces ---------------- */"],["// 左侧=较长（朝阳侧）","// left = longer (sunward)"],["// 判据框","// criterion box"],["txS([W/2,28],'不滑落判据（质量均匀 + 卡普斯坦摩擦）：f/(1−f) ≤ e^(μθ)'","txS([W/2,28],'No-slip criterion (uniform mass + capstan friction): f/(1−f) ≤ e^(μθ)'"],["ratio.toFixed(2)+'  ≤  '+sm.kappa.toFixed(2)+'     余量 '+margin.toFixed(2)+'×  '+(ok?'✓ 能保持住':'✗ 有滑落风险')","ratio.toFixed(2)+'  ≤  '+sm.kappa.toFixed(2)+'     margin '+margin.toFixed(2)+'×  '+(ok?'✓ holds':'✗ slip risk')"],["// 地面","// ground"],["txS([W-18,groundY+18],'地面'","txS([W-18,groundY+18],'ground'"],["// 两层","// layers"],["// 包角","// wrap angle"],["pillS(cx,ropeY-42,'包角 θ≈π'","pillS(cx,ropeY-42,'wrap θ≈π'"],["// 重量箭头","// weight arrows"],["wArrow(lx-16,Wy-40,Wy,'重量 ↓'","wArrow(lx-16,Wy-40,Wy,'weight ↓'"],["wArrow(rx+16,Wy-40,Wy,'重量 ↓'","wArrow(rx+16,Wy-40,Wy,'weight ↓'"],["// 下垂标注","// drop labels"],["txS([lx-24,yL-6],'下垂 '+hL.toFixed(2)+' m'","txS([lx-24,yL-6],'drop '+hL.toFixed(2)+' m'"],["txS([rx+24,yR-6],'下垂 '+hR.toFixed(2)+' m'","txS([rx+24,yR-6],'drop '+hR.toFixed(2)+' m'"],["pillS(lx-30,ropeY-16,tieT?'较长一侧（任一侧）':('朝'+dirName8(sm.bigDir)+(softT?'（略多）':'（受光多）'))","pillS(lx-30,ropeY-16,tieT?'longer side (either)':(dirName8(sm.bigDir)+(softT?' (slightly more)':' (more sun)'))"],["pillS(rx+34,ropeY-16,tieT?'较短一侧':'朝'+dirName8(norm360(sm.bigDir+180))","pillS(rx+34,ropeY-16,tieT?'shorter side':'toward '+dirName8(norm360(sm.bigDir+180))"],["// 离地","// clearance"],["(clr>=0.03?'最低点距地 '+clr.toFixed(2)+' m':'最低点距地 '+clr.toFixed(2)+' m（拖地！）')","(clr>=0.03?'Clearance '+clr.toFixed(2)+' m':'Clearance '+clr.toFixed(2)+' m (dragging!)')"],["'\u003Cdiv class=\"remark\" style=\"margin-top:6px\">剖面按推荐方案绘制。两侧重量按质量均匀分布近似为折点比例；布面绕过晾绳的接触弧按 π 估计，'+","'\u003Cdiv class=\"remark\" style=\"margin-top:6px\">Cross-section drawn for the recommended scheme. Layer weights approximate the fold ratio under uniform mass; fabric wrap is estimated as π radians. '+"],["'不滑落条件即左侧结论卡中的“摩擦余量”。被子越贴近绳（不鼓包）越接近该模型。\u003C/div>';","'The no-slip condition is the \"friction margin\" in the conclusion card. The less the quilt bulges, the closer reality matches this model.\u003C/div>';"],["/* ---------------- 渲染：分数 ---------------- */","/* ---------------- Render: score ---------------- */"],["$('scoreDateTag').textContent=state.y+'年'+state.m+'月'+state.d+'日';","$('scoreDateTag').textContent=state.y+'-'+String(state.m).padStart(2,'0')+'-'+String(state.d).padStart(2,'0');"],["grade='优秀 · 绳向接近当日最优'","grade='Excellent · azimuth near optimal'"],["grade='良好 · 绳向尚有提升空间'","grade='Good · azimuth can improve'"],["grade='一般 · 绳向可优化（见下方）'","grade='Fair · see suggestion below'"],["grade='欠佳 · 建议调整绳向'","grade='Poor · consider turning the line'"],["// 正午高度角","// noon elevation"],["chips.push(['日出',","chips.push(['Sunrise',"],["chips.push(['日落',","chips.push(['Sunset',"],["chips.push(['白昼',","chips.push(['Daylight',"],["chips.push(['正午高度角',","chips.push(['Noon elevation',"],["chips.push(['受光峰值时刻',","chips.push(['Exposure peak',"],["chips.push(['最优绳向',","chips.push(['Best azimuth',"],["chips.push(['全年最佳',(()=>{const md=doyToMD(state.y,c.bestIdx+1);return md.m+'月'+md.d+'日 '+c.yearArr[c.bestIdx].toFixed(1)+' m²·h';})()]);","chips.push(['Year best',(()=>{const md=doyToMD(state.y,c.bestIdx+1);return md.m+'/'+md.d+' '+c.yearArr[c.bestIdx].toFixed(1)+' m²·h';})()]);"],["$('riseL').textContent='日出 '","$('riseL').textContent='Sunrise '"],["$('setL').textContent='日落 '","$('setL').textContent='Sunset '"],["/* ---------------- 渲染：3D 场景 ---------------- */","/* ---------------- Render: 3D scene ---------------- */"],["// 地面网格","// ground grid"],["// 地面罗盘圈（细节）","// ground compass ring"],["// 影子","// shadow"],["// 立柱（含柱顶绳结与柱脚）","// posts (with knots and feet)"],["// 绳（微下垂）","// rope (slight sag)"],["// 被子","// quilt"],["// 缝线（内缩虚线边）+ 底边包边","// stitching (inset dashed border) + bottom binding"],["// 远侧立面、近侧立面、顶面","// far face, near face, top"],["// 受光/背光标签","// lit / shaded labels"],["pillS(lp[0],lp[1],'受光面 余弦 '+si.p.toFixed(2)","pillS(lp[0],lp[1],'Lit side · cos '+si.p.toFixed(2)"],["pillS(sp2[0],sp2[1],'背光（互遮）'","pillS(sp2[0],sp2[1],'Shaded (mutual)'"],["// 光射线","// sun rays"],["// 太阳","// sun"],["// 旋转日冕光刺","// rotating corona rays"],["// 标注层","// annotations"],["pillS(dm[0],dm[1]+13,'沿绳 '+c.g.span.toFixed(2)+' m · '+(state.edge==='long'?'长边':'宽边')+'沿绳'","pillS(dm[0],dm[1]+13,'Along line '+c.g.span.toFixed(2)+' m · '+(state.edge==='long'?'long edge':'short edge')+' on line'"],["// 两侧下垂","// both-side drop"],["pillS(mA[0]+dx*52,mA[1]+dy*52+(idx===0?-9:11),'下垂 '+it[1].toFixed(2)+' m'","pillS(mA[0]+dx*52,mA[1]+dy*52+(idx===0?-9:11),'drop '+it[1].toFixed(2)+' m'"],["// 厚度","// thickness"],["pillS(tb[0],tb[1]-11,'折叠厚 '+(t*100).toFixed(0)+' cm'","pillS(tb[0],tb[1]-11,'thickness '+(t*100).toFixed(0)+' cm'"],["// 折痕位置","// crease position"],["pillS(fl[0],fl[1],'折痕：'+(state.edge==='long'?'宽':'长')+'的 '+Math.round(fB2*100)+'% 处'","pillS(fl[0],fl[1],'crease: '+(state.edge==='long'?'width':'length')+' at '+Math.round(fB2*100)+'%'"],["pillS(gg[0],gg[1]+14,'最低点距地 '+clr.toFixed(2)+' m'+(clr\u003C0.03?'（拖地！）':''),","pillS(gg[0],gg[1]+14,'Clearance '+clr.toFixed(2)+' m'+(clr\u003C0.03?' (dragging!)':''),"],["// 角标","// corner badges"],["pillS(84,22,'视角 '+Math.round(state.view.az)+'° / 拖拽旋转'","pillS(84,22,'view '+Math.round(state.view.az)+'° / drag to rotate'"],["pillS(110,13,'绳向 '+Math.round(state.ropeAz)+'°（'+(state.edge==='long'?'长边':'宽边')+'沿绳）'","pillS(110,13,'Line '+Math.round(state.ropeAz)+'° ('+(state.edge==='long'?'long edge':'short edge')+' on line)'"],["/* ---------------- 渲染：俯视图 ---------------- */","/* ---------------- Render: plan view ---------------- */"],["[['北',0],['东',90],['南',180],['西',270],['东北',45],['东南',135],['西南',225],['西北',315]]","[['N',0],['E',90],['S',180],['W',270],['NE',45],['SE',135],['SW',225],['NW',315]]"],["t==='北'?'#ff9c9c':(main?'#93a2c4':'#5d6d92')","t==='N'?'#ff9c9c':(main?'#93a2c4':'#5d6d92')"],["// 受光半区","// lit half"],["dir(bLit,R*0.62),'受光半区'","dir(bLit,R*0.62),'lit half'"],["// 法线","// normals"],["-10,'法线 '+norm360(state.ropeAz+90)+'° '+dirName8(state.ropeAz+90)","-10,'normal '+norm360(state.ropeAz+90)+'° '+dirName8(state.ropeAz+90)"],["+18,'法线 '+norm360(state.ropeAz-90)+'° '+dirName8(state.ropeAz-90)","+18,'normal '+norm360(state.ropeAz-90)+'° '+dirName8(state.ropeAz-90)"],["// 绳 + 被子条","// rope + quilt bar"],["pillS(r1[0],r1[1]-11,'绳向 '+Math.round(state.ropeAz)+'°'","pillS(r1[0],r1[1]-11,'Line '+Math.round(state.ropeAz)+'°'"],["(state.edge==='long'?'长边':'宽边')+'沿绳 '+c.g.span.toFixed(2)+' m'","(state.edge==='long'?'long edge':'short edge')+' on line '+c.g.span.toFixed(2)+' m'"],["// 日出日落","// sunrise / sunset"],["pillS(dir(azRise,R+26)[0],dir(azRise,R+26)[1],'日出 '+Math.round(azRise)+'°'","pillS(dir(azRise,R+26)[0],dir(azRise,R+26)[1],'Sunrise '+Math.round(azRise)+'°'"],["pillS(dir(azSet,R+26)[0],dir(azSet,R+26)[1],'日落 '+Math.round(azSet)+'°'","pillS(dir(azSet,R+26)[0],dir(azSet,R+26)[1],'Sunset '+Math.round(azSet)+'°'"],["'太阳 '+Math.round(si.az)+'° 高 '+si.elev.toFixed(0)+'°'","'Sun '+Math.round(si.az)+'° el '+si.elev.toFixed(0)+'°'"],["pillS(cx,cy+R+44,'太阳在地平线下'","pillS(cx,cy+R+44,'Sun below horizon'"],["const edgeName=state.edge==='long'?'长边':'宽边';","const edgeName=state.edge==='long'?'long edge':'short edge';"],["$('planNote').innerHTML='罗盘读数 \u003Cb>'+Math.round(state.ropeAz)+'°\u003C/b> 按“沿'+edgeName+'测得”处理，即纸面粗线为绳与'+edgeName+'的共同走向。两条虚蓝线是两层被面的法线方向，太阳落在哪侧，哪层就受光；另一层被互遮，只有顶面折转处在补光。';","$('planNote').innerHTML='Compass reading \u003Cb>'+Math.round(state.ropeAz)+'°\u003C/b> — the heavy line is the shared direction of the rope and the '+edgeName+'. The two dashed blue lines are the layer normals: whichever side the sun is on gets lit while the other layer is shaded, with only the crest adding light.';"],["/* ---------------- 渲染：太阳轨迹极坐标 ---------------- */","/* ---------------- Render: sun-path polar ---------------- */"],["[['北',0],['东',90],['南',180],['西',270]].forEach","[['N',0],['E',90],['S',180],['W',270]].forEach"],["t==='北'?'#ff9c9c':'#93a2c4')","t==='N'?'#ff9c9c':'#93a2c4')"],["// 各月参考","// monthly references"],["// 当日","// today"],["q[1]+dy/L*13+3],hh+'时',","q[1]+dy/L*13+3],hh+'h',"],["// 正午","// noon"],["pillS(q[0],q[1]-12,'正午 '+(spn.elev*R2D).toFixed(1)+'°'","pillS(q[0],q[1]-12,'Noon '+(spn.elev*R2D).toFixed(1)+'°'"],["// 绳向","// line orientation"],["// 当前太阳","// current sun"],["/* ---------------- 渲染：当日曲线 ---------------- */","/* ---------------- Render: daily curve ---------------- */"],["fill=\"#67779c\">极夜：当日无日照\u003C/text>","fill=\"#67779c\">Polar night — no sunlight today\u003C/text>"],["// 网格","// grid"],["// 有效时段底纹","// effective-window shading"],["// 面积曲线","// area curve"],["// 高度角","// elevation"],["// 日出正午日落","// sunrise / noon / sunset"],["[[d.rise,'日出'],[noonT,'正午'],[d.set,'日落']]","[[d.rise,'Sunrise'],[noonT,'Noon'],[d.set,'Sunset']]"],["// 当前游标","// current cursor"],["pillS(X(state.scrub),mT+12,'面积 '+near.area.toFixed(2)+' m²'","pillS(X(state.scrub),mT+12,'area '+near.area.toFixed(2)+' m²'"],["// 面积标注","// area annotation"],["txS([mL+6,Y(yMax)+16],'曲线下面积 = 有效受光量 G = '+d.G.toFixed(2)+' m²·h'","txS([mL+6,Y(yMax)+16],'Area under curve = exposure G = '+d.G.toFixed(2)+' m²·h'"],["txS([W-mR+8,mT+4],'高度角'","txS([W-mR+8,mT+4],'elevation'"],["/* ---------------- 渲染：全年曲线 ---------------- */","/* ---------------- Render: year curve ---------------- */"],[",m+'月','text-anchor=\"middle\" font-size=\"10\"",",['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m-1],'text-anchor=\"middle\" font-size=\"10\""],["// 冬至夏至参考","// solstice references"],["[[172,'夏至'],[355,'冬至']]","[[172,'Jun solstice'],[355,'Dec solstice']]"],["// 最佳日","// best day"],["pillS(bx,Y(arr[c.bestIdx])-14,'全年最佳'","pillS(bx,Y(arr[c.bestIdx])-14,'Year best'"],["// 选中日 & 今天","// selected day & today"],["pillS(X(curIdx),mT+13,'选中 '+state.m+'月'+state.d+'日'","pillS(X(curIdx),mT+13,'Selected '+state.m+'/'+state.d"],["$('yearTitle').textContent=state.y+' 年 · 每日有效受光量';","$('yearTitle').textContent=state.y+' · daily exposure';"],["// 月份 chips","// month chips"],["(i+1)+'月\u003Cb>'","['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][i]+'\u003Cb>'"],["$('yearStats').innerHTML='全年最强 \u003Cb>'+mdBest.m+'月'+mdBest.d+'日\u003C/b>（'+c.yearArr[c.bestIdx].toFixed(1)+' m²·h）· 全年最弱 \u003Cb>'+mdWorst.m+'月'+mdWorst.d+'日\u003C/b>（'+c.yearArr[c.worstIdx].toFixed(1)+' m²·h）· 当前选中日期处于全年 \u003Cb>第 '+pct+' 百分位\u003C/b>。点击图中日期或上方月份可切换计算。';","$('yearStats').innerHTML='Strongest \u003Cb>'+mdBest.m+'/'+mdBest.d+'\u003C/b> ('+c.yearArr[c.bestIdx].toFixed(1)+' m²·h) · weakest \u003Cb>'+mdWorst.m+'/'+mdWorst.d+'\u003C/b> ('+c.yearArr[c.worstIdx].toFixed(1)+' m²·h) · the selected date sits at the \u003Cb>'+pct+'th percentile\u003C/b> of the year. Click a date in the chart or a month above to switch.';"],["' · G='+v.toFixed(2)+' m²·h · 等效满照 '","' · G='+v.toFixed(2)+' m²·h · full-sun '"],["/* ---------------- 渲染：绳向扫描 ---------------- */","/* ---------------- Render: azimuth scan ---------------- */"],["txS([X(0),H-mB+30],'南北走向'","txS([X(0),H-mB+30],'N–S line'"],["txS([X(90),H-mB+30],'东西走向'","txS([X(90),H-mB+30],'E–W line'"],["txS([X(179),H-mB+30],'南北走向'","txS([X(179),H-mB+30],'N–S line'"],["// 当前 & 最优","// current & best"],["Y(arr[kc2])-13,'当前 '+kc2+'°'","Y(arr[kc2])-13,'now '+kc2+'°'"],["Y(arr[c.bestAz])-13,'最优 '+c.bestAz+'°'","Y(arr[c.bestAz])-13,'best '+c.bestAz+'°'"],["txS([W-mR,mT+2],'把绳转到不同走向时，当日有效受光量的变化'","txS([W-mR,mT+2],'Daily exposure as the line is turned to different orientations'"],["/* ---------------- 渲染：建议 ---------------- */","/* ---------------- Render: advice ---------------- */"],["// 当前设置的安全性提示（手动/固定模式下单独检查）","// safety notes for the current setting (manual / pinned modes)"],["tag:'摩擦',txt:'当前设置两侧重量比 '+ratio.toFixed(2)+' 已超过摩擦极限 '+sm.kappa.toFixed(2)+'（μ='+state.mu.toFixed(2)+'），按质量均匀假设被子会滑向更平衡的位置。请降低不对称度、增大摩擦（缠防滑带），或点击上方「应用推荐方案」。'","tag:'Friction',txt:'The current weight ratio '+ratio.toFixed(2)+' exceeds the friction limit '+sm.kappa.toFixed(2)+' (μ='+state.mu.toFixed(2)+'); under uniform mass the quilt would slide toward a more balanced position. Reduce the asymmetry, raise friction (anti-slip tape), or click \"Apply recommendation\" above.'"],["tag:'摩擦',txt:'当前设置接近摩擦极限（余量 '+(sm.kappa/ratio).toFixed(2)+'×，推荐留 1.3×）。实际使用中若有风或被子偏滑，建议回到推荐折点。'","tag:'Friction',txt:'The current setting is close to the friction limit (margin '+(sm.kappa/ratio).toFixed(2)+'×; the recommendation keeps 1.3×). With wind or a slippery quilt, return to the recommended fold.'"],["tag:'拖地',txt:'当前设置下较长一侧下垂 '+ (fB*D).toFixed(2)+' m，绳高 '+state.ropeH.toFixed(2)+' m，最低点即将或已经触地，贴地部分几乎晒不到直射光。'","tag:'Clearance',txt:'With the current setting the longer side drops '+(fB*D).toFixed(2)+' m from a line height of '+state.ropeH.toFixed(2)+' m — the lowest point is at or near the ground, and the touching part gets almost no direct sun.'"],["tag:'绳长',txt:'当前方案沿绳需 '+ropeNeed.toFixed(2)+' m，你填写的绳长只有 '+state.ropeLen.toFixed(1)+' m。请看上方对比表选择更省绳的搭法。'","tag:'Line length',txt:'This scheme needs '+ropeNeed.toFixed(2)+' m of line; you entered only '+state.ropeLen.toFixed(1)+' m. See the comparison table above for a more frugal arrangement.'"],["tag:'推荐',txt:'相比当前设置，推荐方案（'+((rec.edge==='long')?'长边':'宽边')+'搭绳 · '+Math.round(rec.fRec*100)+':'+Math.round((1-rec.fRec)*100)+'）受光量高约 '+gain.toFixed(0)+'%，且满足全部安全约束。'","tag:'Tip',txt:'Compared with the current setting, the recommended scheme ('+((rec.edge==='long')?'long':'short')+' edge · '+Math.round(rec.fRec*100)+':'+Math.round((1-rec.fRec)*100)+') gains about '+gain.toFixed(0)+'% exposure while satisfying all safety constraints.'"],["tone:'warn',tag:'绳向',","tone:'warn',tag:'Azimuth',"],["txt:'如果不方便改绳向可忽略本条。当前绳向 '+Math.round(state.ropeAz)+'° 距当日最优还有差距：转到约 '+b1+'°（或反向 '+b2+'°，即'+dirName8(b1)+'—'+dirName8(b2)+'走向）可提升几何受光量约 '+gainGeom.toFixed(0)+'%。折叠方式再优化也无法弥补绳向的差距。'","txt:'Ignore this if the line cannot be moved. The current azimuth '+Math.round(state.ropeAz)+'° is short of the day\\'s optimum: turning to about '+b1+'° (or '+b2+'°, i.e. a '+dirName8(b1)+'–'+dirName8(b2)+' line) raises geometric exposure by about '+gainGeom.toFixed(0)+'%. No folding tweak can recover the azimuth gap.'"],["tone:'info',tag:'口径',","tone:'info',tag:'Metric',"],["txt:'上述为几何受光量（面积×时间）的提升；按直射能量加权（计入低角度阳光的大气衰减）后约为 '+gainEnergy.toFixed(0)+'%。晨昏低角度光对“面积×时间”贡献大，对能量贡献相对小。'","txt:'The figure above is geometric exposure (area × time); weighted by beam energy (including low-sun atmospheric attenuation) it is about '+gainEnergy.toFixed(0)+'%. Low dawn/dusk light matters a lot to area × time and little to energy.'"],["tone:'good',tag:'绳向',txt:'当前绳向已接近当日最优（差 '+gainGeom.toFixed(1)+'%），无需调整。'","tone:'good',tag:'Azimuth',txt:'The current azimuth is close to the day\\'s optimum ('+gainGeom.toFixed(1)+'% off) — no change needed.'"],["// 均匀性","// evenness"],["tone:'info',tag:'翻面',txt:'本模型按“面积×时间”统计总量，两层朝向不影响总量，但影响干燥均匀度：可在正午前后翻面一次，让两面都直接受晒（推荐方案已把较长一侧朝向当天受光更多的一侧）。'","tone:'info',tag:'Flip',txt:'The model counts total area × time; which layer faces where does not change the total, but it does affect evenness: flip the quilt around noon so both faces get direct sun (the recommendation already puts the longer side toward the sunnier side).'"],["// 时段","// window"],["tone:'info',tag:'时段',txt:'当日 20%→80% 的受光量集中在 '+fmtHM(w1)+'–'+fmtHM(w2)+'，峰值在 '+fmtHM(c.day.peak.t)+'（瞬时最受光面积 '+c.day.peak.area.toFixed(2)+' m²）。只能晒半天时优先选这一段。'","tone:'info',tag:'Window',txt:'80% of the day\\'s exposure arrives between '+fmtHM(w1)+'–'+fmtHM(w2)+', peaking at '+fmtHM(c.day.peak.t)+' (instant area '+c.day.peak.area.toFixed(2)+' m²). If you only have half a day, pick this window.'"],["// 季节","// season"],["tone:'info',tag:'季节',txt:'本地正午太阳高度角：夏至约 '+(sN>0?sN.toFixed(1):'--')+'°，冬至约 '+(wN>0?wN.toFixed(1):'--')+'°。冬夏入射角差异是全年曲线起伏的主因；当前日期处于全年第 '+Math.round(c.rank/c.yearArr.length*100)+' 百分位。'","tone:'info',tag:'Season',txt:'Local noon sun elevation: about '+(sN>0?sN.toFixed(1):'--')+'° at the June solstice and '+(wN>0?wN.toFixed(1):'--')+'° at the December solstice. The seasonal incidence swing drives the yearly curve; the current date is at the '+Math.round(c.rank/c.yearArr.length*100)+'th percentile of the year.'"],["/* ---------------- 渲染：即时读数 & 控制面板实时值 ---------------- */","/* ---------------- Render: instant readout & sidebar live values ---------------- */"],["const name=(off)=>'朝'+dirName8(state.ropeAz+(off>0?90:-90))+'侧层';","const name=(off)=>'the '+dirName8(state.ropeAz+(off>0?90:-90))+'-side layer';"],["'\u003C/b>\u003Cspan class=\"sep\">|\u003C/span>真太阳时 '","'\u003C/b>\u003Cspan class=\"sep\">|\u003C/span>solar time '"],["'\u003Cspan class=\"sep\">|\u003C/span>高度角 '","'\u003Cspan class=\"sep\">|\u003C/span>elevation '"],["'°\u003Cspan class=\"sep\">|\u003C/span>方位角 '","'°\u003Cspan class=\"sep\">|\u003C/span>azimuth '"],["'\u003Cspan class=\"sep\">|\u003C/span>受光面 '+name(si.litOff)","'\u003Cspan class=\"sep\">|\u003C/span>lit '+name(si.litOff)"],["'\u003Cspan class=\"sep\">|\u003C/span>入射余弦 '","'\u003Cspan class=\"sep\">|\u003C/span>cos-incidence '"],["'\u003Cspan class=\"sep\">|\u003C/span>瞬时受光面积 \u003Cb>'","'\u003Cspan class=\"sep\">|\u003C/span>instant area \u003Cb>'"],["\u003Cspan class=\"sep\">|\u003C/span>直射强度 ","\u003Cspan class=\"sep\">|\u003C/span>beam "],["(si.p\u003C0.03?'\u003Cspan class=\"sep\">|\u003C/span>阳光几乎平行于被面，几乎晒不到':'');","(si.p\u003C0.03?'\u003Cspan class=\"sep\">|\u003C/span>sun nearly parallel to the panels — almost no light':'');"],["'\u003C/b>\u003Cspan class=\"sep\">|\u003C/span>太阳在地平线下，无直射光；被子处于“夜晾”状态。'","'\u003C/b>\u003Cspan class=\"sep\">|\u003C/span>sun below the horizon — no direct light (night drying).'"],["t='沿绳边由工具推荐：当前采用 \u003Cb>'+nm(ch.edge)+'\u003C/b> 搭绳。';","t='Along-line edge (tool pick): \u003Cb>'+nm(ch.edge)+'\u003C/b>. ';"],["t='你已固定 \u003Cb>'+nm(state.edgePref)+'\u003C/b> 搭绳'+(sm.rec.edge!==state.edgePref?'\u003Cspan style=\"color:#ffd08a\">（工具计算的最优为沿'+nm(sm.rec.edge)+'）\u003C/span>':'（与工具最优一致）')+'。';","t='Pinned to the \u003Cb>'+nm(state.edgePref)+'\u003C/b>'+(sm.rec.edge!==state.edgePref?'\u003Cspan style=\"color:#ffd08a\"> (tool optimum: '+nm(sm.rec.edge)+')\u003C/span>':' (matches tool optimum)')+'. ';"],["$('edgeNote').innerHTML=t+'沿绳展开 '+ch.span.toFixed(2)+' m；折点分配的是与绳垂直的「'+(ch.edge==='long'?'宽':'长')+'」（'+D.toFixed(2)+","$('edgeNote').innerHTML=t+'Unfolded along line '+ch.span.toFixed(2)+' m; the fold splits the edge perpendicular to the line ('+D.toFixed(2)+"],["' m），两侧下垂 '+(fB*D).toFixed(2)+' m 与 '+(fS*D).toFixed(2)+' m。';","' m); hanging depths '+(fB*D).toFixed(2)+' m and '+(fS*D).toFixed(2)+' m.';"],["// 刻度标记：去重 + 标签两行错开，避免文字重叠","// scale marks: de-duplicated, labels staggered over two rows"],["lab:'居中 50',title:'居中对折'","lab:'Center 50',title:'Center fold'"],["lab:'推荐 '+Math.round(ch.fRec*100),title:'推荐折点'","lab:'Rec '+Math.round(ch.fRec*100),title:'Recommended fold'"],["lab:'摩擦极限 '+Math.round(sm.fFricLim*100),title:'摩擦理论极限'","lab:'Fric. limit '+Math.round(sm.fFricLim*100),title:'Theoretical friction limit'"],["lab:'拖地限制 '+Math.round(ch.clearLim*100),title:'拖地限制'","lab:'Drag limit '+Math.round(ch.clearLim*100),title:'Ground-clearance limit'"],["lab:'当前 '+Math.round(state.fold*100),title:'当前手动折点'","lab:'Now '+Math.round(state.fold*100),title:'Current manual fold'"],["$('fricNote').innerHTML='质量均匀分布 + 卡普斯坦模型（接触弧 π）：不滑落要求两侧重量比 ≤ e^(μ·π) = '+lim.kappa.toFixed(2)+","$('fricNote').innerHTML='Uniform mass + capstan model (wrap π): no-slip requires weight ratio ≤ e^(μ·π) = '+lim.kappa.toFixed(2)+"],["'，即折点不超过 '+Math.round(sm.fFricLim*100)+'（留 1.3× 安全余量时不超过 '+Math.round(sm.fFricSafe*100)+'）。'+","', i.e. fold ≤ '+Math.round(sm.fFricLim*100)+' ('+Math.round(sm.fFricSafe*100)+' with a 1.3× margin). '+"],["'当前比值 '+ratio.toFixed(2)+(ratio>lim.kappa?'，\u003Cspan style=\"color:#ff9c9c\">超出极限，存在滑落风险\u003C/span>':(ratio>lim.kappa/1.3?'，\u003Cspan style=\"color:#ffd08a\">处于极限与建议值之间\u003C/span>':'，安全'))+'。'+","'Current ratio '+ratio.toFixed(2)+(ratio>lim.kappa?', \u003Cspan style=\"color:#ff9c9c\">over the limit — slip risk\u003C/span>':(ratio>lim.kappa/1.3?', \u003Cspan style=\"color:#ffd08a\">between limit and recommendation\u003C/span>':', safe'))+'. '+"],["'最低点距地 '+drag.toFixed(2)+' m'+(drag\u003C0.03?'（\u003Cspan style=\"color:#ff9c9c\">拖地！\u003C/span>）':'。');","'Clearance '+drag.toFixed(2)+' m'+(drag\u003C0.03?' (\u003Cspan style=\"color:#ff9c9c\">dragging!\u003C/span>)':'.');"],["/* ---------------- 事件绑定 ---------------- */","/* ---------------- Event bindings ---------------- */"],["alert('当前环境不支持定位，请手动输入。');","alert('Geolocation is not supported here — please type the coordinates.');"],["alert('定位失败（'+(err.message||'未知原因')+'），请手动输入经纬度。');","alert('Location failed ('+(err.message||'unknown reason')+') — please type the coordinates.');"],["// 时间游标","// time cursor"],["$('playBtn').textContent='播放一日'","$('playBtn').textContent='Play the day'"],["$('playBtn').textContent='暂停';","$('playBtn').textContent='Pause';"],["// 12 秒播完一天","// one day in 12 seconds"],["/* ---------------- 启动 ---------------- */","/* ---------------- Boot ---------------- */"],["// 时区自动读取本机","// time zone read from this device"],["// 首次进入且已就绪时，把时间游标放到正午","// on first ready load, park the time cursor at noon"],["\u003Cspan class=\"unit\">米\u003C/span>","\u003Cspan class=\"unit\">m\u003C/span>"],["填入演示示例","Load demo"],["≤ κ，κ = e^(μ·π)   →   折点上限 f ≤ κ/(1+κ)","≤ κ, κ = e^(μ·π)   →   fold limit f ≤ κ/(1+κ)"],["/[NSEWnsew南北东西]/g","/[NSEWnsew]/g"],["if(c==='S'||c==='W'||mm==='南'||mm==='西')","if(c==='S'||c==='W')"],["\u003C!-- ======================= 控制台 ======================= -->","\u003C!-- ======================= Console ======================= -->"],["\u003C!-- ======================= 主区 ======================= -->","\u003C!-- ======================= Main ======================= -->"],["   UI 层","   UI layer"],["// 方案寻优（沿绳边 × 折点），随后解析当前采用方案","// scheme search (edge × fold), then resolve the adopted scheme"],["// 自动模式下，把较长的一侧放在受光更充足的一边（仅影响摆放示意，总量不变）","// in auto mode put the longer side on the sunnier side (placement visuals only; totals unchanged)"],["// 最优绳向的能量（用于对比“能量加权收益”）","// energy at the best azimuth (for the energy-weighted comparison)"],["// 全年统计","// yearly stats"],["\u003Cp>\u003Cb>为什么推荐折点几乎总是 66:34？\u003C/b>受光面积正比于「较长一层」的下垂长度（两层互遮后由剪影决定），折得越不对称受光越多，所以最优折点总是顶在约束允许的最大值上——默认 μ=0.30、留 1.3× 安全余量时即为摩擦安全上限 66.4%。它不随地点、日期、绳向变化（太阳条件只决定「较长一侧朝哪边」和 G 的数值）；改变摩擦系数 μ、或把绳高降到离地约束先起作用的程度，推荐折点才会移动。\u003C/p>","\u003Cp>\u003Cb>Why is the recommended fold almost always 66:34?\u003C/b> The sunlit area is proportional to the longer layer's drop length (with the two layers mutually shadowing, the silhouette decides), so more asymmetry always means more light — the optimum therefore sits at the maximum the constraints allow: with the defaults (μ=0.30 plus a 1.3× safety margin) that is the friction limit of 66.4%. It does not change with location, date or line direction — the sun only decides which side the longer layer faces, and the value of G. It moves only if you change the friction μ, or lower the line height until the ground-clearance constraint binds first.\u003C/p>"],["演示数据（北京 · 南北走向晾绳），仅用于体验流程；正式使用时请把绳向改为你自己实测的数值。","Demo data (Beijing · north–south line) — trial only; for real use, replace the azimuth with your own reading."],["(E, N, U)：E","(E, N, U): E"],["(P/P₀)，z = ","(P/P₀), z = "],["'°，'+fmtDMS","'°, '+fmtDMS"],["\u003C/span> ｜ '+dirSeg;","\u003C/span> | '+dirSeg;"],["toFixed(2)+' m）',rec.ropeOK","toFixed(2)+' m)',rec.ropeOK"],["'°（'+dirName8(si.az)+'）'","'° ('+dirName8(si.az)+')'"],["播放一日","Play day"],["暂停","Pause"]];
+/* ============================================================
+   语言切换引擎（中文 ⇄ English，无刷新、无跳转）
+   ------------------------------------------------------------
+   原理：
+   · 只保留一套（中文）逻辑源码；英文界面由运行时词典生成。
+   · 静态骨架：切换时用首屏快照整页重建（重建 HTML 字符串在写入
+     innerHTML 时经补丁自动翻译，与构建期生成英文版的规则完全一致）。
+   · 动态内容：所有 innerHTML / textContent 写入经过原型补丁实时翻译，
+     因此图表、按钮、提示语在每次重绘后都是目标语言。
+   · 性能开关：window.__NO_TRANS 置真可临时跳过词典替换（高频重绘期间使用；
+     显示函数为函数级双实现，英文模式下本就产出英文，故不影响可见文本）。
+   · 重建后重新绑定事件（boot()），保留全部已填参数（state 不重置）。
+   ============================================================ */
+window.__LANG = 'zh';
+
+/* 首屏快照（去掉 <script>，避免重建时脚本重复） */
+var __ORIG_BODY = (function(){
+  try{
+    var c = document.body.cloneNode(true);
+    var ss = c.querySelectorAll('script');
+    for(var i=0;i<ss.length;i++){ ss[i].remove(); }
+    return c.innerHTML;
+  }catch(e){ return ''; }
+})();
+
+/* 由内嵌词典构建翻译器（分块编译，最长优先） */
+var __TR_MAP = {}, __TR_CHUNKS = [];
+(function(){
+  var seen = {};
+  for(var i=0;i<__I18N_DATA.length;i++){
+    var zh = __I18N_DATA[i][0], en = __I18N_DATA[i][1];
+    if(zh === en) continue;
+    if(!/[\u4e00-\u9fff\u3000-\u303f\uff01-\uff5e]/.test(zh)) continue;
+    if(seen[zh]) continue;
+    seen[zh] = 1;
+    __TR_MAP[zh] = en;
+  }
+  var keys = Object.keys(__TR_MAP).sort(function(a,b){ return b.length - a.length; });
+  var esc = function(t){ return t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); };
+  for(var j=0;j<keys.length;j+=64){
+    var part = keys.slice(j, j+64);
+    try{ __TR_CHUNKS.push(new RegExp(part.map(esc).join('|'),'g')); }catch(e){}
+  }
+})();
+
+function __trEn(s){
+  if(!s || !/[\u4e00-\u9fff]/.test(s)) return s;
+  for(var i=0;i<__TR_CHUNKS.length;i++){
+    s = s.replace(__TR_CHUNKS[i], function(m){ var v = __TR_MAP[m]; return (v === undefined) ? m : v; });
+  }
+  return s;
+}
+
+/* 原型补丁：拦截全部 DOM 文本写入，在英文模式下实时翻译 */
+(function(){
+  var ihD = Object.getOwnPropertyDescriptor(Element.prototype,'innerHTML');
+  Object.defineProperty(Element.prototype,'innerHTML',{
+    configurable:true, get:ihD.get,
+    set:function(v){
+      if(window.__LANG === 'en' && !window.__NO_TRANS && typeof v === 'string'){ try{ v = __trEn(v); }catch(e){} }
+      ihD.set.call(this, v);
+    }
+  });
+  var tcD = Object.getOwnPropertyDescriptor(Node.prototype,'textContent');
+  Object.defineProperty(Node.prototype,'textContent',{
+    configurable:true, get:tcD.get,
+    set:function(v){
+      if(window.__LANG === 'en' && !window.__NO_TRANS && typeof v === 'string' && /[\u4e00-\u9fff]/.test(v)){ try{ v = __trEn(v); }catch(e){} }
+      tcD.set.call(this, v);
+    }
+  });
+})();
+
+/* 同步语言切换按钮的选中态 */
+function __syncLangBtn(){
+  var ls = document.getElementById('langSeg');
+  if(!ls) return;
+  var bs = ls.querySelectorAll('button');
+  for(var i=0;i<bs.length;i++){
+    bs[i].classList.toggle('on', bs[i].getAttribute('data-lang') === window.__LANG);
+  }
+}
+
+/* 切换语言：重建整页骨架 + 软重启（不刷新、不丢已填数据） */
+function setLang(lang){
+  if(lang !== 'zh' && lang !== 'en') return;
+  if(lang === window.__LANG) return;
+  window.__LANG = lang;
+  try{ localStorage.setItem('quiltLang', lang); }catch(e){}
+  try{ state.playing = false; }catch(e){}
+  document.documentElement.lang = (lang === 'en') ? 'en' : 'zh-CN';
+  document.title = (lang === 'en')
+    ? 'Quilt Sun-Drying Simulator · Solar Geometry Lab'
+    : '晒被光照模拟器 · Quilt Sun Lab';
+  if(__ORIG_BODY){ document.body.innerHTML = __ORIG_BODY; }
+  if(window.__reboot) window.__reboot();
+}
+window.__setLang = setLang;
+
+
 /*===CORE-START===*/
 const D2R=Math.PI/180, R2D=180/Math.PI;
 const clamp=(v,a,b)=>v<a?a:(v>b?b:v);
@@ -589,10 +702,11 @@ function airMassDNI(elevDeg,alt,kc){
   const dni=1353*Math.pow(0.7,Math.pow(am,0.678))*kc;
   return {am,dni};
 }
-const DIR8=['N','NE','E','SE','S','SW','W','NW'];
-function dirName8(az){return DIR8[Math.round(norm360(az)/45)%8];}
+const DIR8=['北','东北','东','东南','南','西南','西','西北'];
+const DIR8_EN=['N','NE','E','SE','S','SW','W','NW'];
+function dirName8(az){const D=(window.__LANG==='en')?DIR8_EN:DIR8;return D[Math.round(norm360(az)/45)%8];}
 function dirName16(az){
-  const n=['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+  const n=(window.__LANG==='en')?['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW']:['北','北北东','东北','东北东','东','东南东','东南','南南东','南','南南西','西南','西南西','西','西北西','西北','北北西'];
   return n[Math.round(norm360(az)/22.5)%16];
 }
 function foldLimit(mu){const kappa=Math.exp(mu*Math.PI);return {kappa,fMax:kappa/(1+kappa)};}
@@ -605,19 +719,19 @@ function parseAngle(raw,isLat){
   if(raw==null)return {ok:false};
   let s=String(raw).trim(); if(!s)return {ok:false};
   let sign=1;
-  s=s.replace(/[NSEWnsew]/g,mm=>{const c=mm.toUpperCase();if(c==='S'||c==='W')sign=-1;return ' ';});
+  s=s.replace(/[NSEWnsew南北东西]/g,mm=>{const c=mm.toUpperCase();if(c==='S'||c==='W'||mm==='南'||mm==='西')sign=-1;return ' ';});
   let neg=false;
   if(/^\s*[-\u2212]/.test(s)){neg=true;s=s.replace(/[-\u2212]/,' ');}
   const parts=s.split(/[^0-9.]+/).filter(x=>x.length>0).map(Number);
   if(!parts.length||parts.some(v=>!isFinite(v)))return {ok:false};
   let v=(parts[0]||0)+((parts[1]||0)/60)+((parts[2]||0)/3600);
-  if(neg)v=-v; v*=sign;
+  if(neg)v=-v; else v*=sign;   // 显式负号优先；未写负号时才套用 N/S、E/W 方向符号
   if(isLat&&(Math.abs(v)>90||Math.abs(v)<0.0001))return {ok:false,range:true};
   if(!isLat&&Math.abs(v)>180)return {ok:false,range:true};
   return {ok:true,v};
 }
 function fmtDMS(v,isLat){
-  const hemi=isLat?(v>=0?'N':'S'):(v>=0?'E':'W');
+  const __en=(window.__LANG==='en');const hemi=isLat?(v>=0?(__en?'N':'N 北纬'):(__en?'S':'S 南纬')):(v>=0?(__en?'E':'E 东经'):(__en?'W':'W 西经'));
   let a=Math.abs(v);let d=Math.floor(a);let mf=(a-d)*60;let m=Math.floor(mf);let sec=Math.round((mf-m)*60);
   if(sec>=60){sec-=60;m++;} if(m>=60){m-=60;d++;}
   return d+'°'+String(m).padStart(2,'0')+'′'+String(sec).padStart(2,'0')+'″ '+hemi;
@@ -691,7 +805,7 @@ function yearScan(par){
   }
   return arr;
 }
-/* ---- Scheme search: edge × fold fraction, maximizing exposure within constraints ---- */
+/* ---- 方案寻优：沿绳边 × 折点分数，在约束内取受光量最大 ---- */
 function litIntegrals(par){
   const {decl,eot}=spencer(par.n);
   const lat=par.lat*D2R;
@@ -729,7 +843,7 @@ function optimizeScheme(par,pref,safety){
   for(const edge of ['long','short']){
     const span=(edge==='long')?par.L:par.W;
     const D=(edge==='long')?par.W:par.L;
-    const clearLim=(par.ropeH-CLEAR)/D;           // deepest drop limit (line height − clearance margin)
+    const clearLim=(par.ropeH-CLEAR)/D;           // 最长一侧下垂不得超过（绳高−离地余量）
     const fMax=clamp(Math.min(fFricLim,clearLim),0.5,0.95);
     const fRec=clamp(Math.min(fFricSafe,clearLim),0.5,0.9);
     const ropeNeed=span+ROPE_MARGIN;
@@ -737,7 +851,7 @@ function optimizeScheme(par,pref,safety){
     const deepest=fRec*D;
     const clear=par.ropeH-deepest;
     const slipMargin=kappa/Math.max(1e-6,fRec/(1-fRec));
-    const dragSymmetric=clearLim<0.5-1e-9;        // even a center fold would drag
+    const dragSymmetric=clearLim<0.5-1e-9;        // 对折也会拖地
     const G=schemeG(par,hist,edge,fRec);
     const G50=schemeG(par,hist,edge,0.5);
     const Gmax=schemeG(par,hist,edge,fMax);
@@ -752,15 +866,15 @@ function optimizeScheme(par,pref,safety){
   }else{
     rec=opts[0].G>=opts[1].G?opts[0]:opts[1];
   }
-  // morning/afternoon verdict: N–S lines are symmetric; gap below 0.6 h counts as equal
-  // (scale of compass error + magnetic declination) → "equivalent sides"
+  // 上午/下午差异判定：南北向绳两侧理论对称，差值小于 0.6 h
+  // （约相当于手机指南针误差与磁偏角带来的影响）视为“两侧相当”
   const dL=Math.abs(hist.Lp-hist.Lm);
   const maxL=Math.max(hist.Lp,hist.Lm);
   const tie=(maxL<0.02)||(dL<0.6);
   const soft=(!tie)&&(dL<1.5);
   const sunnier=tie?0:((hist.Lp>hist.Lm)?1:-1);
   const bigDir=(sunnier===0)?null:norm360(par.ropeAz+(sunnier>0?90:-90));
-  // afternoon-sun side (for the empirical-preference note)
+  // 下午受晒的一侧（用于“经验偏好”提示）
   let afterDir=null;
   {
     const spn=spencer(par.n);
@@ -778,7 +892,7 @@ function optimizeScheme(par,pref,safety){
 /*===CORE-END===*/
 
 /* ======================================================================
-   UI layer
+   UI 层
    ====================================================================== */
 const $=id=>document.getElementById(id);
 const f1=n=>n.toFixed(1);
@@ -836,6 +950,7 @@ function fmtDMSIn(v,isLat){
   return d+'°'+String(m).padStart(2,'0')+'′'+String(sec).padStart(2,'0')+'″'+suf;
 }
 function syncInputsFromState(){
+  if(window.__LANG==='en'){
   $('lat').value=state.lat==null?'':fmtDMSIn(state.lat,true);
   $('lon').value=state.lon==null?'':fmtDMSIn(state.lon,false);
   $('alt').value=state.alt==null?'':String(state.alt);
@@ -856,8 +971,33 @@ function syncInputsFromState(){
   $('daySlider').value=String(n);
   $('dayNo').textContent=n+' d';
   $('timeRange').value=String(Math.round(state.scrub));
+
+    return;
+  }
+  /* ---- 中文逻辑（源码唯一一份）---- */
+  $('lat').value=state.lat==null?'':fmtDMSIn(state.lat,true);
+  $('lon').value=state.lon==null?'':fmtDMSIn(state.lon,false);
+  $('alt').value=state.alt==null?'':String(state.alt);
+  $('tz').value=String(state.tz);
+  $('ropeAz').value=state.ropeAz==null?'':String(Math.round(state.ropeAz));
+  $('qL').value=String(state.L);
+  $('qW').value=String(state.W);
+  $('tCm').value=String(state.tCm);
+  $('fold').value=String(Math.round(state.fold*100));
+  $('ropeH').value=String(state.ropeH);
+  $('ropeLen').value=String(state.ropeLen);
+  $('mu').value=String(state.mu);
+  $('kc').value=String(state.kc);
+  [].forEach.call($('edgeSeg').children,x=>x.classList.toggle('on',x.dataset.edge===state.edgePref));
+  const n=dayOfYear(state.y,state.m,state.d);
+  $('dateInput').value=state.y+'-'+String(state.m).padStart(2,'0')+'-'+String(state.d).padStart(2,'0');
+  $('daySlider').max=isLeap(state.y)?366:365;
+  $('daySlider').value=String(n);
+  $('dayNo').textContent=n+' 天';
+  $('timeRange').value=String(Math.round(state.scrub));
 }
 function pullUI(){
+  if(window.__LANG==='en'){
   const latRaw=$('lat').value.trim(), lonRaw=$('lon').value.trim();
   const lp=latRaw?parseAngle(latRaw,true):{ok:false,blank:true};
   const lo=lonRaw?parseAngle(lonRaw,false):{ok:false,blank:true};
@@ -886,6 +1026,38 @@ function pullUI(){
   const mu=Number($('mu').value); if(isFinite(mu))state.mu=clamp(mu,0.05,1);
   const kc=Number($('kc').value); if(isFinite(kc))state.kc=clamp(kc,0.1,1);
   $('dayNo').textContent=dayOfYear(state.y,state.m,state.d)+' d';
+
+    return;
+  }
+  /* ---- 中文逻辑（源码唯一一份）---- */
+  const latRaw=$('lat').value.trim(), lonRaw=$('lon').value.trim();
+  const lp=latRaw?parseAngle(latRaw,true):{ok:false,blank:true};
+  const lo=lonRaw?parseAngle(lonRaw,false):{ok:false,blank:true};
+  $('lat').classList.toggle('bad',latRaw!==''&&!lp.ok);
+  $('lon').classList.toggle('bad',lonRaw!==''&&!lo.ok);
+  if(lp.ok)state.lat=lp.v; else if(latRaw==='')state.lat=null;
+  if(lo.ok)state.lon=lo.v; else if(lonRaw==='')state.lon=null;
+  if(latRaw==='')$('latShow').innerHTML='<span style="color:#67779c">未填写，支持 39°54′15″ 或 39.904 两种格式</span>';
+  else if(lp.ok)$('latShow').innerHTML='= '+state.lat.toFixed(5)+'°，'+fmtDMS(state.lat,true);
+  else $('latShow').innerHTML='<span style="color:#ff9c9c">无法解析纬度，请用 39°54′15″ 或 39.904 格式</span>';
+  if(lonRaw==='')$('lonShow').innerHTML='<span style="color:#67779c">未填写，支持 116°24′27″ 或 116.407 两种格式</span>';
+  else if(lo.ok)$('lonShow').innerHTML='= '+state.lon.toFixed(5)+'°，'+fmtDMS(state.lon,false);
+  else $('lonShow').innerHTML='<span style="color:#ff9c9c">无法解析经度，请用 116°24′27″ 或 116.407 格式</span>';
+  const altRaw=$('alt').value.trim();
+  if(altRaw===''){state.alt=0;$('altShow').innerHTML='<span style="color:#67779c">留空按 0 米计，对结果影响很小</span>';}
+  else{const alt=Number(altRaw); if(isFinite(alt)){state.alt=clamp(alt,-400,9000);$('altShow').innerHTML='';}}
+  const tz=Number($('tz').value); if(isFinite(tz))state.tz=clamp(tz,-12,14);
+  const azRaw=$('ropeAz').value.trim();
+  if(azRaw==='')state.ropeAz=null;
+  else{const az=Number(azRaw); if(isFinite(az))state.ropeAz=norm360(az);}
+  const L=Number($('qL').value); if(isFinite(L)&&L>0.3)state.L=clamp(L,0.3,5);
+  const W=Number($('qW').value); if(isFinite(W)&&W>0.3)state.W=clamp(W,0.3,5);
+  const t=Number($('tCm').value); if(isFinite(t))state.tCm=clamp(t,0.5,40);
+  const rh=Number($('ropeH').value); if(isFinite(rh))state.ropeH=clamp(rh,0.5,3.5);
+  const rl=Number($('ropeLen').value); if(isFinite(rl))state.ropeLen=clamp(rl,0.5,30);
+  const mu=Number($('mu').value); if(isFinite(mu))state.mu=clamp(mu,0.05,1);
+  const kc=Number($('kc').value); if(isFinite(kc))state.kc=clamp(kc,0.1,1);
+  $('dayNo').textContent=dayOfYear(state.y,state.m,state.d)+' 天';
 }
 function scheduleCompute(delay){
   if(computeTimer)clearTimeout(computeTimer);
@@ -894,6 +1066,7 @@ function scheduleCompute(delay){
 
 /* ---------------- compute ---------------- */
 function computeAll(){
+  if(window.__LANG==='en'){
   const n=dayOfYear(state.y,state.m,state.d);
   const base={lat:state.lat,lon:state.lon,alt:state.alt,tz:state.tz,ropeAz:state.ropeAz,
     L:state.L,W:state.W,ropeH:state.ropeH,ropeLen:state.ropeLen,mu:state.mu,
@@ -938,8 +1111,57 @@ function computeAll(){
   state.cal={par,g,day,scan,yearArr,bestAz,bestG,Gcur,kCur,score,Teq,dayBest,
     bestIdx,worstIdx,rank,monthAvg,solstice,scheme,chosen,base,fGeom,
     fError:(state.foldManual!=null)};
+
+    return;
+  }
+  /* ---- 中文逻辑（源码唯一一份）---- */
+  const n=dayOfYear(state.y,state.m,state.d);
+  const base={lat:state.lat,lon:state.lon,alt:state.alt,tz:state.tz,ropeAz:state.ropeAz,
+    L:state.L,W:state.W,ropeH:state.ropeH,ropeLen:state.ropeLen,mu:state.mu,
+    t:state.tCm/100,kc:state.kc,n,year:state.y,step:2};
+  // 方案寻优（沿绳边 × 折点），随后解析当前采用方案
+  const scheme=optimizeScheme(base,state.edgePref,1.3);
+  const chosen=(state.edgePref==='auto')?scheme.rec:scheme.opts.find(o=>o.edge===state.edgePref);
+  state.edge=chosen.edge;
+  state.fold=(state.foldManual!=null)?clamp(state.foldManual,0.1,0.9):chosen.fRec;
+  // 自动模式下，把较长的一侧放在受光更充足的一边（仅影响摆放示意，总量不变）
+  let fGeom=state.fold;
+  if(state.edgePref==='auto'&&state.foldManual==null&&scheme.sunnier<0)fGeom=1-state.fold;
+  const g=geomFromEdge(state.edge,state.L,state.W,fGeom);
+  const par=Object.assign({},base,{span:g.span,hBig:g.hBig,withEnergy:true,withCurve:true});
+  const day=integrateDay(par);
+  const scan=scanAzimuths(par);
+  const yearArr=yearScan({lat:base.lat,lon:base.lon,alt:base.alt,tz:base.tz,ropeAz:base.ropeAz,
+    span:g.span,hBig:g.hBig,t:base.t,kc:base.kc,year:base.year,step:3});
+  const Gcur=day.G, kCur=((Math.round(state.ropeAz)%180)+180)%180;
+  const bestAz=scan.bestAz, bestG=Math.max(scan.bestG,1e-9);
+  const score=clamp(Gcur/bestG*100,0,100);
+  const Teq=Gcur/Math.max(0.01,state.L*state.W);
+  // 最优绳向的能量（用于对比“能量加权收益”）
+  const parBest=Object.assign({},par,{ropeAz:norm360(bestAz)});
+  const dayBest=integrateDay(parBest);
+  // 全年统计
+  const N=yearArr.length;
+  let bestIdx=0,worstIdx=0,sum=0;
+  for(let i=0;i<N;i++){sum+=yearArr[i];if(yearArr[i]>yearArr[bestIdx])bestIdx=i;if(yearArr[i]<yearArr[worstIdx])worstIdx=i;}
+  const curIdx=par.n-1;
+  let rank=0; for(let i=0;i<N;i++)if(yearArr[i]<=yearArr[curIdx])rank++;
+  const monthAvg=[];
+  const md=monthDays(state.y); let acc=0;
+  for(let m=1;m<=12;m++){
+    let s=0; for(let k=0;k<md[m-1];k++)s+=yearArr[acc+k];
+    monthAvg.push(s/md[m-1]); acc+=md[m-1];
+  }
+  const solstice=(declDeg)=>{
+    const d=Math.abs(state.lat-declDeg);
+    return 90-d;
+  };
+  state.cal={par,g,day,scan,yearArr,bestAz,bestG,Gcur,kCur,score,Teq,dayBest,
+    bestIdx,worstIdx,rank,monthAvg,solstice,scheme,chosen,base,fGeom,
+    fError:(state.foldManual!=null)};
 }
 function recompute(){
+  if(window.__LANG==='en'){
   try{
     pullUI();
     const main=document.querySelector('main');
@@ -960,9 +1182,34 @@ function recompute(){
     const eb=$('errBar'); eb.style.display='block'; eb.textContent='Compute error: '+(err&&err.message?err.message:err);
     console.error(err);
   }
+
+    return;
+  }
+  /* ---- 中文逻辑（源码唯一一份）---- */
+  try{
+    pullUI();
+    const main=document.querySelector('main');
+    if(!isReady()){
+      state.cal=null;
+      main.classList.add('notready');
+      renderEmpty();
+      renderCompass();
+      return;
+    }
+    main.classList.remove('notready');
+    computeAll();
+    if(!state.cal.day.polarNight){
+      if(!state._init){state.scrub=Math.round((state.cal.day.rise+state.cal.day.set)/2);state._init=true;}
+    }
+    renderAll();
+  }catch(err){
+    const eb=$('errBar'); eb.style.display='block'; eb.textContent='计算出错：'+(err&&err.message?err.message:err);
+    console.error(err);
+  }
 }
-/* Empty state: list the missing inputs */
+/* 空状态：提示还缺哪些输入 */
 function renderEmpty(){
+  if(window.__LANG==='en'){
   const hasLat=state.lat!=null, hasLon=state.lon!=null, hasAz=state.ropeAz!=null;
   const st=(ok)=>'<span class="st '+(ok?'ok':'todo')+'">'+(ok?'✓':'○')+'</span>';
   const li=[];
@@ -974,9 +1221,24 @@ function renderEmpty(){
   const missing=[];
   if(!hasLat)missing.push('latitude'); if(!hasLon)missing.push('longitude'); if(!hasAz)missing.push('line azimuth');
   $('emptyMissing').innerHTML=missing.length?('Missing: <b>'+missing.join(', ')+'</b> — once all three are set, the computation starts automatically.'):'Ready — computing…';
+
+    return;
+  }
+  /* ---- 中文逻辑（源码唯一一份）---- */
+  const hasLat=state.lat!=null, hasLon=state.lon!=null, hasAz=state.ropeAz!=null;
+  const st=(ok)=>'<span class="st '+(ok?'ok':'todo')+'">'+(ok?'✓':'待填')+'</span>';
+  const li=[];
+  li.push('<li>'+st(hasLat&&hasLon)+'<div><b>第 1 步 · 晾晒地点</b><br>纬度'+(hasLat?' 已填 ':' 未填，')+'经度'+(hasLon?'已填':'未填')+
+    '。可点下方按钮自动获取本机位置，也可手动输入；海拔可留空（按 0 米计）。</div></li>');
+  li.push('<li><span class="st ok">✓</span><div><b>第 2 步 · 时区与日期</b><br>时区已自动读取本机（UTC'+((state.tz>=0?'+':'')+state.tz)+'），日期默认今天（'+state.y+'年'+state.m+'月'+state.d+'日），均可修改。</div></li>');
+  li.push('<li>'+st(hasAz)+'<div><b>第 3 步 · 晾绳走向</b><br>'+(hasAz?'绳向已填（'+Math.round(state.ropeAz)+'°）。':'用手机指南针沿晾绳方向读数后填入，或直接拖动左侧罗盘圆点。')+'</div></li>');
+  $('emptySteps').innerHTML='<ul class="stepsList">'+li.join('')+'</ul>';
+  const missing=[];
+  if(!hasLat)missing.push('纬度'); if(!hasLon)missing.push('经度'); if(!hasAz)missing.push('绳向方位角');
+  $('emptyMissing').innerHTML=missing.length?('还缺：<b>'+missing.join('、')+'</b>。三项填齐后自动开始计算并给出推荐晒法。'):'已就绪，正在计算…';
 }
 
-/* ---------------- Time cursor ---------------- */
+/* ---------------- 时间游标 ---------------- */
 function sunAtScrub(){
   const c=state.cal; if(!c)return null;
   const {decl,eot}=spencer(c.par.n);
@@ -993,8 +1255,9 @@ function sunAtScrub(){
   return {elev,az,p,litOff,dni,area,up,cU,solarT};
 }
 
-/* ---------------- Render: compass (sidebar) ---------------- */
+/* ---------------- 渲染：罗盘（侧栏输入） ---------------- */
 function renderCompass(){
+  if(window.__LANG==='en'){
   const W=224,cx=112,cy=112,R=92;
   const az=state.ropeAz;
   const dir=(aDeg,r)=>{const a=aDeg*D2R;return [cx+r*Math.sin(a),cy-r*Math.cos(a)];};
@@ -1030,8 +1293,47 @@ function renderCompass(){
   }
   p.push(txS([cx,cy+52],az==null?'drag the dial or type an azimuth':'drag the dot to set direction','text-anchor="middle" font-size="10.5" fill="#67779c"'));
   $('compassBox').innerHTML='<svg viewBox="0 0 '+W+' '+W+'" id="compassSvg" style="width:100%">'+p.join('')+'</svg>';
+
+    return;
+  }
+  /* ---- 中文逻辑（源码唯一一份）---- */
+  const W=224,cx=112,cy=112,R=92;
+  const az=state.ropeAz;
+  const dir=(aDeg,r)=>{const a=aDeg*D2R;return [cx+r*Math.sin(a),cy-r*Math.cos(a)];};
+  const p=[];
+  p.push('<circle cx="'+cx+'" cy="'+cy+'" r="'+(R+6)+'" fill="#0b1322" stroke="#1f2c44"/>');
+  for(let a=0;a<360;a+=10){
+    const big=(a%45===0);
+    const p1=dir(a,R-2),p2=dir(a,R-(big?11:6));
+    p.push(lnS(p1,p2,'stroke="'+(big?'#4a6187':'#263651')+'" stroke-width="'+(big?1.6:1)+'"'));
+  }
+  if(az!=null){
+    // 法线（-90/+90，注意“+90°”对应 az+90）
+    const b1=dir(az+90,R-26),b2=dir(az+270,R-26);
+    p.push(lnS(dir(az+90,R-2),b1,'stroke="#5aa7ff" stroke-dasharray="4 5" stroke-width="1.2" opacity=".65"'));
+    p.push(lnS(dir(az+270,R-2),b2,'stroke="#5aa7ff" stroke-dasharray="4 5" stroke-width="1.2" opacity=".65"'));
+    // 绳
+    const r1=dir(az,R-14),r2=dir(az+180,R-14);
+    p.push(lnS(r1,r2,'stroke="#e0b27a" stroke-width="6" stroke-linecap="round"'));
+    p.push('<circle cx="'+f1(r1[0])+'" cy="'+f1(r1[1])+'" r="9" fill="url(#cg)" stroke="#151d30" stroke-width="2"/>');
+    p.push('<defs><radialGradient id="cg"><stop offset="0" stop-color="#ffe3ad"/><stop offset="1" stop-color="#ff9a3d"/></radialGradient></defs>');
+  }
+  // 方位字：深色底片压在线之上，避免与绳线重叠
+  [['北',0,'#ffb3b3'],['东',90,'#93a2c4'],['南',180,'#93a2c4'],['西',270,'#93a2c4']].forEach(it=>{
+    const q=dir(it[1],R-32);
+    p.push(pillS(q[0],q[1],it[0],it[2],12));
+  });
+  if(az!=null){
+    p.push(txS([cx,cy-4],Math.round(az)+'°','text-anchor="middle" font-size="24" font-weight="700" fill="#e9eefb" style="font-variant-numeric:tabular-nums" stroke="#0b1322" stroke-width="4" paint-order="stroke"'));
+    p.push(txS([cx,cy+15],dirName8(az)+'—'+dirName8(norm360(az+180))+'走向','text-anchor="middle" font-size="12" fill="#93a2c4" stroke="#0b1322" stroke-width="3" paint-order="stroke"'));
+  }else{
+    p.push(txS([cx,cy-4],'--','text-anchor="middle" font-size="24" font-weight="700" fill="#67779c"'));
+    p.push(txS([cx,cy+15],'未设置','text-anchor="middle" font-size="12" fill="#67779c"'));
+  }
+  p.push(txS([cx,cy+52],az==null?'拖动表盘或填写方位角':'拖动圆点调整绳向','text-anchor="middle" font-size="10.5" fill="#67779c"'));
+  $('compassBox').innerHTML='<svg viewBox="0 0 '+W+' '+W+'" id="compassSvg" style="width:100%">'+p.join('')+'</svg>';
 }
-(function bindCompass(){
+function bindCompass(){
   const box=$('compassBox');
   let dragging=false;
   const setFromEvent=(ev)=>{
@@ -1051,10 +1353,11 @@ function renderCompass(){
   box.addEventListener('pointermove',e=>{if(dragging)setFromEvent(e);});
   box.addEventListener('pointerup',e=>{dragging=false;});
   box.addEventListener('pointercancel',e=>{dragging=false;});
-})();
+}
 
-/* ---------------- Render: recommendation (hero) ---------------- */
+/* ---------------- 渲染：推荐结论（首屏） ---------------- */
 function renderRec(){
+  if(window.__LANG==='en'){
   const c=state.cal; if(!c)return;
   const sm=c.scheme, rec=sm.rec;
   const nm=e=>e==='long'?'long edge':'short edge';
@@ -1107,10 +1410,67 @@ function renderRec(){
   if(c.fError)stt.push('Manual fold '+(Math.max(state.fold,1-state.fold)*100).toFixed(0)+':'+((1-Math.max(state.fold,1-state.fold))*100).toFixed(0)+' (recommended '+Math.round(rec.fRec*100)+':'+Math.round((1-rec.fRec)*100)+')');
   const base=stt.length?stt.join('; ')+'. Click "Apply recommendation" to reset.':'The scene shows the recommended scheme (auto mode).';
   $('recState').textContent=(state.demoNote?state.demoNote+' ':'')+base;
+
+    return;
+  }
+  /* ---- 中文逻辑（源码唯一一份）---- */
+  const c=state.cal; if(!c)return;
+  const sm=c.scheme, rec=sm.rec;
+  const nm=e=>e==='long'?'长边':'宽边';
+  const fBig=rec.fRec, fSmall=1-fBig;
+  const ratio=fBig/fSmall, margin=sm.kappa/ratio;
+  const gain50=rec.G50>1e-9?(rec.G/rec.G50-1)*100:0;
+  const gainCur=(c.Gcur>1e-9)?(rec.G/c.Gcur-1)*100:0;
+  const sideA=norm360(state.ropeAz+90), sideB=norm360(state.ropeAz-90);
+  // 头部：朝向按“相当 / 略优 / 明显”三档措辞
+  let dirSeg;
+  if(sm.tie){
+    dirSeg='较长一侧（'+rec.deepest.toFixed(2)+' m）朝 '+dirName8(sideA)+' 或 '+dirName8(sideB)+' 一侧均可';
+  }else if(sm.soft){
+    dirSeg='较长一侧（'+rec.deepest.toFixed(2)+' m）朝 '+dirName8(sm.bigDir)+' 略优';
+  }else{
+    dirSeg='较长一侧（'+rec.deepest.toFixed(2)+' m）朝 '+dirName8(sm.bigDir)+' 垂下';
+  }
+  $('recHead').innerHTML='推荐：<span class="hl">'+nm(rec.edge)+'搭在绳上</span> ｜ 折点 <span class="hl">'+Math.round(fBig*100)+':'+Math.round(fSmall*100)+
+    '</span> ｜ '+dirSeg;
+  const bl=[];
+  bl.push('沿绳展开 <b>'+rec.span.toFixed(2)+' m</b>（'+nm(rec.edge)+'与绳平行），需要绳长至少 '+rec.ropeNeed.toFixed(2)+
+    ' m（含打结余量 0.2 m），你填写的绳长 '+state.ropeLen.toFixed(1)+' m '+(rec.ropeOK?'<span class="good">✓ 够用</span>':'<span class="bad">✗ 不够，请看下方对比表选另一种搭法</span>'));
+  bl.push('折在「'+(rec.edge==='long'?'宽':'长')+'」的 '+(fSmall*100).toFixed(0)+'% 处：两侧下垂 '+rec.deepest.toFixed(2)+' m 与 '+(rec.D-rec.deepest).toFixed(2)+
+    ' m，最低点距地 '+rec.clear.toFixed(2)+' m '+(rec.clear>=0.06?'<span class="good">✓ 不拖地</span>':'<span class="bad">✗ 会拖地</span>'));
+  bl.push('两侧重量比（按质量均匀）<b>'+ratio.toFixed(2)+'</b>，摩擦极限 '+sm.kappa.toFixed(2)+'（μ='+state.mu.toFixed(2)+'），余量 <b>'+margin.toFixed(2)+'×</b>'+
+    (margin>=1.0?'<span class="good"> ✓ 能保持住</span>':'<span class="bad"> ✗ 可能滑落</span>')+'。担心滑动可在折痕压绳处缠两圈防滑胶带或用两个晒衣夹');
+  const dTxt=(sm.dL*60).toFixed(0);
+  if(sm.tie){
+    bl.push('当天上午与下午的受光<b>基本相当</b>（'+dirName8(sideA)+'侧 '+sm.hist.Lp.toFixed(2)+' h，'+dirName8(sideB)+'侧 '+sm.hist.Lm.toFixed(2)+
+      ' h，相差约 '+dTxt+' 分钟，在指南针误差量级内），较长一侧垂向哪边都可以。经验上下午气温更高、湿度更低，干燥往往更快；若你有此偏好，可把较长一侧朝 '+dirName8(sm.afterDir)+
+      '（下午受晒的一侧），本模型对此不加分也不扣分。');
+  }else if(sm.soft){
+    bl.push('当天两侧受光<b>略有差异</b>（'+dirName8(sm.bigDir)+'侧多约 '+dTxt+' 分钟），较长一侧朝 '+dirName8(sm.bigDir)+
+      ' 略优；差距不大，若按经验偏好下午（'+dirName8(sm.afterDir)+'）来，损失也有限。');
+  }else{
+    bl.push('当天阳光主要落在 <b>'+dirName8(sm.bigDir)+'</b> 一侧（受光积分 '+Math.max(sm.hist.Lp,sm.hist.Lm).toFixed(1)+' h，另一侧 '+
+      Math.min(sm.hist.Lp,sm.hist.Lm).toFixed(1)+' h），把较长的一侧朝 '+dirName8(sm.bigDir)+'，外露被面晒得最多；另一侧朝 '+dirName8(norm360(sm.bigDir+180)));
+  }
+  if(gain50>0.5)bl.push('受光量 <b>'+rec.G.toFixed(2)+' m²·h</b>，比同边居中对折多 <b>+'+gain50.toFixed(0)+'%</b>'+
+    (c.fError||state.edgePref!=='auto'?'；相对你当前的手动设置 '+(gainCur>=0?'+':'')+gainCur.toFixed(0)+'%':''));
+  $('recBullets').innerHTML=bl.map(t=>'<li>'+t+'</li>').join('');
+  const badges=[];
+  badges.push(['绳长 '+(rec.ropeOK?'够用':'不足')+'（需 '+rec.ropeNeed.toFixed(2)+' m）',rec.ropeOK?'ok':'bad']);
+  badges.push([(rec.dragSymmetric?'会拖地':'不拖地')+'（距地 '+rec.clear.toFixed(2)+' m）',(rec.dragSymmetric||rec.clear<0.06)?'bad':'ok']);
+  badges.push(['摩擦余量 '+margin.toFixed(2)+'×',margin>=1.3?'ok':(margin>=1?'warn':'bad')]);
+  if(gain50>0.5)badges.push(['受光量 +'+gain50.toFixed(0)+'%','ok']);
+  $('recBadges').innerHTML=badges.map(b=>'<span class="badge '+b[1]+'">'+b[0]+'</span>').join('');
+  const stt=[];
+  if(state.edgePref!=='auto')stt.push('你已固定沿'+nm(state.edgePref)+'搭绳'+(sm.rec.edge!==state.edgePref?'（工具最优为沿'+nm(sm.rec.edge)+'）':''));
+  if(c.fError)stt.push('当前为手动折点 '+(Math.max(state.fold,1-state.fold)*100).toFixed(0)+':'+((1-Math.max(state.fold,1-state.fold))*100).toFixed(0)+'（推荐 '+Math.round(rec.fRec*100)+':'+Math.round((1-rec.fRec)*100)+'）');
+  const base=stt.length?stt.join('；')+'。点击「应用推荐方案」恢复。':'当前示意即为推荐方案（自动模式）。';
+  $('recState').textContent=(state.demoNote?state.demoNote+' ':'')+base;
 }
 
-/* ---------------- Render: fold diagram ---------------- */
+/* ---------------- 渲染：折叠示意图 ---------------- */
 function renderFoldDiag(){
+  if(window.__LANG==='en'){
   const c=state.cal; if(!c)return;
   const rec=c.scheme.rec, sm=c.scheme;
   const W=344,H=336;
@@ -1164,10 +1524,68 @@ function renderFoldDiag(){
   $('foldDiag').innerHTML='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;display:block;max-width:400px;margin:0 auto">'+p.join('')+'</svg>';
   const fn=$('foldNote');
   if(fn)fn.innerHTML='The fold point splits the two layers across the line, measured along the '+(rec.edge==='long'?'width':'length')+' edge. Left and right are symmetric — 30% and 70% are the same fold. Ticks show the friction / clearance limits and the recommended spot. The recommended fold usually sits right at the friction-safety limit (about 66% with the defaults) and does not depend on location or date — the sun only decides which side the longer layer faces; it moves only when the friction or line height changes.';
+
+    return;
+  }
+  /* ---- 中文逻辑（源码唯一一份）---- */
+  const c=state.cal; if(!c)return;
+  const rec=c.scheme.rec, sm=c.scheme;
+  const W=344,H=336;
+  const nm=e=>e==='long'?'长边':'宽边';
+  const fBig=rec.fRec, fSmall=1-fBig;
+  const spanM=rec.span, depM=rec.D;
+  const scale=Math.min(210/spanM,178/depM,118);
+  const rw=spanM*scale, rh=depM*scale;
+  const x0=(W-rw)/2-4, y0=58;
+  const foldY=y0+fSmall*rh;              // 上带=短侧，下带=长侧
+  const p=[];
+  p.push('<defs>',
+    '<linearGradient id="fdgA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6e9d2"/><stop offset="1" stop-color="#e2c9a0"/></linearGradient>',
+    '<pattern id="fdgPat" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">',
+    '<rect width="14" height="14" fill="none"/><path d="M0 7h14M7 0v14" stroke="rgba(120,90,50,.18)" stroke-width="1"/></pattern>',
+    '</defs>');
+  p.push('<rect x="'+x0+'" y="'+y0+'" width="'+f1(rw)+'" height="'+f1(rh)+'" rx="9" fill="url(#fdgA)" stroke="#8a7359" stroke-width="1.2"/>');
+  p.push('<rect x="'+x0+'" y="'+y0+'" width="'+f1(rw)+'" height="'+f1(rh)+'" rx="9" fill="url(#fdgPat)"/>');
+  // 两个折带
+  p.push('<rect x="'+x0+'" y="'+y0+'" width="'+f1(rw)+'" height="'+f1(foldY-y0)+'" rx="9" fill="rgba(120,150,200,.13)"/>');
+  p.push('<rect x="'+x0+'" y="'+f1(foldY)+'" width="'+f1(rw)+'" height="'+f1(y0+rh-foldY)+'" rx="9" fill="rgba(255,200,110,.20)"/>');
+  // 折痕 + 绳
+  p.push(lnS([x0-10,foldY],[x0+rw+10,foldY],'stroke="#ffe2b0" stroke-width="8" stroke-linecap="round" opacity=".9"'));
+  p.push(lnS([x0-2,foldY],[x0+rw+2,foldY],'stroke="#4a3a1c" stroke-width="1" stroke-dasharray="5 4" opacity=".55"'));
+  // 折带标注
+  const cxM=x0+rw/2;
+  p.push(txS([cxM,y0+(foldY-y0)/2-4],'较短一侧  '+(fSmall*depM).toFixed(2)+' m','text-anchor="middle" font-size="11.5" fill="#4a5f8c"'));
+  const tieT=sm.tie, softT=sm.soft;
+  p.push(txS([cxM,y0+(foldY-y0)/2+13],tieT?'垂在任一侧均可':'朝 '+dirName8(norm360(sm.bigDir+180))+' 垂下','text-anchor="middle" font-size="10.5" fill="#5d6d92"'));
+  p.push(txS([cxM,foldY+(y0+rh-foldY)/2-3],'较长一侧  '+rec.deepest.toFixed(2)+' m','text-anchor="middle" font-size="12" font-weight="600" fill="#6b4e1e"'));
+  p.push(txS([cxM,foldY+(y0+rh-foldY)/2+14],tieT?'垂在任一侧均可（两侧相当）':(softT?'朝 '+dirName8(sm.bigDir)+' 垂下（略多）':'朝 '+dirName8(sm.bigDir)+' 垂下（当天阳光更多）'),'text-anchor="middle" font-size="10.5" fill="#7d5c28"'));
+  // 对折箭头
+  p.push('<path d="M '+(x0-26)+' '+(y0+14)+' Q '+(x0-40)+' '+foldY+' '+(x0-26)+' '+(y0+rh-12)+'" fill="none" stroke="#ffb454" stroke-width="1.6" marker-end="url(#fdArr)" opacity=".8"/>');
+  p.push('<defs><marker id="fdArr" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto"><path d="M0 0L7 3.5L0 7Z" fill="#ffb454"/></marker></defs>');
+  p.push(txS([x0-52,(y0+rh)/2],'对折','text-anchor="middle" font-size="10.5" fill="#c9a06a"'));
+  // 尺寸标注
+  p.push(lnS([x0+rw/2,y0+rh+16],[x0+rw/2,y0+rh+16],'stroke="none"'));
+  p.push(lnS([x0,y0+rh+20],[x0+rw,y0+rh+20],'stroke="#8fa5cf" stroke-width="1"'));
+  p.push(lnS([x0,y0+rh+15],[x0,y0+rh+25],'stroke="#8fa5cf" stroke-width="1"'));
+  p.push(lnS([x0+rw,y0+rh+15],[x0+rw,y0+rh+25],'stroke="#8fa5cf" stroke-width="1"'));
+  p.push(txS([cxM,y0+rh+36],'沿绳 '+spanM.toFixed(2)+' m（需绳 ≥ '+rec.ropeNeed.toFixed(2)+' m）','text-anchor="middle" font-size="11" fill="#bcd0f2"'));
+  // 折点比例竖标
+  p.push(lnS([x0+rw+22,y0],[x0+rw+22,y0+rh],'stroke="#8fa5cf" stroke-width="1"'));
+  p.push(lnS([x0+rw+17,y0],[x0+rw+27,y0],'stroke="#8fa5cf" stroke-width="1"'));
+  p.push(lnS([x0+rw+17,foldY],[x0+rw+27,foldY],'stroke="#ffd79a" stroke-width="1.4"'));
+  p.push(lnS([x0+rw+17,y0+rh],[x0+rw+27,y0+rh],'stroke="#8fa5cf" stroke-width="1"'));
+  p.push(pillS(clamp(x0+rw+62,60,W-52),y0+rh/2,'折点 '+Math.round(fBig*100)+':'+Math.round(fSmall*100),'#ffd79a',11));
+  // 顶部信息
+  p.push(pillS(96,20,'被子平铺 '+state.L.toFixed(2)+'×'+state.W.toFixed(2)+' m','#bcd0f2',10.5));
+  p.push(pillS(W-88,20,'折痕搭在绳上（与绳平行）','#ffd79a',10.5));
+  $('foldDiag').innerHTML='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;display:block;max-width:400px;margin:0 auto">'+p.join('')+'</svg>';
+  const fn=$('foldNote');
+  if(fn)fn.innerHTML='折点决定两层在绳两侧的长度分配（按与绳垂直的「'+(rec.edge==='long'?'宽':'长')+'」计算）。左右对称，30% 与 70% 是同一种折法；虚线刻度标出摩擦与拖地限制及推荐位置。推荐折点一般紧贴摩擦安全上限（默认约 66%），不随地点、日期变化——太阳只决定「较长一侧朝哪边」；改变摩擦或绳高才会移动折点。';
 }
 
-/* ---------------- Render: scheme comparison ---------------- */
+/* ---------------- 渲染：方案对比表 ---------------- */
 function renderSchemeTable(){
+  if(window.__LANG==='en'){
   const c=state.cal; if(!c)return;
   const sm=c.scheme;
   const nm=e=>e==='long'?'long edge':'short edge';
@@ -1209,10 +1627,56 @@ function renderSchemeTable(){
   $('schemeTable').innerHTML='<table class="schemeTable">'+th+trs+'</table>'+
     '<div class="remark" style="margin-top:8px">Click any row to load that scheme into the 3D scene above. The recommended row is chosen under a 1.3× friction margin and 6 cm ground clearance. '+
     '"rel." is relative to the best exposure in the table. Note: at the same fold fraction both edge choices collect nearly equal total light (only crest length differs); the real differences are line length needed and hanging-depth limits.</div>';
+
+    return;
+  }
+  /* ---- 中文逻辑（源码唯一一份）---- */
+  const c=state.cal; if(!c)return;
+  const sm=c.scheme;
+  const nm=e=>e==='long'?'长边':'宽边';
+  const rows=[];
+  sm.opts.forEach(o=>{
+    rows.push({rec:sm.rec===o,edge:o.edge,f:o.fRec,label:nm(o.edge)+'搭绳 · 推荐折点',
+      ropeNeed:o.ropeNeed,ropeOK:o.ropeOK,clear:o.clear,
+      margin:o.slipMargin,G:o.G});
+    rows.push({rec:false,edge:o.edge,f:0.5,label:nm(o.edge)+'搭绳 · 居中对折',
+      ropeNeed:o.ropeNeed,ropeOK:o.ropeOK,clear:state.ropeH-0.5*o.D,
+      margin:sm.kappa/(1),G:o.G50});
+  });
+  const Gbest=Math.max.apply(null,rows.map(r=>r.G));
+  if(c.fError){
+    const fB=Math.max(state.fold,1-state.fold);
+    const D=(state.edge==='long')?state.W:state.L;
+    const span=(state.edge==='long')?state.L:state.W;
+    rows.push({rec:false,cur:true,edge:state.edge,f:fB,label:'你当前的手动设置',
+      ropeNeed:span+0.2,ropeOK:state.ropeLen>=span+0.2,clear:state.ropeH-fB*D,
+      margin:sm.kappa/(fB/(1-fB)),G:c.Gcur});
+  }
+  const th='<tr><th>方案</th><th>折点</th><th>受光量 G（相对）</th><th>需绳长</th><th>最低点距地</th><th>摩擦余量</th></tr>';
+  const trs=rows.map(r=>{
+    const fB=r.f,fS=1-fB;
+    const gcls=r.rec?'recRow':(r.cur?'curRow':'');
+    const rel=Gbest>1e-9?Math.round(r.G/Gbest*100):0;
+    const ropeCls=r.ropeOK?'ok':'bad';
+    const clearCls=r.clear>=0.06?(r.clear>=0.3?'ok':'warn'):'bad';
+    const mCls=r.margin>=1.3?'ok':(r.margin>=1.0?'warn':'bad');
+    const tag=r.rec?'<span class="tagRec">推荐</span>':(r.cur?'<span class="tagCur">当前</span>':'');
+    return '<tr class="rowc '+gcls+'" data-edge="'+r.edge+'" data-f="'+(r.f===0.5?'0.5':'rec')+'" title="点击载入该方案">'+
+      '<td>'+r.label+tag+'</td>'+
+      '<td>'+(Math.round(fB*100))+':'+(Math.round(fS*100))+'</td>'+
+      '<td><b>'+(r.G>1e-9?r.G.toFixed(2):'0.00')+'</b><span class="dim"> m²·h · '+rel+'%</span></td>'+
+      '<td class="'+ropeCls+'">'+r.ropeNeed.toFixed(2)+' m '+(r.ropeOK?'✓':'✗')+'</td>'+
+      '<td class="'+clearCls+'">'+r.clear.toFixed(2)+' m '+(r.clear>=0.06?'✓':'✗')+'</td>'+
+      '<td class="'+mCls+'">'+r.margin.toFixed(2)+'× '+(r.margin>=1.0?'✓':'✗')+'</td></tr>';
+  }).join('');
+  $('schemeTable').innerHTML='<table class="schemeTable">'+th+trs+'</table>'+
+    '<div class="remark" style="margin-top:8px">点击任意行可把该方案载入上方 3D 示意。推荐行已按 1.3× 摩擦安全余量与离地 6 cm 限制优选；'+
+    '「相对」为相对表中最高受光量。注：相同折点下，长边/宽边搭绳的两层受光总量几乎相同（差别只在顶部折转面长度），真正的区别在所需绳长与下垂深度限制。</div>';
 }
 
-/* ---------------- Render: cross-section & forces ---------------- */
+/* ---------------- 渲染：折叠剖面与受力 ---------------- */
 function renderCross(){
+  if(window.__LANG==='en'){
   const c=state.cal; if(!c)return;
   const sm=c.scheme, rec=sm.rec;
   const W=380,H=336;
@@ -1269,10 +1733,71 @@ function renderCross(){
   $('crossDiag').innerHTML='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;display:block;max-width:430px;margin:0 auto">'+p.join('')+'</svg>'+
     '<div class="remark" style="margin-top:6px">Cross-section drawn for the recommended scheme. Layer weights approximate the fold ratio under uniform mass; fabric wrap is estimated as π radians. '+
     'The no-slip condition is the "friction margin" in the conclusion card. The less the quilt bulges, the closer reality matches this model.</div>';
+
+    return;
+  }
+  /* ---- 中文逻辑（源码唯一一份）---- */
+  const c=state.cal; if(!c)return;
+  const sm=c.scheme, rec=sm.rec;
+  const W=380,H=336;
+  const px=Math.min(78,188/Math.max(state.ropeH,0.8));
+  const groundY=H-42;
+  const ropeY=groundY-state.ropeH*px;
+  const cx=190;
+  const bigF=rec.fRec, smallF=1-bigF;
+  const D=rec.D;
+  const hL=bigF*D, hR=smallF*D;          // 左侧=较长（朝阳侧）
+  const yL=ropeY+hL*px, yR=ropeY+hR*px;
+  const p=[];
+  p.push('<defs><linearGradient id="crFab" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe9c6"/><stop offset="1" stop-color="#e0bd8a"/></linearGradient></defs>');
+  // 判据框
+  const ratio=bigF/smallF, margin=sm.kappa/ratio;
+  const ok=margin>=1.0;
+  p.push('<rect x="10" y="8" width="'+(W-20)+'" height="46" rx="10" fill="'+(ok?'rgba(79,214,165,.08)':'rgba(255,122,122,.10)')+'" stroke="'+(ok?'#1f5c45':'#7c3540')+'"/>');
+  p.push(txS([W/2,28],'不滑落判据（质量均匀 + 卡普斯坦摩擦）：f/(1−f) ≤ e^(μθ)','text-anchor="middle" font-size="11.5" fill="#c8d4ec"'));
+  p.push(txS([W/2,45],ratio.toFixed(2)+'  ≤  '+sm.kappa.toFixed(2)+'     余量 '+margin.toFixed(2)+'×  '+(ok?'✓ 能保持住':'✗ 有滑落风险'),'text-anchor="middle" font-size="12" font-weight="600" fill="'+(ok?'#8fe3bb':'#ff9c9c')+'"'));
+  // 地面
+  p.push(lnS([16,groundY],[W-16,groundY],'stroke="#4a5c82" stroke-width="1.4"'));
+  for(let x=20;x<W-16;x+=14){p.push(lnS([x,groundY],[x-7,groundY+8],'stroke="#2a3a58" stroke-width="1"'));}
+  p.push(txS([W-18,groundY+18],'地面','text-anchor="end" font-size="10" fill="#67779c"'));
+  // 两层
+  const lx=cx-30, rx=cx+30;
+  p.push('<path d="M '+(cx-7)+' '+(ropeY-3)+' Q '+(cx-26)+' '+(ropeY+16)+' '+lx+' '+(ropeY+40)+' L '+lx+' '+f1(yL)+'" fill="none" stroke="url(#crFab)" stroke-width="7" stroke-linecap="round"/>');
+  p.push('<path d="M '+(cx+7)+' '+(ropeY-3)+' Q '+(cx+26)+' '+(ropeY+16)+' '+rx+' '+(ropeY+40)+' L '+rx+' '+f1(yR)+'" fill="none" stroke="#b39a78" stroke-width="7" stroke-linecap="round"/>');
+  // 绳
+  p.push('<circle cx="'+cx+'" cy="'+ropeY+'" r="9" fill="#d8c19a" stroke="#7a6350" stroke-width="1.6"/>');
+  p.push('<circle cx="'+cx+'" cy="'+ropeY+'" r="3.2" fill="#7a6350" opacity=".5"/>');
+  // 包角
+  p.push('<path d="M '+(cx-13)+' '+(ropeY-8)+' A 15 15 0 0 1 '+(cx+13)+' '+(ropeY-8)+'" fill="none" stroke="#7fc3ff" stroke-width="1.2" stroke-dasharray="3 3"/>');
+  p.push(pillS(cx,ropeY-42,'包角 θ≈π','#9dc8ff',10));
+  // 重量箭头
+  function wArrow(x,y1,y2,txt,pct){
+    p.push(lnS([x,y1],[x,y2],'stroke="#7fc3ff" stroke-width="1.6"'));
+    p.push('<path d="M '+x+' '+y2+' l -4 -7 l 8 0 z" fill="#7fc3ff"/>');
+    p.push(txS([x,y2+14],txt,'text-anchor="middle" font-size="11" fill="#9dc8ff"'));
+    p.push(txS([x,y2+28],pct,'text-anchor="middle" font-size="10.5" fill="#67779c"'));
+  }
+  const Wy=Math.min(yL,yR)-6;
+  wArrow(lx-16,Wy-40,Wy,'重量 ↓','≈ '+Math.round(bigF*100)+'%');
+  wArrow(rx+16,Wy-40,Wy,'重量 ↓','≈ '+Math.round(smallF*100)+'%');
+  // 下垂标注
+  p.push(txS([lx-24,yL-6],'下垂 '+hL.toFixed(2)+' m','text-anchor="end" font-size="11" fill="#ffd79a"'));
+  p.push(txS([rx+24,yR-6],'下垂 '+hR.toFixed(2)+' m','text-anchor="start" font-size="11" fill="#9fb2d6"'));
+  const tieT=sm.tie, softT=sm.soft;
+  p.push(pillS(lx-30,ropeY-16,tieT?'较长一侧（任一侧）':('朝'+dirName8(sm.bigDir)+(softT?'（略多）':'（受光多）')),'#ffd79a',10.5));
+  p.push(pillS(rx+34,ropeY-16,tieT?'较短一侧':'朝'+dirName8(norm360(sm.bigDir+180)),'#8a98bb',10.5));
+  // 离地
+  const clr=state.ropeH-hL;
+  p.push(lnS([lx,Math.max(yL,yR)],[lx,groundY],'stroke="#6d80a8" stroke-width="1" stroke-dasharray="4 4"'));
+  p.push(pillS((lx+90),groundY-10,(clr>=0.03?'最低点距地 '+clr.toFixed(2)+' m':'最低点距地 '+clr.toFixed(2)+' m（拖地！）'),clr>=0.03?'#9fb2d6':'#ff9c9c',10.5));
+  $('crossDiag').innerHTML='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;display:block;max-width:430px;margin:0 auto">'+p.join('')+'</svg>'+
+    '<div class="remark" style="margin-top:6px">剖面按推荐方案绘制。两侧重量按质量均匀分布近似为折点比例；布面绕过晾绳的接触弧按 π 估计，'+
+    '不滑落条件即左侧结论卡中的“摩擦余量”。被子越贴近绳（不鼓包）越接近该模型。</div>';
 }
 
-/* ---------------- Render: score ---------------- */
+/* ---------------- 渲染：分数 ---------------- */
 function renderScore(){
+  if(window.__LANG==='en'){
   const c=state.cal; if(!c)return;
   const s=c.score;
   $('scoreDateTag').textContent=state.y+'-'+String(state.m).padStart(2,'0')+'-'+String(state.d).padStart(2,'0');
@@ -1308,10 +1833,50 @@ function renderScore(){
   $('metaChips').innerHTML=chips.map(x=>'<span class="pill">'+x[0]+' <b style="color:#ffd79a;margin-left:3px">'+x[1]+'</b></span>').join('');
   $('riseL').textContent='Sunrise '+(d.polarNight?'--':fmtHM(d.rise));
   $('setL').textContent='Sunset '+(d.polarNight?'--':fmtHM(d.set));
+
+    return;
+  }
+  /* ---- 中文逻辑（源码唯一一份）---- */
+  const c=state.cal; if(!c)return;
+  const s=c.score;
+  $('scoreDateTag').textContent=state.y+'年'+state.m+'月'+state.d+'日';
+  $('gaugeVal').setAttribute('stroke-dashoffset',String(368.6*(1-s/100)));
+  $('gaugeNum').textContent=Math.round(s);
+  let grade,color;
+  if(s>=92){grade='优秀 · 绳向接近当日最优';color='#4fd6a5';}
+  else if(s>=80){grade='良好 · 绳向尚有提升空间';color='#7fc3ff';}
+  else if(s>=65){grade='一般 · 绳向可优化（见下方）';color='#ffc24b';}
+  else {grade='欠佳 · 建议调整绳向';color='#ff7a7a';}
+  const gt=$('gaugeGrade'); gt.textContent=grade; gt.setAttribute('fill',color);
+  $('tG').innerHTML=c.day.G.toFixed(2)+'<small>m²·h</small>';
+  $('tTeq').innerHTML=c.Teq.toFixed(2)+'<small>h</small>';
+  $('tQ').innerHTML=(c.day.Q*0.0036).toFixed(2)+'<small>MJ</small>';
+  $('tTef').innerHTML=c.day.tEff.toFixed(1)+'<small>h</small>';
+  // 正午高度角
+  const d=c.day;
+  let noonElev=NaN;
+  if(!d.polarNight){
+    const off=4*(state.lon-15*state.tz)+d.eot;
+    const noonClock=720-off;
+    const sp=sunAt(noonClock,state.lat*D2R,spencer(c.par.n).decl,d.eot,state.lon,state.tz);
+    noonElev=sp.elev*R2D;
+  }
+  const chips=[];
+  chips.push(['日出',fmtHM(d.rise)]);
+  chips.push(['日落',fmtHM(d.set)]);
+  chips.push(['白昼',d.dayLen.toFixed(1)+' h']);
+  chips.push(['正午高度角',isFinite(noonElev)?noonElev.toFixed(1)+'°':'--']);
+  chips.push(['受光峰值时刻',fmtHM(d.peak.t)]);
+  chips.push(['最优绳向',norm360(c.bestAz)+'° / '+norm360(c.bestAz+180)+'°']);
+  chips.push(['全年最佳',(()=>{const md=doyToMD(state.y,c.bestIdx+1);return md.m+'月'+md.d+'日 '+c.yearArr[c.bestIdx].toFixed(1)+' m²·h';})()]);
+  $('metaChips').innerHTML=chips.map(x=>'<span class="pill">'+x[0]+' <b style="color:#ffd79a;margin-left:3px">'+x[1]+'</b></span>').join('');
+  $('riseL').textContent='日出 '+(d.polarNight?'--':fmtHM(d.rise));
+  $('setL').textContent='日落 '+(d.polarNight?'--':fmtHM(d.set));
 }
 
-/* ---------------- Render: 3D scene ---------------- */
+/* ---------------- 渲染：3D 场景 ---------------- */
 function renderScene(){
+  if(window.__LANG==='en'){
   const c=state.cal; if(!c)return;
   const W=780,H=430;
   const proj=makeCam(state.view.az,state.view.el,116,W/2,H*0.62);
@@ -1522,8 +2087,222 @@ function renderScene(){
   svg.push(pillS(84,22,'view '+Math.round(state.view.az)+'° / drag to rotate','#8a98bb',10.5));
   svg.push('<svg x="'+(W-232)+'" y="12" width="220" height="26">'+pillS(110,13,'Line '+Math.round(state.ropeAz)+'° ('+(state.edge==='long'?'long edge':'short edge')+' on line)','#ffd79a',11)+'</svg>');
   $('scene').innerHTML='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;display:block;touch-action:none;cursor:grab" id="sceneSvg">'+svg.join('')+'</svg>';
+
+    return;
+  }
+  /* ---- 中文逻辑（源码唯一一份）---- */
+  const c=state.cal; if(!c)return;
+  const W=780,H=430;
+  const proj=makeCam(state.view.az,state.view.el,116,W/2,H*0.62);
+  const aR=state.ropeAz*D2R;
+  const d=[Math.sin(aR),Math.cos(aR),0];
+  const wv=[Math.sin(aR+Math.PI/2),Math.cos(aR+Math.PI/2),0];
+  const hs=c.g.span/2, t=c.par.t, zr=state.ropeH;
+  const hPlus=c.g.hA, hMinus=c.g.hB;
+  const plusNear=(wv[0]*proj.u[0]+wv[1]*proj.u[1])>0;
+  const P=(s,off,z)=>proj([s*d[0]+off*wv[0], s*d[1]+off*wv[1], z]);
+  const si=sunAtScrub();
+  const svg=[];
+  svg.push('<defs>',
+    '<linearGradient id="fabLit" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe9c6"/><stop offset="1" stop-color="#ffca82"/></linearGradient>',
+    '<linearGradient id="fabDim" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8d7c66"/><stop offset="1" stop-color="#5f5648"/></linearGradient>',
+    '<linearGradient id="fabCrest" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7ecd9"/><stop offset="1" stop-color="#d8bd94"/></linearGradient>',
+    '<radialGradient id="sunGlow"><stop offset="0" stop-color="rgba(255,214,138,.95)"/><stop offset=".45" stop-color="rgba(255,170,80,.5)"/><stop offset="1" stop-color="rgba(255,150,60,0)"/></radialGradient>',
+    '<filter id="shblur"><feGaussianBlur stdDeviation="5"/></filter>',
+    '<pattern id="quiltPat" width="16" height="16" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">',
+    '<rect width="16" height="16" fill="none"/><path d="M0 8h16M8 0v16" stroke="rgba(120,90,50,.16)" stroke-width="1"/></pattern>',
+    '</defs>');
+  // 地面网格
+  const ext=2.6,stG=0.52;
+  for(let x=-ext;x<=ext+1e-6;x+=stG){
+    svg.push(lnS(proj([x,-ext,0]),proj([x,ext,0]),'stroke="#152034" stroke-width="1"'));
+  }
+  for(let y=-ext;y<=ext+1e-6;y+=stG){
+    svg.push(lnS(proj([-ext,y,0]),proj([ext,y,0]),'stroke="#152034" stroke-width="1"'));
+  }
+  const o=proj([0,0,0]);
+  svg.push('<ellipse cx="'+f1(o[0])+'" cy="'+f1(o[1])+'" rx="46" ry="20" fill="rgba(90,140,255,.05)"/>');
+  // 地面罗盘圈（细节）
+  {
+    const rr=2.16;
+    const cir=[];
+    for(let k=0;k<=64;k++){
+      const a2=k/64*2*Math.PI;
+      cir.push(proj([Math.sin(a2)*rr,Math.cos(a2)*rr,0]));
+    }
+    svg.push('<polyline points="'+cir.map(q=>f1(q[0])+','+f1(q[1])).join(' ')+'" fill="none" stroke="#243354" stroke-width="1.2"/>');
+    for(let k=0;k<8;k++){
+      const a2=k*45;
+      const q1=proj([Math.sin(a2*D2R)*rr,Math.cos(a2*D2R)*rr,0]);
+      const q2=proj([Math.sin(a2*D2R)*(rr-0.14),Math.cos(a2*D2R)*(rr-0.14),0]);
+      svg.push(lnS(q1,q2,'stroke="'+(a2%90===0?'#3d5480':'#25355a')+'" stroke-width="'+(a2%90===0?2:1.2)+'"'));
+    }
+    [['北',0,'#ffb3b3'],['东',90,'#93a2c4'],['南',180,'#93a2c4'],['西',270,'#93a2c4']].forEach(it=>{
+      const q=proj([Math.sin(it[1]*D2R)*(rr+0.32),Math.cos(it[1]*D2R)*(rr+0.32),0]);
+      svg.push(txS(q,it[0],'text-anchor="middle" font-size="12" fill="'+it[2]+'" opacity=".9"'));
+    });
+  }
+  // 影子
+  if(si.up&&si.elev>2){
+    const sd=[-Math.sin(si.az*D2R),-Math.cos(si.az*D2R),0];
+    const Lsh=clamp(c.g.hBig/Math.max(0.14,Math.tan(si.elev*D2R)),0,3.4);
+    const b0=[-hs*d[0],-hs*d[1],0.01],b1=[hs*d[0],hs*d[1],0.01];
+    const q0=[b0[0]+sd[0]*Lsh,b0[1]+sd[1]*Lsh,0.01],q1=[b1[0]+sd[0]*Lsh,b1[1]+sd[1]*Lsh,0.01];
+    const op=clamp(Math.sin(si.elev*D2R)*0.42,0.04,0.34);
+    svg.push(pgS([proj(b0),proj(b1),proj(q1),proj(q0)],'fill="rgba(5,8,14,'+op.toFixed(2)+')" filter="url(#shblur)"'));
+  }
+  // 立柱（含柱顶绳结与柱脚）
+  for(const s of [-(hs+0.34),hs+0.34]){
+    const pb=proj([s*d[0],s*d[1],0]),pt2=proj([s*d[0],s*d[1],zr+0.16]);
+    svg.push('<ellipse cx="'+f1(pb[0])+'" cy="'+f1(pb[1]+2)+'" rx="8" ry="3.4" fill="rgba(0,0,0,.35)"/>');
+    svg.push(lnS(pb,pt2,'stroke="#6d5a48" stroke-width="9" stroke-linecap="round"'));
+    svg.push(lnS(pb,pt2,'stroke="#8a7359" stroke-width="5" stroke-linecap="round"'));
+    svg.push('<circle cx="'+f1(pt2[0])+'" cy="'+f1(pt2[1])+'" r="4.6" fill="#d8c19a" stroke="#7a6350" stroke-width="1.2"/>');
+  }
+  // 绳（微下垂）
+  const rA=proj([-(hs+0.3)*d[0],-(hs+0.3)*d[1],zr+0.14]);
+  const rB=proj([(hs+0.3)*d[0],(hs+0.3)*d[1],zr+0.14]);
+  const rM=proj([0,0,zr+0.02]);
+  svg.push('<path d="M '+f1(rA[0])+' '+f1(rA[1])+' Q '+f1(rM[0])+' '+f1(rM[1])+' '+f1(rB[0])+' '+f1(rB[1])+'" fill="none" stroke="#d8c19a" stroke-width="2.4" stroke-linecap="round"/>');
+  // 被子
+  const litSide=si.up?(si.litOff>0?1:-1):0;
+  function insetQuad(pts,k){
+    const cx4=(pts[0][0]+pts[1][0]+pts[2][0]+pts[3][0])/4;
+    const cy4=(pts[0][1]+pts[1][1]+pts[2][1]+pts[3][1])/4;
+    return pts.map(q=>[cx4+(q[0]-cx4)*k, cy4+(q[1]-cy4)*k]);
+  }
+  function drawPanel(h,off,lit){
+    const tp=P(hs,off,zr),tq=P(-hs,off,zr),bq=P(-hs,off,zr-h),bp=P(hs,off,zr-h);
+    const fill=lit?'url(#fabLit)':'url(#fabDim)';
+    svg.push(pgS([tp,tq,bq,bp],'fill="'+fill+'" stroke="rgba(255,255,255,.07)" stroke-width="1"'));
+    svg.push(pgS([tp,tq,bq,bp],'fill="url(#quiltPat)"'));
+    if(lit&&si.p>0.02){
+      svg.push(pgS([tp,tq,bq,bp],'fill="rgba(255,190,100,'+(0.10+0.30*si.p).toFixed(2)+')"'));
+    }
+    // 缝线（内缩虚线边）+ 底边包边
+    const inQ=insetQuad([tp,tq,bq,bp],0.94);
+    svg.push('<polyline points="'+inQ.map(q=>f1(q[0])+','+f1(q[1])).join(' ')+' '+f1(inQ[0][0])+','+f1(inQ[0][1])+'" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="1" stroke-dasharray="4 4"/>');
+    svg.push(lnS(bq,bp,'stroke="rgba(255,255,255,.4)" stroke-width="2" stroke-linecap="round" opacity="'+(lit?0.8:0.45)+'"'));
+    return {tp,tq,bq,bp};
+  }
+  function drawCrest(){
+    const c1=P(hs,t/2,zr),c2=P(-hs,t/2,zr),c3=P(-hs,-t/2,zr),c4=P(hs,-t/2,zr);
+    const c5=P(hs,t/2,zr+t),c6=P(-hs,t/2,zr+t),c7=P(-hs,-t/2,zr+t),c8=P(hs,-t/2,zr+t);
+    // 远侧立面、近侧立面、顶面
+    if(plusNear){
+      svg.push(pgS([c2,c3,c7,c6],'fill="#a08b6f"'));
+      svg.push(pgS([c1,c6,c7,c8],'fill="url(#fabCrest)"'));
+      svg.push(pgS([c4,c1,c8,c5],'fill="#c3aa86"'));
+    }else{
+      svg.push(pgS([c1,c6,c7,c8],'fill="url(#fabCrest)"'));
+      svg.push(pgS([c2,c3,c7,c6],'fill="#c3aa86"'));
+      svg.push(pgS([c4,c1,c8,c5],'fill="#a08b6f"'));
+    }
+    svg.push(pgS([c8,c7,c6,c5],'fill="url(#fabCrest)"'));
+    if(si.up&&si.elev>0){
+      svg.push(pgS([c5,c6,c7,c8],'fill="rgba(255,200,110,'+(0.10+0.25*Math.sin(si.elev*D2R)).toFixed(2)+')"'));
+    }
+  }
+  const panelPlus=()=>drawPanel(hPlus, t/2, litSide>0);
+  const panelMinus=()=>drawPanel(hMinus, -t/2, litSide<0);
+  if(plusNear){
+    svg.push('<g>'); panelMinus(); svg.push('</g>');
+    svg.push('<g>'); drawCrest(); svg.push('</g>');
+    svg.push('<g>'); panelPlus(); svg.push('</g>');
+  }else{
+    svg.push('<g>'); panelPlus(); svg.push('</g>');
+    svg.push('<g>'); drawCrest(); svg.push('</g>');
+    svg.push('<g>'); panelMinus(); svg.push('</g>');
+  }
+  // 受光/背光标签
+  if(si.up){
+    const litH=litSide>0?hPlus:hMinus;
+    const litOff=litSide>0?1:-1;
+    const lp=P(hs*0.22,litOff*(t/2+0.16),zr-litH*0.45);
+    svg.push(pillS(lp[0],lp[1],'受光面 余弦 '+si.p.toFixed(2),'#ffd79a',11.5));
+    const shH=litSide>0?hMinus:hPlus;
+    const sp2=P(-hs*0.55,-litOff*(t/2+0.5),zr-shH*0.72);
+    svg.push(pillS(sp2[0],sp2[1],'背光（互遮）','#8a98bb',10.5));
+  }
+  // 光射线
+  if(si.up&&si.p>0.04){
+    const su=[Math.sin(si.az*D2R)*Math.cos(si.elev*D2R),Math.cos(si.az*D2R)*Math.cos(si.elev*D2R),Math.sin(si.elev*D2R)];
+    const R3=3.0;
+    const sunP=proj([su[0]*R3,su[1]*R3,Math.max(0.25,su[2]*R3)]);
+    const litH=litSide>0?hPlus:hMinus, litOff=litSide>0?t/2:-t/2;
+    for(let k=0;k<5;k++){
+      const sS=-hs*0.55+k*(hs*0.275);
+      const zt=zr-litH*(0.2+0.13*k);
+      const q=P(sS,litOff,zt);
+      svg.push('<line x1="'+f1(sunP[0])+'" y1="'+f1(sunP[1])+'" x2="'+f1(q[0])+'" y2="'+f1(q[1])+'" stroke="rgba(255,205,120,.55)" stroke-width="1.2" stroke-dasharray="6 8">'+
+        '<animate attributeName="stroke-dashoffset" from="0" to="-28" dur="1.6s" repeatCount="indefinite"/></line>');
+    }
+  }
+  // 太阳
+  if(si.up){
+    const su=[Math.sin(si.az*D2R)*Math.cos(si.elev*D2R),Math.cos(si.az*D2R)*Math.cos(si.elev*D2R),Math.sin(si.elev*D2R)];
+    const R3=3.0;
+    const sp3=proj([su[0]*R3,su[1]*R3,su[2]*R3]);
+    const gp=proj([su[0]/Math.max(1e-3,Math.hypot(su[0],su[1]))*2.3,su[1]/Math.max(1e-3,Math.hypot(su[0],su[1]))*2.3,0]);
+    svg.push('<g>');
+    svg.push('<circle cx="'+f1(sp3[0])+'" cy="'+f1(sp3[1])+'" r="32" fill="url(#sunGlow)"/>');
+    // 旋转日冕光刺
+    let rays='';
+    for(let k=0;k<8;k++){
+      const aa=k*45*D2R;
+      rays+=lnS([16*Math.cos(aa),16*Math.sin(aa)],[25*Math.cos(aa),25*Math.sin(aa)],'stroke="rgba(255,205,120,.75)" stroke-width="1.6" stroke-linecap="round"');
+    }
+    svg.push('<g transform="translate('+f1(sp3[0])+','+f1(sp3[1])+')"><g>'+rays+
+      '<animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="70s" repeatCount="indefinite"/></g></g>');
+    svg.push('<circle cx="'+f1(sp3[0])+'" cy="'+f1(sp3[1])+'" r="13" fill="#ffd98a" stroke="rgba(255,255,255,.55)" stroke-width="1.2"/>');
+    svg.push('</g>');
+    svg.push(lnS(sp3,gp,'stroke="rgba(255,190,100,.28)" stroke-width="1" stroke-dasharray="3 5"'));
+    svg.push('<circle cx="'+f1(gp[0])+'" cy="'+f1(gp[1])+'" r="3" fill="rgba(255,190,100,.4)"/>');
+  }
+  // 标注层
+  if(state.anno){
+    const offDim=(plusNear?1:-1)*(t/2+0.55);
+    const d1=P(-hs,offDim,0.07),d2=P(hs,offDim,0.07);
+    svg.push(lnS(d1,d2,'stroke="#8fa5cf" stroke-width="1"'));
+    svg.push(lnS([d1[0],d1[1]-4],[d1[0],d1[1]+4],'stroke="#8fa5cf" stroke-width="1"'));
+    svg.push(lnS([d2[0],d2[1]-4],[d2[0],d2[1]+4],'stroke="#8fa5cf" stroke-width="1"'));
+    const dm=[(d1[0]+d2[0])/2,(d1[1]+d2[1])/2+2];
+    svg.push(pillS(dm[0],dm[1]+13,'沿绳 '+c.g.span.toFixed(2)+' m · '+(state.edge==='long'?'长边':'宽边')+'沿绳','#bcd0f2',11));
+    // 两侧下垂
+    const sDim=hs+0.5;
+    const ctrA=P(0,(plusNear?1:-1)*0.3,zr*0.5);
+    [['+',hPlus],['−',hMinus]].forEach((it,idx)=>{
+      const off=it[0]==='+'?t/2+0.16:-t/2-0.16;
+      const a=P(sDim,off,zr),b=P(sDim,off,zr-it[1]);
+      svg.push(lnS(a,b,'stroke="#8fa5cf" stroke-width="1"'));
+      svg.push(lnS([a[0]-4,a[1]],[a[0]+4,a[1]],'stroke="#8fa5cf" stroke-width="1"'));
+      svg.push(lnS([b[0]-4,b[1]],[b[0]+4,b[1]],'stroke="#8fa5cf" stroke-width="1"'));
+      const mA=[(a[0]+b[0])/2,(a[1]+b[1])/2];
+      let dx=mA[0]-ctrA[0],dy=mA[1]-ctrA[1]; const dl=Math.hypot(dx,dy)||1;
+      dx/=dl;dy/=dl;
+      svg.push(pillS(mA[0]+dx*52,mA[1]+dy*52+(idx===0?-9:11),'下垂 '+it[1].toFixed(2)+' m','#bcd0f2',10.5));
+    });
+    // 厚度
+    const ta=P(-sDim,0,zr),tb=P(-sDim,0,zr+t);
+    svg.push(lnS(ta,tb,'stroke="#8fa5cf" stroke-width="1.4"'));
+    svg.push(pillS(tb[0],tb[1]-11,'折叠厚 '+(t*100).toFixed(0)+' cm','#bcd0f2',10.5));
+    // 折痕位置
+    const fB2=Math.max(state.fold,1-state.fold);
+    const fl=P(hs+0.28,0,zr+t+0.14);
+    svg.push(pillS(fl[0],fl[1],'折痕：'+(state.edge==='long'?'宽':'长')+'的 '+Math.round(fB2*100)+'% 处','#ffd79a',10.5));
+    // 离地
+    const bigSide=c.g.hA>=c.g.hB?1:-1;
+    const gb=P(-hs*0.15,bigSide*t/2,zr-c.g.hBig), gg=P(-hs*0.15,bigSide*t/2,0);
+    svg.push(lnS(gb,gg,'stroke="#6d80a8" stroke-width="1" stroke-dasharray="4 4"'));
+    const clr=zr-c.g.hBig;
+    svg.push(pillS(gg[0],gg[1]+14,'最低点距地 '+clr.toFixed(2)+' m'+(clr<0.03?'（拖地！）':''),clr<0.03?'#ff9c9c':'#9fb2d6',10.5));
+  }
+  // 角标
+  svg.push(pillS(84,22,'视角 '+Math.round(state.view.az)+'° / 拖拽旋转','#8a98bb',10.5));
+  svg.push('<svg x="'+(W-232)+'" y="12" width="220" height="26">'+pillS(110,13,'绳向 '+Math.round(state.ropeAz)+'°（'+(state.edge==='long'?'长边':'宽边')+'沿绳）','#ffd79a',11)+'</svg>');
+  $('scene').innerHTML='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;display:block;touch-action:none;cursor:grab" id="sceneSvg">'+svg.join('')+'</svg>';
 }
-(function bindScene(){
+function bindScene(){
   const box=$('scene');
   let drag=false,lx=0,ly=0;
   box.addEventListener('pointerdown',e=>{drag=true;lx=e.clientX;ly=e.clientY;box.setPointerCapture(e.pointerId);});
@@ -1536,10 +2315,11 @@ function renderScene(){
   });
   box.addEventListener('pointerup',()=>{drag=false;});
   box.addEventListener('pointercancel',()=>{drag=false;});
-})();
+}
 
-/* ---------------- Render: plan view ---------------- */
+/* ---------------- 渲染：俯视图 ---------------- */
 function renderPlan(){
+  if(window.__LANG==='en'){
   const c=state.cal; if(!c)return;
   const S=380,cx=190,cy=190,R=150;
   const dir=(aDeg,r)=>{const a=aDeg*D2R;return [cx+r*Math.sin(a),cy-r*Math.cos(a)];};
@@ -1602,10 +2382,77 @@ function renderPlan(){
   $('plan').innerHTML='<svg viewBox="0 0 '+S+' '+S+'" style="width:100%;display:block;max-width:430px;margin:0 auto">'+p.join('')+'</svg>';
   const edgeName=state.edge==='long'?'long edge':'short edge';
   $('planNote').innerHTML='Compass reading <b>'+Math.round(state.ropeAz)+'°</b> — the heavy line is the shared direction of the rope and the '+edgeName+'. The two dashed blue lines are the layer normals: whichever side the sun is on gets lit while the other layer is shaded, with only the crest adding light.';
+
+    return;
+  }
+  /* ---- 中文逻辑（源码唯一一份）---- */
+  const c=state.cal; if(!c)return;
+  const S=380,cx=190,cy=190,R=150;
+  const dir=(aDeg,r)=>{const a=aDeg*D2R;return [cx+r*Math.sin(a),cy-r*Math.cos(a)];};
+  const si=sunAtScrub();
+  const p=[];
+  p.push('<circle cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="#0b1322" stroke="#1f2c44"/>');
+  for(let a=0;a<360;a+=10){
+    const big=(a%30===0);
+    p.push(lnS(dir(a,R),dir(a,R-(big?9:5)),'stroke="'+(big?'#42557c':'#263651')+'" stroke-width="1"'));
+  }
+  [['北',0],['东',90],['南',180],['西',270],['东北',45],['东南',135],['西南',225],['西北',315]].forEach(([t,a])=>{
+    const q=dir(a,R-22);
+    const main=t.length===1;
+    p.push(txS(q,t,'text-anchor="middle" font-size="'+(main?13:10)+'" fill="'+(t==='北'?'#ff9c9c':(main?'#93a2c4':'#5d6d92'))+'"'));
+  });
+  // 受光半区
+  if(si.up){
+    const bLit=(state.ropeAz+(si.litOff>0?90:-90));
+    const q1=dir(bLit-90,R*0.94),q2=dir(bLit+90,R*0.94);
+    p.push('<path d="M '+f1(cx)+' '+f1(cy)+' L '+f1(q1[0])+' '+f1(q1[1])+' A '+f1(R*0.94)+' '+f1(R*0.94)+' 0 0 1 '+f1(q2[0])+' '+f1(q2[1])+' Z" fill="rgba(255,180,84,.08)" stroke="rgba(255,180,84,.25)" stroke-dasharray="4 5"/>');
+    p.push(txS(dir(bLit,R*0.62),'受光半区','text-anchor="middle" font-size="10.5" fill="rgba(255,200,130,.75)"'));
+  }
+  // 法线
+  p.push(lnS([cx,cy],dir(state.ropeAz+90,R*0.78),'stroke="#5aa7ff" stroke-width="1.4" stroke-dasharray="5 5" opacity=".8"'));
+  p.push(lnS([cx,cy],dir(state.ropeAz-90,R*0.78),'stroke="#5aa7ff" stroke-width="1.4" stroke-dasharray="5 5" opacity=".8"'));
+  p.push(pillS(dir(state.ropeAz+90,R*0.78)[0],dir(state.ropeAz+90,R*0.78)[1]-10,'法线 '+norm360(state.ropeAz+90)+'° '+dirName8(state.ropeAz+90),'#9dc8ff',10.5));
+  p.push(pillS(dir(state.ropeAz-90,R*0.78)[0],dir(state.ropeAz-90,R*0.78)[1]+18,'法线 '+norm360(state.ropeAz-90)+'° '+dirName8(state.ropeAz-90),'#9dc8ff',10.5));
+  // 绳 + 被子条
+  const r1=dir(state.ropeAz,R*0.92),r2=dir(state.ropeAz+180,R*0.92);
+  p.push(lnS(r1,r2,'stroke="#e0b27a" stroke-width="7" stroke-linecap="round" opacity=".92"'));
+  const half=R*0.74*clamp(c.g.span/2.4,0.3,1);
+  const b1=dir(state.ropeAz,half),b2=dir(state.ropeAz+180,half);
+  p.push(lnS(b1,b2,'stroke="#ffd79a" stroke-width="3.5" stroke-linecap="round" opacity=".9"'));
+  p.push(pillS(r1[0],r1[1]-11,'绳向 '+Math.round(state.ropeAz)+'°','#ffd79a',11));
+  p.push(pillS(dir(state.ropeAz+180,R*0.92)[0],dir(state.ropeAz+180,R*0.92)[1]+18,(state.edge==='long'?'长边':'宽边')+'沿绳 '+c.g.span.toFixed(2)+' m','#bcd0f2',10.5));
+  // 日出日落
+  if(!c.day.polarNight){
+    const {decl,eot}=spencer(c.par.n);
+    const latR=state.lat*D2R;
+    const sr=sunAt(c.day.rise,latR,decl,eot,state.lon,state.tz);
+    const ss=sunAt(c.day.set,latR,decl,eot,state.lon,state.tz);
+    const azRise=norm360(sr.az*R2D),azSet=norm360(ss.az*R2D);
+    const qr=dir(azRise,R+8),qs=dir(azSet,R+8);
+    p.push('<circle cx="'+f1(qr[0])+'" cy="'+f1(qr[1])+'" r="4.5" fill="#ffb454" opacity=".85"/>');
+    p.push('<circle cx="'+f1(qs[0])+'" cy="'+f1(qs[1])+'" r="4.5" fill="#ff8a3c" opacity=".85"/>');
+    p.push(pillS(dir(azRise,R+26)[0],dir(azRise,R+26)[1],'日出 '+Math.round(azRise)+'°','#ffcf9a',9.5));
+    p.push(pillS(dir(azSet,R+26)[0],dir(azSet,R+26)[1],'日落 '+Math.round(azSet)+'°','#ffcf9a',9.5));
+  }
+  // 太阳
+  if(si.up){
+    const q=dir(si.az,R*0.9);
+    p.push('<circle cx="'+f1(q[0])+'" cy="'+f1(q[1])+'" r="16" fill="url(#sgl)"/>');
+    p.push('<circle cx="'+f1(q[0])+'" cy="'+f1(q[1])+'" r="7.5" fill="#ffd98a" stroke="rgba(255,255,255,.5)"/>');
+    p.push(lnS(q,[cx,cy],'stroke="rgba(255,190,100,.35)" stroke-width="1" stroke-dasharray="3 6"'));
+    p.push(pillS(q[0],q[1]+24,'太阳 '+Math.round(si.az)+'° 高 '+si.elev.toFixed(0)+'°','#ffd79a',10.5));
+  }else{
+    p.push(pillS(cx,cy+R+44,'太阳在地平线下','#8a98bb',11));
+  }
+  p.push('<defs><radialGradient id="sgl"><stop offset="0" stop-color="rgba(255,214,138,.9)"/><stop offset="1" stop-color="rgba(255,150,60,0)"/></radialGradient></defs>');
+  $('plan').innerHTML='<svg viewBox="0 0 '+S+' '+S+'" style="width:100%;display:block;max-width:430px;margin:0 auto">'+p.join('')+'</svg>';
+  const edgeName=state.edge==='long'?'长边':'宽边';
+  $('planNote').innerHTML='罗盘读数 <b>'+Math.round(state.ropeAz)+'°</b> 按“沿'+edgeName+'测得”处理，即纸面粗线为绳与'+edgeName+'的共同走向。两条虚蓝线是两层被面的法线方向，太阳落在哪侧，哪层就受光；另一层被互遮，只有顶面折转处在补光。';
 }
 
-/* ---------------- Render: sun-path polar ---------------- */
+/* ---------------- 渲染：太阳轨迹极坐标 ---------------- */
 function renderPolar(){
+  if(window.__LANG==='en'){
   const c=state.cal; if(!c)return;
   const S=380,cx=190,cy=190,R=160;
   const rad=elev=>R*(1-clamp(elev,0,90)/90);
@@ -1699,10 +2546,108 @@ function renderPolar(){
     p.push('<defs><radialGradient id="spg"><stop offset="0" stop-color="rgba(255,214,138,.9)"/><stop offset="1" stop-color="rgba(255,150,60,0)"/></radialGradient></defs>');
   }
   $('polar').innerHTML='<svg viewBox="0 0 '+S+' '+S+'" style="width:100%;display:block;max-width:430px;margin:0 auto">'+p.join('')+'</svg>';
+
+    return;
+  }
+  /* ---- 中文逻辑（源码唯一一份）---- */
+  const c=state.cal; if(!c)return;
+  const S=380,cx=190,cy=190,R=160;
+  const rad=elev=>R*(1-clamp(elev,0,90)/90);
+  const pos=(elev,az)=>{const a=az*D2R;const r=rad(elev);return [cx+r*Math.sin(a),cy-r*Math.cos(a)];};
+  const p=[];
+  p.push('<circle cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="#0b1322" stroke="#1f2c44"/>');
+  [30,60].forEach(el=>{p.push('<circle cx="'+cx+'" cy="'+cy+'" r="'+f1(rad(el))+'" fill="none" stroke="#22304d" stroke-dasharray="3 5"/>');});
+  p.push('<circle cx="'+cx+'" cy="'+cy+'" r="3.5" fill="#42557c"/>');
+  for(let a=0;a<360;a+=15){
+    const big=(a%45===0);
+    const pu=pos(0,a);
+    const q3=[cx+(R-(big?10:6))*Math.sin(a*D2R),cy-(R-(big?10:6))*Math.cos(a*D2R)];
+    p.push(lnS(pu,q3,'stroke="'+(big?'#42557c':'#263651')+'" stroke-width="1"'));
+  }
+  [['北',0],['东',90],['南',180],['西',270]].forEach(([t,a])=>{
+    const q=pos(0,a);const dx=(q[0]-cx),dy=(q[1]-cy);
+    const L=Math.hypot(dx,dy)||1;
+    p.push(txS([cx+dx/L*(R+16),cy+dy/L*(R+16)],t,'text-anchor="middle" font-size="12.5" fill="'+(t==='北'?'#ff9c9c':'#93a2c4')+'"'));
+  });
+  p.push(txS([cx,cy-rad(30)-3],'30°','text-anchor="middle" font-size="9.5" fill="#5d6d92"'));
+  p.push(txS([cx,cy-rad(60)-3],'60°','text-anchor="middle" font-size="9.5" fill="#5d6d92"'));
+  p.push(txS([cx,cy+11],'90°','text-anchor="middle" font-size="9.5" fill="#5d6d92"'));
+  // 各月参考
+  for(let m=1;m<=12;m++){
+    const n21=dayOfYear(state.y,m,21);
+    const spm=spencer(n21);
+    const latR=state.lat*D2R;
+    const stm=sunTimesP(spm.decl,latR,state.lon,state.tz,state.alt,spm.eot);
+    if(stm.polarNight)continue;
+    const pts=[];
+    for(let tm=stm.rise;tm<=stm.set;tm+=8){
+      const s=sunAt(tm,latR,spm.decl,spm.eot,state.lon,state.tz);
+      if(s.elev*R2D<1)continue;
+      pts.push(pos(s.elev*R2D,norm360(s.az*R2D)));
+    }
+    if(pts.length>2){
+      p.push('<polyline points="'+pts.map(q=>f1(q[0])+','+f1(q[1])).join(' ')+'" fill="none" stroke="#4a6ea8" stroke-width="1.1" opacity="'+(m===state.m?0.5:0.30)+'"/>');
+    }
+  }
+  // 当日
+  if(!c.day.polarNight){
+    const pts=[];
+    const latR=state.lat*D2R;
+    const {decl,eot}=spencer(c.par.n);
+    for(let tm=c.day.rise;tm<=c.day.set;tm+=4){
+      const s=sunAt(tm,latR,decl,eot,state.lon,state.tz);
+      if(s.elev*R2D<0.8)continue;
+      pts.push(pos(s.elev*R2D,norm360(s.az*R2D)));
+    }
+    if(pts.length>2){
+      p.push('<polyline points="'+pts.map(q=>f1(q[0])+','+f1(q[1])).join(' ')+'" fill="none" stroke="#ffb454" stroke-width="2.2"/>');
+    }
+    for(let hh=Math.ceil(c.day.rise/60);hh<=Math.floor(c.day.set/60);hh++){
+      const s=sunAt(hh*60,latR,decl,eot,state.lon,state.tz);
+      if(s.elev*R2D<2)continue;
+      const q=pos(s.elev*R2D,norm360(s.az*R2D));
+      if(hh%2===0){
+        p.push('<circle cx="'+f1(q[0])+'" cy="'+f1(q[1])+'" r="2.6" fill="#ffd79a"/>');
+        const dx=q[0]-cx,dy=q[1]-cy,L=Math.hypot(dx,dy)||1;
+        p.push(txS([q[0]+dx/L*13,q[1]+dy/L*13+3],hh+'时','text-anchor="middle" font-size="9.5" fill="#c9a06a"'));
+      }
+    }
+    // 正午
+    const off=4*(state.lon-15*state.tz)+eot;
+    const spn=sunAt(720-off,latR,decl,eot,state.lon,state.tz);
+    if(spn.elev>0){
+      const q=pos(spn.elev*R2D,norm360(spn.az*R2D));
+      p.push('<circle cx="'+f1(q[0])+'" cy="'+f1(q[1])+'" r="3.4" fill="#fff6df"/>');
+      p.push(pillS(q[0],q[1]-12,'正午 '+(spn.elev*R2D).toFixed(1)+'°','#ffe9c6',10));
+    }
+    // 受光半区
+    const si=sunAtScrub();
+    if(si.up){
+      const bLit=(state.ropeAz+(si.litOff>0?90:-90));
+      const q1=pos(0,bLit-90),q2=pos(0,bLit+90);
+      p.push('<path d="M '+f1(cx)+' '+f1(cy)+' L '+f1(q1[0])+' '+f1(q1[1])+' A '+f1(R)+' '+f1(R)+' 0 0 1 '+f1(q2[0])+' '+f1(q2[1])+' Z" fill="rgba(255,180,84,.07)" stroke="rgba(255,180,84,.22)" stroke-dasharray="4 5"/>');
+    }
+  }
+  // 绳向
+  const aR=state.ropeAz*D2R;
+  const qa=pos(0,state.ropeAz),qb=pos(0,state.ropeAz+180);
+  p.push(lnS(qa,qb,'stroke="#e0b27a" stroke-width="4.5" stroke-linecap="round" opacity=".95"'));
+  p.push(pillS(qa[0],qa[1],Math.round(state.ropeAz)+'°','#ffd79a',10.5));
+  p.push(pillS(qb[0],qb[1],Math.round(norm360(state.ropeAz+180))+'°','#ffd79a',10.5));
+  // 当前太阳
+  const si=sunAtScrub();
+  if(si.up){
+    const q=pos(si.elev,si.az);
+    p.push('<circle cx="'+f1(q[0])+'" cy="'+f1(q[1])+'" r="15" fill="url(#spg)"/>');
+    p.push('<circle cx="'+f1(q[0])+'" cy="'+f1(q[1])+'" r="6.5" fill="#ffd98a" stroke="rgba(255,255,255,.5)"/>');
+    p.push('<defs><radialGradient id="spg"><stop offset="0" stop-color="rgba(255,214,138,.9)"/><stop offset="1" stop-color="rgba(255,150,60,0)"/></radialGradient></defs>');
+  }
+  $('polar').innerHTML='<svg viewBox="0 0 '+S+' '+S+'" style="width:100%;display:block;max-width:430px;margin:0 auto">'+p.join('')+'</svg>';
 }
 
-/* ---------------- Render: daily curve ---------------- */
+/* ---------------- 渲染：当日曲线 ---------------- */
 function renderDay(){
+  if(window.__LANG==='en'){
   const c=state.cal; if(!c)return;
   const W=780,H=272,mL=52,mR=50,mT=20,mB=34;
   const p=[];
@@ -1774,8 +2719,83 @@ function renderDay(){
   p.push(txS([W-mR+8,mT+4],'elevation','text-anchor="start" font-size="10" fill="#4a6ea8"'));
   p.push(txS([mL-8,mT-6],'m²','text-anchor="end" font-size="10" fill="#8a98bb"'));
   $('dayC').innerHTML='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;display:block;touch-action:none" id="daySvg">'+p.join('')+'</svg>';
+
+    return;
+  }
+  /* ---- 中文逻辑（源码唯一一份）---- */
+  const c=state.cal; if(!c)return;
+  const W=780,H=272,mL=52,mR=50,mT=20,mB=34;
+  const p=[];
+  const d=c.day;
+  if(d.polarNight){
+    $('dayC').innerHTML='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%"><text x="'+(W/2)+'" y="'+(H/2)+'" text-anchor="middle" font-size="14" fill="#67779c">极夜：当日无日照</text></svg>';
+    return;
+  }
+  const x0=d.rise-25,x1=d.set+25;
+  const X=t=>mL+(t-x0)/(x1-x0)*(W-mL-mR);
+  const yMax=Math.max(0.02,Math.max.apply(null,d.curve.map(q=>q.area))*1.18);
+  const Y=a=>mT+(1-a/yMax)*(H-mT-mB);
+  const Y2=e=>mT+(1-e/90)*(H-mT-mB);
+  // 网格
+  for(let h=Math.ceil(x0/120)*120;h<=x1;h+=120){
+    p.push(lnS([X(h),mT],[X(h),H-mB],'stroke="#182338" stroke-width="1"'));
+    p.push(txS([X(h),H-mB+16],fmtHM(h),'text-anchor="middle" font-size="10.5" fill="#67779c"'));
+  }
+  for(let k=0;k<=4;k++){
+    const v=yMax*k/4;
+    p.push(lnS([mL,Y(v)],[W-mR,Y(v)],'stroke="#182338" stroke-width="1"'));
+    p.push(txS([mL-8,Y(v)+3.5],v.toFixed(1),'text-anchor="end" font-size="10" fill="#67779c"'));
+  }
+  [0,45,90].forEach(e=>{
+    p.push(txS([W-mR+8,Y2(e)+3.5],e+'°','text-anchor="start" font-size="10" fill="#4a6ea8"'));
+  });
+  // 有效时段底纹
+  const effSegs=[];
+  let cur=null;
+  d.curve.forEach(q=>{
+    if(q.p>0.2&&q.elev>3){if(!cur)cur=[q.t,q.t];else cur[1]=q.t;}
+    else if(cur){effSegs.push(cur);cur=null;}
+  });
+  if(cur)effSegs.push(cur);
+  effSegs.forEach(sg=>{
+    p.push('<rect x="'+f1(X(sg[0]))+'" y="'+mT+'" width="'+f1(X(sg[1])-X(sg[0]))+'" height="'+f1(H-mT-mB)+'" fill="rgba(90,167,255,.06)"/>');
+  });
+  // 面积曲线
+  const pts=d.curve.map(q=>[X(q.t),Y(q.area)]);
+  if(pts.length>2){
+    const areaPath='M '+f1(pts[0][0])+' '+f1(H-mB)+' '+'L '+pts.map(q=>f1(q[0])+' '+f1(q[1])).join(' L ')+' L '+f1(pts[pts.length-1][0])+' '+f1(H-mB)+' Z';
+    p.push('<defs><linearGradient id="dayFill" x1="0" y1="0" x2="0" y2="1">'+
+      '<stop offset="0" stop-color="rgba(255,180,84,.42)"/><stop offset="1" stop-color="rgba(255,180,84,.03)"/></linearGradient></defs>');
+    p.push('<path d="'+areaPath+'" fill="url(#dayFill)"/>');
+    p.push('<polyline points="'+pts.map(q=>f1(q[0])+','+f1(q[1])).join(' ')+'" fill="none" stroke="#ffb454" stroke-width="2"/>');
+  }
+  // 高度角
+  const epts=d.curve.map(q=>[X(q.t),Y2(q.elev)]);
+  if(epts.length>2){
+    p.push('<polyline points="'+epts.map(q=>f1(q[0])+','+f1(q[1])).join(' ')+'" fill="none" stroke="#4a6ea8" stroke-width="1.4" stroke-dasharray="5 5" opacity=".9"/>');
+  }
+  // 日出正午日落
+  const off=4*(state.lon-15*state.tz)+d.eot;
+  const noonT=720-off;
+  [[d.rise,'日出'],[noonT,'正午'],[d.set,'日落']].forEach(([tt,tt2])=>{
+    if(tt<x0||tt>x1)return;
+    p.push(lnS([X(tt),mT],[X(tt),H-mB],'stroke="#31426a" stroke-width="1" stroke-dasharray="3 5"'));
+    p.push(txS([X(tt),mT-6],tt2,'text-anchor="middle" font-size="10" fill="#8a98bb"'));
+  });
+  // 当前游标
+  if(state.scrub>=x0&&state.scrub<=x1){
+    const near=d.curve.reduce((a,b)=>Math.abs(b.t-state.scrub)<Math.abs(a.t-state.scrub)?b:a);
+    p.push(lnS([X(state.scrub),mT],[X(state.scrub),H-mB],'stroke="#ffd79a" stroke-width="1.4"'));
+    p.push('<circle cx="'+f1(X(state.scrub))+'" cy="'+f1(Y(near.area))+'" r="4.5" fill="#ffd79a" stroke="#4a3a1c"/>');
+    p.push(pillS(X(state.scrub),mT+12,'面积 '+near.area.toFixed(2)+' m²','#ffd79a',10.5));
+  }
+  // 面积标注
+  p.push(txS([mL+6,Y(yMax)+16],'曲线下面积 = 有效受光量 G = '+d.G.toFixed(2)+' m²·h','font-size="11.5" fill="#ffd79a"'));
+  p.push(txS([W-mR+8,mT+4],'高度角','text-anchor="start" font-size="10" fill="#4a6ea8"'));
+  p.push(txS([mL-8,mT-6],'m²','text-anchor="end" font-size="10" fill="#8a98bb"'));
+  $('dayC').innerHTML='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;display:block;touch-action:none" id="daySvg">'+p.join('')+'</svg>';
 }
-(function bindDayChart(){
+function bindDayChart(){
   const box=$('dayC');
   let drag=false;
   const setFromEvent=e=>{
@@ -1794,10 +2814,11 @@ function renderDay(){
   box.addEventListener('pointermove',e=>{if(drag)setFromEvent(e);});
   box.addEventListener('pointerup',()=>{drag=false;});
   box.addEventListener('pointercancel',()=>{drag=false;});
-})();
+}
 
-/* ---------------- Render: year curve ---------------- */
+/* ---------------- 渲染：全年曲线 ---------------- */
 function renderYear(){
+  if(window.__LANG==='en'){
   const c=state.cal; if(!c)return;
   const W=780,H=238,mL=52,mR=18,mT=18,mB=30;
   const arr=c.yearArr,N=arr.length;
@@ -1853,8 +2874,68 @@ function renderYear(){
   const mdBest=doyToMD(state.y,c.bestIdx+1),mdWorst=doyToMD(state.y,c.worstIdx+1);
   const pct=Math.round(c.rank/c.yearArr.length*100);
   $('yearStats').innerHTML='Strongest <b>'+mdBest.m+'/'+mdBest.d+'</b> ('+c.yearArr[c.bestIdx].toFixed(1)+' m²·h) · weakest <b>'+mdWorst.m+'/'+mdWorst.d+'</b> ('+c.yearArr[c.worstIdx].toFixed(1)+' m²·h) · the selected date sits at the <b>'+pct+'th percentile</b> of the year. Click a date in the chart or a month above to switch.';
+
+    return;
+  }
+  /* ---- 中文逻辑（源码唯一一份）---- */
+  const c=state.cal; if(!c)return;
+  const W=780,H=238,mL=52,mR=18,mT=18,mB=30;
+  const arr=c.yearArr,N=arr.length;
+  const X=i=>mL+(i/(N-1))*(W-mL-mR);
+  const yMax=Math.max(0.01,Math.max.apply(null,arr)*1.12);
+  const Y=v=>mT+(1-v/yMax)*(H-mT-mB);
+  const p=[];
+  const md=monthDays(state.y);
+  let acc=0;
+  for(let m=1;m<=12;m++){
+    p.push(lnS([X(acc),mT],[X(acc),H-mB],'stroke="#182338" stroke-width="1"'));
+    if(m===state.m){
+      p.push('<rect x="'+f1(X(acc))+'" y="'+mT+'" width="'+f1(X(acc+md[m-1]-1)-X(acc))+'" height="'+f1(H-mT-mB)+'" fill="rgba(255,180,84,.05)"/>');
+    }
+    p.push(txS([(X(acc)+X(Math.min(N-1,acc+md[m-1]-1)))/2,H-mB+16],m+'月','text-anchor="middle" font-size="10" fill="#67779c"'));
+    acc+=md[m-1];
+  }
+  for(let k=0;k<=3;k++){
+    const v=yMax*k/3;
+    p.push(lnS([mL,Y(v)],[W-mR,Y(v)],'stroke="#182338" stroke-width="1"'));
+    p.push(txS([mL-8,Y(v)+3.5],v.toFixed(1),'text-anchor="end" font-size="10" fill="#67779c"'));
+  }
+  const pts=arr.map((v,i)=>[X(i),Y(v)]);
+  const areaPath='M '+f1(pts[0][0])+' '+f1(H-mB)+' L '+pts.map(q=>f1(q[0])+' '+f1(q[1])).join(' L ')+' L '+f1(pts[N-1][0])+' '+f1(H-mB)+' Z';
+  p.push('<defs><linearGradient id="yearFill" x1="0" y1="0" x2="0" y2="1">'+
+    '<stop offset="0" stop-color="rgba(120,190,255,.30)"/><stop offset="1" stop-color="rgba(120,190,255,.02)"/></linearGradient></defs>');
+  p.push('<path d="'+areaPath+'" fill="url(#yearFill)"/>');
+  p.push('<polyline points="'+pts.map(q=>f1(q[0])+','+f1(q[1])).join(' ')+'" fill="none" stroke="#7fc3ff" stroke-width="1.8"/>');
+  // 冬至夏至参考
+  [[172,'夏至'],[355,'冬至']].forEach(([n0,lab])=>{
+    if(n0<N){p.push(lnS([X(n0-1),mT],[X(n0-1),H-mB],'stroke="#22304d" stroke-width="1" stroke-dasharray="2 6"'));
+      p.push(txS([X(n0-1),mT-2],lab,'text-anchor="middle" font-size="9.5" fill="#5d6d92"'));}
+  });
+  // 最佳日
+  const bx=X(c.bestIdx);
+  p.push('<circle cx="'+f1(bx)+'" cy="'+f1(Y(arr[c.bestIdx]))+'" r="4.5" fill="#4fd6a5" stroke="#0c1424" stroke-width="1.5"/>');
+  p.push(pillS(bx,Y(arr[c.bestIdx])-14,'全年最佳','#9fd6b8',10));
+  // 选中日 & 今天
+  const curIdx=c.par.n-1;
+  p.push(lnS([X(curIdx),mT],[X(curIdx),H-mB],'stroke="#ffd79a" stroke-width="1.5"'));
+  p.push('<circle cx="'+f1(X(curIdx))+'" cy="'+f1(Y(arr[curIdx]))+'" r="4.5" fill="#ffb454" stroke="#4a3a1c" stroke-width="1.5"/>');
+  p.push(pillS(X(curIdx),mT+13,'选中 '+state.m+'月'+state.d+'日','#ffd79a',10.5));
+  const td=(()=>{const t=new Date();return {y:t.getFullYear(),m:t.getMonth()+1,d:t.getDate()};})();
+  if(td.y===state.y){
+    const ti=dayOfYear(td.y,td.m,td.d)-1;
+    p.push('<circle cx="'+f1(X(ti))+'" cy="'+f1(Y(arr[ti]))+'" r="3" fill="none" stroke="#7fc3ff" stroke-width="1.6"/>');
+  }
+  p.push(txS([mL-8,mT-6],'m²·h','text-anchor="end" font-size="10" fill="#8a98bb"'));
+  $('yearC').innerHTML='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;display:block;touch-action:none" id="yearSvg">'+p.join('')+'</svg>';
+  $('yearTitle').textContent=state.y+' 年 · 每日有效受光量';
+  // 月份 chips
+  $('monthChips').innerHTML=c.monthAvg.map((v,i)=>'<button data-m="'+(i+1)+'" class="'+(state.m===i+1?'on':'')+'">'+(i+1)+'月<b>'+v.toFixed(1)+'</b></button>').join('');
+  const mdBest=doyToMD(state.y,c.bestIdx+1),mdWorst=doyToMD(state.y,c.worstIdx+1);
+  const pct=Math.round(c.rank/c.yearArr.length*100);
+  $('yearStats').innerHTML='全年最强 <b>'+mdBest.m+'月'+mdBest.d+'日</b>（'+c.yearArr[c.bestIdx].toFixed(1)+' m²·h）· 全年最弱 <b>'+mdWorst.m+'月'+mdWorst.d+'日</b>（'+c.yearArr[c.worstIdx].toFixed(1)+' m²·h）· 当前选中日期处于全年 <b>第 '+pct+' 百分位</b>。点击图中日期或上方月份可切换计算。';
 }
-(function bindYearChart(){
+function bindYearChart(){
+  if(window.__LANG==='en'){
   const box=$('yearC');
   const tip=$('tip');
   const idxFromEvent=e=>{
@@ -1885,10 +2966,45 @@ function renderYear(){
     syncInputsFromState();
     scheduleCompute(30);
   });
-})();
 
-/* ---------------- Render: azimuth scan ---------------- */
+    return;
+  }
+  /* ---- 中文逻辑（源码唯一一份）---- */
+  const box=$('yearC');
+  const tip=$('tip');
+  const idxFromEvent=e=>{
+    const svg=$('yearSvg'); if(!svg)return -1;
+    const rect=svg.getBoundingClientRect();
+    const W=780,mL=52,mR=18;
+    const px=(e.clientX-rect.left)/rect.width*W;
+    const c=state.cal; const N=c.yearArr.length;
+    const fi=(px-mL)/(W-mL-mR)*(N-1);
+    return clamp(Math.round(fi),0,N-1);
+  };
+  box.addEventListener('pointermove',e=>{
+    const c=state.cal; if(!c)return;
+    const i=idxFromEvent(e);
+    if(i<0){tip.style.opacity=0;return;}
+    const md=doyToMD(state.y,i+1);
+    const v=c.yearArr[i];
+    tip.textContent=state.y+'/'+md.m+'/'+md.d+' · G='+v.toFixed(2)+' m²·h · 等效满照 '+(v/Math.max(0.01,state.L*state.W)).toFixed(2)+' h';
+    tip.style.left=(e.clientX+14)+'px';
+    tip.style.top=(e.clientY-34)+'px';
+    tip.style.opacity=1;
+  });
+  box.addEventListener('pointerleave',()=>{tip.style.opacity=0;});
+  box.addEventListener('click',e=>{
+    const i=idxFromEvent(e); if(i<0)return;
+    const md=doyToMD(state.y,i+1);
+    state.m=md.m;state.d=md.d;
+    syncInputsFromState();
+    scheduleCompute(30);
+  });
+}
+
+/* ---------------- 渲染：绳向扫描 ---------------- */
 function renderScan(){
+  if(window.__LANG==='en'){
   const c=state.cal; if(!c)return;
   const W=760,H=170,mL=52,mR=16,mT=16,mB=30;
   const arr=c.scan.arr;
@@ -1928,10 +3044,54 @@ function renderScan(){
   p.push(txS([mL-8,mT-4],'m²·h','text-anchor="end" font-size="10" fill="#8a98bb"'));
   p.push(txS([W-mR,mT+2],'Daily exposure as the line is turned to different orientations','text-anchor="end" font-size="11" fill="#8a98bb"'));
   $('scanC').innerHTML='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;display:block">'+p.join('')+'</svg>';
+
+    return;
+  }
+  /* ---- 中文逻辑（源码唯一一份）---- */
+  const c=state.cal; if(!c)return;
+  const W=760,H=170,mL=52,mR=16,mT=16,mB=30;
+  const arr=c.scan.arr;
+  const X=k=>mL+(k/179)*(W-mL-mR);
+  const yMax=Math.max(0.01,Math.max.apply(null,arr)*1.12);
+  const Y=v=>mT+(1-v/yMax)*(H-mT-mB);
+  const p=[];
+  for(let k=0;k<180;k+=45){
+    p.push(lnS([X(k),mT],[X(k),H-mB],'stroke="#182338" stroke-width="1"'));
+  }
+  const ticks=[[0,'0°'],[45,'45°'],[90,'90°'],[135,'135°'],[179,'180°']];
+  ticks.forEach(([k,t])=>{
+    p.push(txS([X(k),H-mB+16],t,'text-anchor="middle" font-size="10" fill="#67779c"'));
+  });
+  p.push(txS([X(0),H-mB+30],'南北走向','text-anchor="middle" font-size="9.5" fill="#5d6d92"'));
+  p.push(txS([X(90),H-mB+30],'东西走向','text-anchor="middle" font-size="9.5" fill="#5d6d92"'));
+  p.push(txS([X(179),H-mB+30],'南北走向','text-anchor="middle" font-size="9.5" fill="#5d6d92"'));
+  const pts=arr.map((v,k)=>[X(k),Y(v)]);
+  const areaPath='M '+f1(pts[0][0])+' '+f1(H-mB)+' L '+pts.map(q=>f1(q[0])+' '+f1(q[1])).join(' L ')+' L '+f1(pts[179][0])+' '+f1(H-mB)+' Z';
+  p.push('<defs><linearGradient id="scanFill" x1="0" y1="0" x2="0" y2="1">'+
+    '<stop offset="0" stop-color="rgba(120,214,184,.30)"/><stop offset="1" stop-color="rgba(120,214,184,.02)"/></linearGradient></defs>');
+  p.push('<path d="'+areaPath+'" fill="url(#scanFill)"/>');
+  p.push('<polyline points="'+pts.map(q=>f1(q[0])+','+f1(q[1])).join(' ')+'" fill="none" stroke="#4fd6a5" stroke-width="1.8"/>');
+  // 当前 & 最优
+  const kc2=c.kCur;
+  p.push(lnS([X(kc2),mT],[X(kc2),H-mB],'stroke="#5aa7ff" stroke-width="1.4" stroke-dasharray="4 4"'));
+  p.push('<circle cx="'+f1(X(kc2))+'" cy="'+f1(Y(arr[kc2]))+'" r="4.2" fill="#5aa7ff" stroke="#0c1424" stroke-width="1.4"/>');
+  p.push(pillS(clamp(X(kc2),mL+50,W-mR-50),Y(arr[kc2])-13,'当前 '+kc2+'°','#9dc8ff',10.5));
+  if(Math.abs(c.bestAz-kc2)>1.5){
+    p.push('<circle cx="'+f1(X(c.bestAz))+'" cy="'+f1(Y(arr[c.bestAz]))+'" r="4.2" fill="#4fd6a5" stroke="#0c1424" stroke-width="1.4"/>');
+    p.push(pillS(clamp(X(c.bestAz),mL+50,W-mR-50),Y(arr[c.bestAz])-13,'最优 '+c.bestAz+'°','#9fd6b8',10.5));
+  }
+  for(let k=0;k<=3;k++){
+    const v=yMax*k/3;
+    p.push(txS([mL-8,Y(v)+3.5],v.toFixed(1),'text-anchor="end" font-size="10" fill="#67779c"'));
+  }
+  p.push(txS([mL-8,mT-4],'m²·h','text-anchor="end" font-size="10" fill="#8a98bb"'));
+  p.push(txS([W-mR,mT+2],'把绳转到不同走向时，当日有效受光量的变化','text-anchor="end" font-size="11" fill="#8a98bb"'));
+  $('scanC').innerHTML='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;display:block">'+p.join('')+'</svg>';
 }
 
-/* ---------------- Render: advice ---------------- */
+/* ---------------- 渲染：建议 ---------------- */
 function renderAdvice(){
+  if(window.__LANG==='en'){
   const c=state.cal; if(!c)return;
   const items=[];
   const sm=c.scheme, rec=sm.rec;
@@ -1997,10 +3157,80 @@ function renderAdvice(){
     const tones={good:'#4fd6a5',warn:'#ffc24b',bad:'#ff7a7a',info:'#5aa7ff'};
     return '<div class="adv" style="border-left-color:'+tones[it.tone]+'"><span class="dot" style="--c:'+tones[it.tone]+'"></span><div><b>'+it.tag+'</b> '+it.txt+(it.delta?'<span class="delta">'+it.delta+'</span>':'')+'</div></div>';
   }).join('');
+
+    return;
+  }
+  /* ---- 中文逻辑（源码唯一一份）---- */
+  const c=state.cal; if(!c)return;
+  const items=[];
+  const sm=c.scheme, rec=sm.rec;
+  const G=c.Gcur,Ga=c.bestG;
+  const gainGeom=(Ga/G-1)*100;
+  const gainEnergy=(c.dayBest.Q/Math.max(1e-6,c.day.Q)-1)*100;
+  const fB=Math.max(state.fold,1-state.fold),fS=1-fB;
+  const ratio=fB/fS;
+  const manual=(c.fError||state.edgePref!=='auto');
+  // 当前设置的安全性提示（手动/固定模式下单独检查）
+  if(manual){
+    const D=c.g.D;
+    const clr=state.ropeH-fB*D;
+    const ropeNeed=c.g.span+0.2;
+    if(ratio>sm.kappa){
+      items.push({tone:'bad',tag:'摩擦',txt:'当前设置两侧重量比 '+ratio.toFixed(2)+' 已超过摩擦极限 '+sm.kappa.toFixed(2)+'（μ='+state.mu.toFixed(2)+'），按质量均匀假设被子会滑向更平衡的位置。请降低不对称度、增大摩擦（缠防滑带），或点击上方「应用推荐方案」。'});
+    }else if(ratio>sm.fFricSafe){
+      items.push({tone:'warn',tag:'摩擦',txt:'当前设置接近摩擦极限（余量 '+(sm.kappa/ratio).toFixed(2)+'×，推荐留 1.3×）。实际使用中若有风或被子偏滑，建议回到推荐折点。'});
+    }
+    if(clr<0.06){
+      items.push({tone:'bad',tag:'拖地',txt:'当前设置下较长一侧下垂 '+ (fB*D).toFixed(2)+' m，绳高 '+state.ropeH.toFixed(2)+' m，最低点即将或已经触地，贴地部分几乎晒不到直射光。'});
+    }
+    if(state.ropeLen<ropeNeed){
+      items.push({tone:'bad',tag:'绳长',txt:'当前方案沿绳需 '+ropeNeed.toFixed(2)+' m，你填写的绳长只有 '+state.ropeLen.toFixed(1)+' m。请看上方对比表选择更省绳的搭法。'});
+    }
+    const gain=(rec.G/c.Gcur-1)*100;
+    if(gain>2){
+      items.push({tone:'warn',tag:'推荐',txt:'相比当前设置，推荐方案（'+((rec.edge==='long')?'长边':'宽边')+'搭绳 · '+Math.round(rec.fRec*100)+':'+Math.round((1-rec.fRec)*100)+'）受光量高约 '+gain.toFixed(0)+'%，且满足全部安全约束。',delta:'+'+gain.toFixed(0)+'%'});
+    }
+  }
+  // 绳向
+  if(gainGeom>4){
+    const b1=c.bestAz,b2=norm360(c.bestAz+180);
+    items.push({tone:'warn',tag:'绳向',
+      txt:'如果不方便改绳向可忽略本条。当前绳向 '+Math.round(state.ropeAz)+'° 距当日最优还有差距：转到约 '+b1+'°（或反向 '+b2+'°，即'+dirName8(b1)+'—'+dirName8(b2)+'走向）可提升几何受光量约 '+gainGeom.toFixed(0)+'%。折叠方式再优化也无法弥补绳向的差距。',
+      delta:'+'+gainGeom.toFixed(0)+'%'});
+    if(gainEnergy>0&&Math.abs(gainGeom-gainEnergy)>5){
+      items.push({tone:'info',tag:'口径',
+        txt:'上述为几何受光量（面积×时间）的提升；按直射能量加权（计入低角度阳光的大气衰减）后约为 '+gainEnergy.toFixed(0)+'%。晨昏低角度光对“面积×时间”贡献大，对能量贡献相对小。'});
+    }
+  }else if(gainGeom>0.5){
+    items.push({tone:'good',tag:'绳向',txt:'当前绳向已接近当日最优（差 '+gainGeom.toFixed(1)+'%），无需调整。'});
+  }
+  // 均匀性
+  items.push({tone:'info',tag:'翻面',txt:'本模型按“面积×时间”统计总量，两层朝向不影响总量，但影响干燥均匀度：可在正午前后翻面一次，让两面都直接受晒（推荐方案已把较长一侧朝向当天受光更多的一侧）。'});
+  // 时段
+  if(c.day.curve.length>4){
+    const tot=c.day.G; let acc=0,w1=null,w2=null;
+    for(const q of c.day.curve){
+      acc+=q.area*2/60;
+      if(w1===null&&acc>=tot*0.2)w1=q.t;
+      if(w2===null&&acc>=tot*0.8){w2=q.t;break;}
+    }
+    if(w1!==null&&w2!==null){
+      items.push({tone:'info',tag:'时段',txt:'当日 20%→80% 的受光量集中在 '+fmtHM(w1)+'–'+fmtHM(w2)+'，峰值在 '+fmtHM(c.day.peak.t)+'（瞬时最受光面积 '+c.day.peak.area.toFixed(2)+' m²）。只能晒半天时优先选这一段。'});
+    }
+  }
+  // 季节
+  const wN=90-Math.abs(state.lat-(-23.44));
+  const sN=90-Math.abs(state.lat-23.44);
+  items.push({tone:'info',tag:'季节',txt:'本地正午太阳高度角：夏至约 '+(sN>0?sN.toFixed(1):'--')+'°，冬至约 '+(wN>0?wN.toFixed(1):'--')+'°。冬夏入射角差异是全年曲线起伏的主因；当前日期处于全年第 '+Math.round(c.rank/c.yearArr.length*100)+' 百分位。'});
+  $('advice').innerHTML=items.map(it=>{
+    const tones={good:'#4fd6a5',warn:'#ffc24b',bad:'#ff7a7a',info:'#5aa7ff'};
+    return '<div class="adv" style="border-left-color:'+tones[it.tone]+'"><span class="dot" style="--c:'+tones[it.tone]+'"></span><div><b>'+it.tag+'</b> '+it.txt+(it.delta?'<span class="delta">'+it.delta+'</span>':'')+'</div></div>';
+  }).join('');
 }
 
-/* ---------------- Render: instant readout & sidebar live values ---------------- */
+/* ---------------- 渲染：即时读数 & 控制面板实时值 ---------------- */
 function renderInstant(){
+  if(window.__LANG==='en'){
   const si=sunAtScrub(); if(!si||!state.cal)return;
   const name=(off)=>'the '+dirName8(state.ropeAz+(off>0?90:-90))+'-side layer';
   if(si.up){
@@ -2012,12 +3242,33 @@ function renderInstant(){
   }else{
     $('instant').innerHTML='<b>'+fmtHM(state.scrub)+'</b><span class="sep">|</span>sun below the horizon — no direct light (night drying).';
   }
+
+    return;
+  }
+  /* ---- 中文逻辑（源码唯一一份）---- */
+  const si=sunAtScrub(); if(!si||!state.cal)return;
+  const name=(off)=>'朝'+dirName8(state.ropeAz+(off>0?90:-90))+'侧层';
+  if(si.up){
+    $('instant').innerHTML='<b>'+fmtHM(state.scrub)+'</b><span class="sep">|</span>真太阳时 '+fmtHM(si.solarT)+
+      '<span class="sep">|</span>高度角 '+si.elev.toFixed(1)+'°<span class="sep">|</span>方位角 '+si.az.toFixed(0)+'°（'+dirName8(si.az)+'）'+
+      '<span class="sep">|</span>受光面 '+name(si.litOff)+'<span class="sep">|</span>入射余弦 '+si.p.toFixed(2)+
+      '<span class="sep">|</span>瞬时受光面积 <b>'+si.area.toFixed(2)+' m²</b><span class="sep">|</span>直射强度 '+si.dni.toFixed(0)+' W/m²'+
+      (si.p<0.03?'<span class="sep">|</span>阳光几乎平行于被面，几乎晒不到':'');
+  }else{
+    $('instant').innerHTML='<b>'+fmtHM(state.scrub)+'</b><span class="sep">|</span>太阳在地平线下，无直射光；被子处于“夜晾”状态。';
+  }
 }
 function renderLive(){
-  renderScene(); renderPlan(); renderPolar(); renderDay(); renderInstant();
-  $('timeLabel').textContent=fmtHM(state.scrub);
+  /* 拖动时五个图表高频重绘；暂停词典翻译可省去全部翻译开销（详见引擎注释）。
+     try/finally：任何异常下翻译开关都会复位，不会把界面留在“不翻译”状态。 */
+  window.__NO_TRANS=true;
+  try{
+    renderScene(); renderPlan(); renderPolar(); renderDay(); renderInstant();
+    $('timeLabel').textContent=fmtHM(state.scrub);
+  }finally{ window.__NO_TRANS=false; }
 }
 function renderEdgeNote(){
+  if(window.__LANG==='en'){
   const c=state.cal; if(!c)return;
   const sm=c.scheme, ch=c.chosen;
   const nm=e=>e==='long'?'long edge':'short edge';
@@ -2058,6 +3309,50 @@ function renderEdgeNote(){
     ', i.e. fold ≤ '+Math.round(sm.fFricLim*100)+' ('+Math.round(sm.fFricSafe*100)+' with a 1.3× margin). '+
     'Current ratio '+ratio.toFixed(2)+(ratio>lim.kappa?', <span style="color:#ff9c9c">over the limit — slip risk</span>':(ratio>lim.kappa/1.3?', <span style="color:#ffd08a">between limit and recommendation</span>':', safe'))+'. '+
     'Clearance '+drag.toFixed(2)+' m'+(drag<0.03?' (<span style="color:#ff9c9c">dragging!</span>)':'.');
+
+    return;
+  }
+  /* ---- 中文逻辑（源码唯一一份）---- */
+  const c=state.cal; if(!c)return;
+  const sm=c.scheme, ch=c.chosen;
+  const nm=e=>e==='long'?'长边':'宽边';
+  const fB=Math.max(state.fold,1-state.fold), fS=1-fB;
+  const D=ch.D;
+  let t;
+  if(state.edgePref==='auto'){
+    t='沿绳边由工具推荐：当前采用 <b>'+nm(ch.edge)+'</b> 搭绳。';
+  }else{
+    t='你已固定 <b>'+nm(state.edgePref)+'</b> 搭绳'+(sm.rec.edge!==state.edgePref?'<span style="color:#ffd08a">（工具计算的最优为沿'+nm(sm.rec.edge)+'）</span>':'（与工具最优一致）')+'。';
+  }
+  $('edgeNote').innerHTML=t+'沿绳展开 '+ch.span.toFixed(2)+' m；折点分配的是与绳垂直的「'+(ch.edge==='long'?'宽':'长')+'」（'+D.toFixed(2)+
+    ' m），两侧下垂 '+(fB*D).toFixed(2)+' m 与 '+(fS*D).toFixed(2)+' m。';
+  $('hangTxt').textContent=(fB*D).toFixed(2)+' m / '+(fS*D).toFixed(2)+' m';
+  const lim=foldLimit(state.mu);
+  $('foldVal').textContent=Math.round(fB*100)+' / '+Math.round(fS*100);
+  // 刻度标记：去重 + 标签两行错开，避免文字重叠
+  const marks=[];
+  marks.push({v:0.5,cls:'cur',lab:'居中 50',title:'居中对折'});
+  if(Math.abs(ch.fRec-0.5)>0.015)marks.push({v:ch.fRec,cls:'rec',lab:'推荐 '+Math.round(ch.fRec*100),title:'推荐折点'});
+  if(sm.fFricLim<0.97&&Math.abs(sm.fFricLim-ch.fRec)>0.03)marks.push({v:sm.fFricLim,cls:'limit',lab:'摩擦极限 '+Math.round(sm.fFricLim*100),title:'摩擦理论极限'});
+  if(ch.clearLim<0.95&&Math.abs(ch.clearLim-ch.fRec)>0.03)marks.push({v:ch.clearLim,cls:'drag',lab:'拖地限制 '+Math.round(ch.clearLim*100),title:'拖地限制'});
+  if(state.foldManual!=null&&Math.abs(state.fold-ch.fRec)>0.015)marks.push({v:state.fold,cls:'cur',lab:'当前 '+Math.round(state.fold*100),title:'当前手动折点'});
+  marks.sort((a,b)=>a.v-b.v);
+  let scale='',labHtml='',lastRow0=-1,lastRow1=-1;
+  marks.forEach(mk2=>{
+    scale+='<div class="mk '+(mk2.cls||'cur')+'" style="left:calc('+(mk2.v*100)+'% - 1px)" title="'+mk2.title+'"></div>';
+    let row=0;
+    if(lastRow0>=0&&mk2.v-lastRow0<0.15)row=1;
+    if(row===1&&lastRow1>=0&&mk2.v-lastRow1<0.15)row=0;
+    if(row===0)lastRow0=mk2.v;else lastRow1=mk2.v;
+    labHtml+='<div class="lab" style="left:'+(mk2.v*100)+'%;top:'+(row===0?10:24)+'px">'+mk2.lab+'</div>';
+  });
+  $('foldScale').innerHTML=scale+labHtml;
+  const ratio=fB/fS;
+  const drag=(state.ropeH-fB*D);
+  $('fricNote').innerHTML='质量均匀分布 + 卡普斯坦模型（接触弧 π）：不滑落要求两侧重量比 ≤ e^(μ·π) = '+lim.kappa.toFixed(2)+
+    '，即折点不超过 '+Math.round(sm.fFricLim*100)+'（留 1.3× 安全余量时不超过 '+Math.round(sm.fFricSafe*100)+'）。'+
+    '当前比值 '+ratio.toFixed(2)+(ratio>lim.kappa?'，<span style="color:#ff9c9c">超出极限，存在滑落风险</span>':(ratio>lim.kappa/1.3?'，<span style="color:#ffd08a">处于极限与建议值之间</span>':'，安全'))+'。'+
+    '最低点距地 '+drag.toFixed(2)+' m'+(drag<0.03?'（<span style="color:#ff9c9c">拖地！</span>）':'。');
 }
 function renderAll(){
   renderCompass();
@@ -2073,7 +3368,7 @@ function renderAll(){
   renderLive();
 }
 
-/* ---------------- Event bindings ---------------- */
+/* ---------------- 事件绑定 ---------------- */
 function bindAll(){
   ['lat','lon','alt','tz','ropeAz','qL','qW','tCm','ropeH','ropeLen','mu','kc'].forEach(id=>{
     $(id).addEventListener('input',()=>{state.demoNote=null;scheduleCompute(180);});
@@ -2107,7 +3402,7 @@ function bindAll(){
     const n=Number($('daySlider').value);
     const md=doyToMD(state.y,n);
     state.m=md.m;state.d=md.d;
-    $('dayNo').textContent=n+' d';
+    $('dayNo').textContent=n+(window.__LANG==='en'?' d':' 天');
     syncInputsFromState();scheduleCompute(40);
   });
   $('edgeSeg').addEventListener('click',e=>{
@@ -2139,7 +3434,7 @@ function bindAll(){
   $('btnExample').addEventListener('click',()=>{
     state.lat=39.9042;state.lon=116.4074;state.alt=44;state.tz=8;
     state.ropeAz=0;state.edgePref='auto';state.foldManual=null;state.ropeLen=3.2;state.ropeH=1.8;
-    state.demoNote='Demo data (Beijing · north–south line) — trial only; for real use, replace the azimuth with your own reading.';
+    state.demoNote='演示数据（北京 · 南北走向晾绳），仅用于体验流程；正式使用时请把绳向改为你自己实测的数值。';
     syncInputsFromState();scheduleCompute(30);
   });
   $('btnToday').addEventListener('click',()=>{
@@ -2148,18 +3443,18 @@ function bindAll(){
     syncInputsFromState();scheduleCompute(30);
   });
   $('btnGeo').addEventListener('click',()=>{
-    if(!navigator.geolocation){alert('Geolocation is not supported here — please type the coordinates.');return;}
+    if(!navigator.geolocation){alert('当前环境不支持定位，请手动输入。');return;}
     navigator.geolocation.getCurrentPosition(pos=>{
       state.lat=pos.coords.latitude;state.lon=pos.coords.longitude;
       if(isFinite(pos.coords.altitude))state.alt=Math.round(pos.coords.altitude*10)/10;
       state.tz=-new Date().getTimezoneOffset()/60;
       state.demoNote=null;
       syncInputsFromState();scheduleCompute(30);
-    },err=>{alert('Location failed ('+(err.message||'unknown reason')+') — please type the coordinates.');},{enableHighAccuracy:true,timeout:9000});
+    },err=>{alert('定位失败（'+(err.message||'未知原因')+'），请手动输入经纬度。');},{enableHighAccuracy:true,timeout:9000});
   });
   $('btnGeo2').addEventListener('click',()=>$('btnGeo').click());
   $('btnExample2').addEventListener('click',()=>$('btnExample').click());
-  // time cursor
+  // 时间游标
   $('timeRange').addEventListener('input',()=>{
     state.scrub=Number($('timeRange').value);
     renderLive();
@@ -2181,8 +3476,8 @@ function bindAll(){
   let raf=null;
   $('playBtn').addEventListener('click',()=>{
     const c=state.cal; if(!c)return;
-    if(state.playing){state.playing=false;$('playBtn').textContent='Play the day';if(raf)cancelAnimationFrame(raf);return;}
-    state.playing=true;$('playBtn').textContent='Pause';
+    if(state.playing){state.playing=false;$('playBtn').textContent='播放一日';if(raf)cancelAnimationFrame(raf);return;}
+    state.playing=true;$('playBtn').textContent='暂停';
     const dayLen=c.day.polarNight?1440:(c.day.set-c.day.rise+30);
     const t0=c.day.polarNight?0:Math.max(0,c.day.rise-15),t1=c.day.polarNight?1439:Math.min(1439,c.day.set+15);
     state.scrub=t0;
@@ -2190,9 +3485,9 @@ function bindAll(){
     const step=(now)=>{
       if(!state.playing)return;
       const dt=now-last;last=now;
-      const speed=(t1-t0)/12000; // one day in 12 seconds
+      const speed=(t1-t0)/12000; // 12 秒播完一天
       state.scrub+=dt*speed;
-      if(state.scrub>=t1){state.scrub=t1;state.playing=false;$('playBtn').textContent='Play the day';}
+      if(state.scrub>=t1){state.scrub=t1;state.playing=false;$('playBtn').textContent='播放一日';}
       $('timeRange').value=String(Math.round(state.scrub));
       renderLive();
       if(state.playing)raf=requestAnimationFrame(step);
@@ -2200,21 +3495,63 @@ function bindAll(){
     raf=requestAnimationFrame(step);
   });
   window.addEventListener('resize',()=>{},{passive:true});
+  const __langSegEl=$('langSeg');
+  if(__langSegEl){
+    __langSegEl.addEventListener('click',e=>{
+      const b=e.target.closest('button');
+      if(b&&b.dataset.lang)setLang(b.dataset.lang);
+    });
+  }
 }
 
-/* ---------------- Boot ---------------- */
-(function init(){
-  const t=new Date();
-  state.y=t.getFullYear();state.m=t.getMonth()+1;state.d=t.getDate();
-  state.tz=clamp(-t.getTimezoneOffset()/60,-12,14);   // time zone read from this device
-  bindAll();
+/* ---------------- 启动 ---------------- */
+/* ---------------- 启动（语言切换时整页软重启，保留已填参数） ---------------- */
+function boot(){
+  if(!boot.__first){
+    boot.__first=1;
+    const t=new Date();
+    state.y=t.getFullYear();state.m=t.getMonth()+1;state.d=t.getDate();
+    state.tz=clamp(-t.getTimezoneOffset()/60,-12,14);
+  }
+  bindAll();bindCompass();bindScene();bindDayChart();bindYearChart();
   syncInputsFromState();
   recompute();
-  // on first ready load, park the time cursor at noon
-  if(state.cal&&!state.cal.day.polarNight){
-    state.scrub=Math.round((state.cal.day.rise+state.cal.day.set)/2);
-    $('timeRange').value=String(state.scrub);
-    renderLive();
+  if(!boot.__nooned){
+    boot.__nooned=1;
+    if(state.cal&&!state.cal.day.polarNight){
+      state.scrub=Math.round((state.cal.day.rise+state.cal.day.set)/2);
+      $('timeRange').value=String(state.scrub);
+      renderLive();
+    }
+  }
+  __syncLangBtn();
+}
+window.__reboot=boot;
+(function start(){
+  /* 英文首屏防闪：若上次语言为英文，脚本运行期间页面保持隐藏（html.i18n-boot）；
+     无论启动成功或失败，finally 都会立即解除隐藏（另有 2 秒兜底计时器防极端情况） */
+  var __bootTimer=setTimeout(function(){ document.documentElement.classList.remove('i18n-boot'); },2000);
+  try{
+    let sl=null;
+    try{ sl=localStorage.getItem('quiltLang'); }catch(e){}
+    if(sl==='en'){
+      window.__LANG='en';
+      document.documentElement.lang='en';
+      document.title='Quilt Sun-Drying Simulator · Solar Geometry Lab';
+      /* 先翻译、再注入：静态骨架不会以“中文先上屏”的中间态出现 */
+      if(__ORIG_BODY){ document.body.innerHTML=(typeof __trEn==='function')?__trEn(__ORIG_BODY):__ORIG_BODY; }
+    }
+    boot();
+  }catch(e){
+    console.error('Boot failed:', e);
+    /* 启动失败时按当前语言给出可见提示，绝不留下隐藏/空白页面 */
+    var __msg=(window.__LANG==='en')
+      ? 'Failed to start. Please refresh the page.'
+      : '加载失败，请刷新页面重试。';
+    try{ document.body.innerHTML='<div id="bootErr" style="text-align:center;padding:60px 20px;color:#e9eefb">'+__msg+'</div>'; }catch(e2){}
+  }finally{
+    clearTimeout(__bootTimer);
+    document.documentElement.classList.remove('i18n-boot');
   }
 })();
 </script>
