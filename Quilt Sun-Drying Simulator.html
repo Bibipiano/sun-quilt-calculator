@@ -1,0 +1,2222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Quilt Sun-Drying Simulator · Solar Geometry Lab</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='8' fill='%23ffb454'/%3E%3Cg stroke='%23ffb454' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M16 2v4M16 26v4M2 16h4M26 16h4M6 6l3 3M23 23l3 3M26 6l-3 3M9 23l-3 3'/%3E%3C/g%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#0a0f1a; --card:#111a2c; --card2:#0d1526; --line:#1f2c44; --line2:#2a3a58;
+  --tx:#e9eefb; --dim:#93a2c4; --dim2:#67779c;
+  --sun:#ffb454; --sun2:#ff8a3c; --sky:#5aa7ff; --good:#4fd6a5; --warn:#ffc24b; --bad:#ff7a7a;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Courier New",monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:radial-gradient(1100px 620px at 78% -8%, rgba(60,84,140,.30) 0%, rgba(10,15,26,0) 62%),
+             radial-gradient(900px 500px at 6% 4%, rgba(255,150,60,.08) 0%, rgba(10,15,26,0) 55%),
+             var(--bg);
+  color:var(--tx);
+  font:14px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei","Noto Sans SC",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:rgba(255,180,84,.25)}
+.page{max-width:1380px;margin:0 auto;padding:18px 20px 64px}
+.hdr{display:flex;align-items:center;gap:14px;margin:4px 0 16px;flex-wrap:wrap}
+.logo{width:54px;height:54px;flex:0 0 54px;border-radius:15px;border:1px solid #2c3c5c;
+  background:linear-gradient(165deg,#241f14,#17203a);display:grid;place-items:center;overflow:hidden}
+.logo svg{animation:spin 46s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hdr h1{font-size:21px;margin:0;letter-spacing:.02em}
+.hdr .sub{color:var(--dim);font-size:12.5px;margin:3px 0 0}
+.hdrPills{margin-left:auto;display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:var(--dim);
+  background:#0c1424;border:1px solid var(--line);border-radius:999px;padding:3px 10px}
+.grid{display:grid;grid-template-columns:352px minmax(0,1fr);gap:14px;align-items:start}
+.side{display:flex;flex-direction:column;gap:12px;position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto;padding-right:3px}
+.side::-webkit-scrollbar{width:8px}.side::-webkit-scrollbar-thumb{background:#22304d;border-radius:8px}
+.main{display:flex;flex-direction:column;gap:14px;min-width:0}
+.card{background:linear-gradient(180deg,rgba(23,33,55,.88),rgba(13,20,35,.92));border:1px solid var(--line);
+  border-radius:16px;padding:14px 16px;box-shadow:0 10px 28px rgba(0,0,0,.28)}
+h2{font-size:13.5px;margin:0 0 10px;letter-spacing:.03em;color:#e2eafb;display:flex;align-items:center;gap:8px}
+h2 .h2n{margin-left:auto;color:var(--dim2);font:600 11px var(--mono)}
+h3{font-size:12.5px;color:#cfe0ff;margin:12px 0 6px}
+.fld{display:grid;grid-template-columns:92px minmax(0,1fr);align-items:center;gap:8px;margin:7px 0}
+.fld label{font-size:12px;color:var(--dim)}
+.fld .inb{display:flex;align-items:center;gap:6px}
+.fld .unit{font-size:11px;color:var(--dim2);white-space:nowrap}
+input[type=text],input[type=number],input[type=date],select{
+  width:100%;background:#0b1322;border:1px solid var(--line);color:var(--tx);border-radius:9px;
+  padding:7px 10px;font:inherit;font-size:12.8px;outline:none;min-width:0}
+input:focus,select:focus{border-color:#3a5a8c;box-shadow:0 0 0 3px rgba(70,120,200,.14)}
+input.bad{border-color:#7c3540;box-shadow:0 0 0 3px rgba(255,110,110,.12)}
+.remark{font-size:11px;color:var(--dim2);margin-top:2px}
+.remark b{color:#ffd79a;font-weight:600}
+.note{font-size:11.6px;color:var(--dim);background:#0b1322;border-left:3px solid var(--sky);
+  padding:8px 10px;border-radius:8px;margin:8px 0 2px;line-height:1.65}
+.note.warm{border-left-color:var(--sun)}
+.note.good{border-left-color:var(--good)}
+.note.bad{border-left-color:var(--bad)}
+.seg{display:flex;background:#0b1322;border:1px solid var(--line);border-radius:10px;padding:3px;gap:3px}
+.seg button{flex:1;background:transparent;border:0;color:var(--dim);padding:6px 6px;border-radius:8px;cursor:pointer;font:inherit;font-size:12.3px;transition:.15s}
+.seg button.on{background:linear-gradient(180deg,#2a3c5e,#22304d);color:#fff;box-shadow:0 1px 0 rgba(255,255,255,.07) inset}
+.seg button:hover{color:#dfe8fb}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:7px 0}
+.chips button{background:#0b1322;border:1px solid var(--line);color:var(--dim);border-radius:999px;
+  padding:3.5px 11px;font:inherit;font-size:11.6px;cursor:pointer;transition:.15s}
+.chips button:hover{color:#efe6cf;border-color:#4a6187}
+input[type=range]{width:100%;accent-color:var(--sun);height:20px;cursor:pointer}
+.foldScale{position:relative;height:7px;background:#0b1322;border:1px solid var(--line);border-radius:6px;margin:4px 0 34px}
+.foldScale .mk{position:absolute;top:-4px;width:2px;height:13px;background:var(--sun);border-radius:2px;opacity:.9}
+.foldScale .mk.cur{background:var(--sun)}
+.foldScale .mk.limit{background:var(--bad);height:11px;top:-2px;opacity:.85}
+.foldScale .mk.drag{background:var(--sky);height:11px;top:-2px;opacity:.85}
+.foldScale .mk.rec{background:var(--good);height:15px;top:-5px;width:3px;opacity:.95}
+.foldScale .lab{position:absolute;top:10px;font-size:10px;color:var(--dim2);transform:translateX(-50%);white-space:nowrap;background:rgba(11,19,34,.85);padding:0 3px;border-radius:4px}
+.compassBox{display:grid;place-items:center;margin:2px 0 4px;touch-action:none;user-select:none}
+.compassBox svg{max-width:224px;cursor:grab}
+.kv{display:flex;gap:10px;align-items:baseline;justify-content:space-between;font-size:11.8px;color:var(--dim);margin:3px 0}
+.kv b{color:#e9eefb;font-weight:600;font-variant-numeric:tabular-nums}
+.gaugeWrap{display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+#gaugeSvg{width:238px;flex:0 0 238px}
+.scoreHead{font-size:12px;color:var(--dim);letter-spacing:.06em}
+.scoreGrade{font-size:13px;margin-top:2px}
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;flex:1;min-width:300px}
+.tile{background:#0d1626;border:1px solid var(--line);border-radius:12px;padding:9px 11px;min-width:0}
+.tile .k{font-size:10.6px;color:var(--dim2);letter-spacing:.05em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile .v{font-size:17.5px;font-weight:650;font-variant-numeric:tabular-nums;margin-top:2px;white-space:nowrap}
+.tile .v small{font-size:11px;color:var(--dim);font-weight:500;margin-left:2px}
+.tile .s{font-size:10.4px;color:var(--dim2);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.metaChips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.toolbar{display:flex;align-items:center;gap:10px;margin:10px 0 2px;flex-wrap:wrap}
+.btn{background:#16233c;border:1px solid #2c3c5c;color:#dbe6fa;border-radius:9px;padding:6px 13px;
+  font:inherit;font-size:12.3px;cursor:pointer;transition:.15s}
+.btn:hover{background:#1c2c4c;border-color:#3d5380}
+.btn.pri{background:linear-gradient(180deg,#3a2f16,#33260f);border-color:#6d5426;color:#ffd79a}
+.btn.pri:hover{background:linear-gradient(180deg,#46391a,#3b2c11)}
+.timeRow{display:flex;align-items:center;gap:12px;margin-top:6px}
+.timeRow .t{font:600 15px var(--mono);color:#ffd79a;min-width:64px;text-align:center}
+.rangeWrap{flex:1;min-width:140px}
+.rangeEnds{display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim2);margin-top:-2px}
+.instant{font-size:11.9px;color:#b9c8e6;background:#0b1322;border:1px solid var(--line);border-radius:9px;
+  padding:7px 11px;margin-top:9px;font-variant-numeric:tabular-nums;line-height:1.7}
+.instant b{color:#ffd79a;font-weight:600}
+.instant .sep{color:#33456b;margin:0 6px}
+.row2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;font-size:11px;color:var(--dim)}
+.legend i{display:inline-block;width:14px;height:0;border-top:2.5px solid;margin-right:5px;vertical-align:3px;border-radius:2px}
+.mthGrid{display:grid;grid-template-columns:repeat(12,1fr);gap:5px;margin-top:10px}
+.mthGrid button{background:#0b1322;border:1px solid var(--line);border-radius:8px;padding:5px 2px;color:var(--dim);
+  font:inherit;font-size:10.6px;cursor:pointer;text-align:center;line-height:1.35;transition:.15s}
+.mthGrid button:hover{border-color:#4a6187;color:#e9eefb}
+.mthGrid button.on{border-color:#6d5426;background:#2b2413;color:#ffd79a}
+.mthGrid button b{display:block;font-size:11.6px;font-weight:650;font-variant-numeric:tabular-nums}
+.adv{display:flex;gap:9px;padding:9px 11px;border:1px solid var(--line);border-left-width:3px;border-radius:10px;
+  background:#0d1526;margin:8px 0;font-size:12.7px;color:#c8d4ec;line-height:1.62}
+.adv .dot{flex:0 0 8px;width:8px;height:8px;border-radius:50%;margin-top:7px;background:var(--c,#5aa7ff);box-shadow:0 0 8px var(--c,#5aa7ff)}
+.adv b{color:#fff;font-weight:600}
+.delta{margin-left:6px;font:600 11.4px var(--mono);padding:1px 7px;border-radius:999px;border:1px solid #2c3c5c;color:#9fd6b8;white-space:nowrap}
+.delta.neg{color:#ffb0b0}
+/* ===== Recommendation card ===== */
+.recWrap{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(280px,.85fr);gap:16px;align-items:start}
+@media(max-width:1080px){.recWrap{grid-template-columns:1fr}}
+.recHead{font-size:19px;font-weight:650;line-height:1.5;color:#fff;margin:2px 0 10px}
+.recHead .hl{color:#ffd79a}
+.recHead .hl2{color:#7fd6b0}
+.recBullets{margin:0;padding:0 0 0 2px;list-style:none}
+.recBullets li{position:relative;padding:3px 0 3px 18px;font-size:13px;color:#c8d4ec;line-height:1.65}
+.recBullets li::before{content:"·";position:absolute;left:4px;top:2px;color:#ffb454;font-weight:700;font-size:16px}
+.recBullets b{color:#ffd79a;font-weight:600}
+.recBullets .good{color:#8fe3bb}
+.recBullets .bad{color:#ff9c9c}
+.recBadges{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 4px}
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:11.6px;border-radius:999px;padding:3.5px 11px;border:1px solid}
+.badge.ok{color:#8fe3bb;border-color:#1f5c45;background:#0d2119}
+.badge.warn{color:#ffd08a;border-color:#6d5426;background:#231c0e}
+.badge.bad{color:#ffb0b0;border-color:#7c3540;background:#261216}
+.recActions{display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap}
+.recDiag{background:#0b1322;border:1px solid var(--line);border-radius:12px;padding:8px;min-width:0}
+/* ===== Scheme comparison ===== */
+.schemeTable{width:100%;border-collapse:collapse;font-size:12.2px}
+.schemeTable th{font-weight:600;color:var(--dim2);text-align:left;padding:5px 6px;border-bottom:1px solid var(--line);white-space:nowrap;font-size:11px;letter-spacing:.03em}
+.schemeTable td{padding:7px 6px;border-bottom:1px solid #16213a;color:#c8d4ec;font-variant-numeric:tabular-nums;white-space:nowrap}
+.schemeTable tr.rowc{cursor:pointer;transition:.12s}
+.schemeTable tr.rowc:hover td{background:#132140}
+.schemeTable tr.recRow td{background:#14251d}
+.schemeTable tr.recRow:hover td{background:#193025}
+.schemeTable tr.curRow td{background:#1a2030}
+.schemeTable .tagRec{display:inline-block;font-size:10px;color:#0d2119;background:#4fd6a5;border-radius:6px;padding:1px 6px;margin-left:5px;font-weight:700}
+.schemeTable .tagCur{display:inline-block;font-size:10px;color:#0e1626;background:#7fc3ff;border-radius:6px;padding:1px 6px;margin-left:5px;font-weight:700}
+.schemeTable .dim{color:var(--dim2)}
+.schemeTable .ok{color:#8fe3bb}
+.schemeTable .warn{color:#ffd08a}
+.schemeTable .bad{color:#ff9c9c}
+/* ===== Section divider ===== */
+.secDiv{display:flex;align-items:center;gap:12px;color:#8a98bb;font-size:12.6px;letter-spacing:.05em;margin:6px 2px -2px}
+.secDiv span{color:var(--dim2);font-size:11.5px;letter-spacing:0}
+.secDiv::before,.secDiv::after{content:"";height:1px;background:linear-gradient(90deg,rgba(90,167,255,.35),rgba(90,167,255,.06));flex:1}
+.secDiv::before{max-width:26px}
+/* ===== Not-ready (empty state) ===== */
+main.notready > .card:not(.emptycard), main.notready > .row2, main.notready > .secDiv{display:none}
+main:not(.notready) .emptycard{display:none}
+.stepsList{margin:0;padding:0;list-style:none}
+.stepsList li{display:flex;gap:11px;align-items:flex-start;padding:9px 0;border-bottom:1px dashed #1c2a44;font-size:13px;color:#c8d4ec;line-height:1.7}
+.stepsList li:last-child{border-bottom:none}
+.stepsList .st{flex:0 0 22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:700;margin-top:2px}
+.stepsList .st.ok{background:#123528;color:#6fe0b0;border:1px solid #1f5c45}
+.stepsList .st.todo{background:#2a2210;color:#ffd08a;border:1px solid #6d5426}
+.stepsList b{color:#ffd79a}
+.tip{position:fixed;z-index:60;background:rgba(14,22,38,.96);border:1px solid #2c3c5c;border-radius:9px;
+  padding:6px 10px;font-size:11.8px;color:#dfe8fb;pointer-events:none;opacity:0;transition:opacity .12s;
+  font-variant-numeric:tabular-nums;white-space:nowrap}
+details{border-top:1px dashed var(--line);margin-top:12px;padding-top:9px}
+summary{cursor:pointer;color:#cfe0ff;font-size:13px;list-style:none;user-select:none}
+summary::before{content:"▸";display:inline-block;margin-right:7px;color:var(--sun);transition:.15s}
+details[open] summary::before{transform:rotate(90deg)}
+pre{background:#0a1120;border:1px solid var(--line);border-radius:10px;padding:10px 13px;overflow:auto;
+  font:12px/1.75 var(--mono);color:#a8c1e8;margin:8px 0}
+.method p{font-size:12.6px;color:#b9c8e6;margin:7px 0;line-height:1.75}
+.method li{font-size:12.5px;color:#b9c8e6;margin:4px 0;line-height:1.7}
+.method b{color:#ffd79a;font-weight:600}
+.method code{font:11.6px var(--mono);background:#0a1120;border:1px solid var(--line);border-radius:5px;padding:1px 5px;color:#c6d8f8}
+.foot{color:var(--dim2);font-size:11.4px;text-align:center;padding:8px 6px 0;line-height:1.8}
+.err{display:none;background:#3a1418;border:1px solid #7c3540;color:#ffc9c9;border-radius:10px;
+  padding:9px 12px;font-size:12.3px;margin-bottom:10px;white-space:pre-wrap}
+@media(max-width:1080px){
+  .grid{grid-template-columns:1fr}
+  .side{position:static;max-height:none;overflow:visible}
+  .row2{grid-template-columns:1fr}
+  .tiles{grid-template-columns:repeat(2,1fr)}
+  .mthGrid{grid-template-columns:repeat(6,1fr)}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="hdr">
+    <div class="logo">
+      <svg width="34" height="34" viewBox="0 0 34 34">
+        <circle cx="17" cy="17" r="7.5" fill="url(#lg)"/>
+        <g stroke="#ffb454" stroke-width="2" stroke-linecap="round">
+          <path d="M17 2.5v3.4M17 28.1v3.4M2.5 17h3.4M28.1 17h3.4M6.7 6.7l2.4 2.4M24.9 24.9l2.4 2.4M27.3 6.7l-2.4 2.4M9.1 24.9l-2.4 2.4"/>
+        </g>
+        <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#ffd98a"/><stop offset="1" stop-color="#ff8a3c"/>
+        </linearGradient></defs>
+      </svg>
+    </div>
+    <div>
+      <h1>Quilt Sun-Drying Simulator</h1>
+      <p class="sub">Enter your location, line orientation and quilt geometry — simulate the sun's path and quantify "sunlit area × time".</p>
+    </div>
+    <div class="hdrPills">
+      <span class="pill">Sun position: Spencer / NOAA formulas</span>
+      <span class="pill">Light model: silhouette × incidence cosine</span>
+      <span class="pill">Integral unit: m²·h</span>
+      <span class="pill">Fully local · offline</span>
+    </div>
+  </header>
+
+  <div class="grid">
+
+    <!-- ======================= Console ======================= -->
+    <aside class="side">
+
+      <section class="card">
+        <h2>Location &amp; date <span class="h2n">01</span></h2>
+        <div class="fld">
+          <label>Latitude</label>
+          <div class="inb"><input type="text" id="lat" value="" placeholder="39°54′15″ or 39.904"><span class="unit">N / S</span></div>
+        </div>
+        <div class="remark" id="latShow"></div>
+        <div class="fld">
+          <label>Longitude</label>
+          <div class="inb"><input type="text" id="lon" value="" placeholder="116°24′27″ or 116.407"><span class="unit">E / W</span></div>
+        </div>
+        <div class="remark" id="lonShow"></div>
+        <div class="fld">
+          <label>Altitude</label>
+          <div class="inb"><input type="number" id="alt" value="" step="0.1" placeholder="optional"><span class="unit">m</span></div>
+        </div>
+        <div class="remark" id="altShow"></div>
+        <div class="fld">
+          <label>Time zone</label>
+          <div class="inb"><input type="number" id="tz" value="8" step="0.5" min="-12" max="14"><span class="unit">UTC</span></div>
+        </div>
+        <div class="fld">
+          <label>Date</label>
+          <div class="inb"><input type="date" id="dateInput"></div>
+        </div>
+        <div class="fld">
+          <label>Day of year</label>
+          <div class="inb"><input type="range" id="daySlider" min="1" max="365" value="284"><span class="unit" id="dayNo">284 d</span></div>
+        </div>
+        <div class="chips">
+          <button id="btnExample">Load demo (Beijing)</button>
+          <button id="btnGeo">Use my location</button>
+          <button id="btnToday">Back to today</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Line direction (compass) <span class="h2n">02</span></h2>
+        <div class="compassBox" id="compassBox"></div>
+        <div class="fld">
+          <label>Line azimuth</label>
+          <div class="inb"><input type="number" id="ropeAz" value="" min="0" max="360" step="1" placeholder="e.g. 0 or 90"><span class="unit">0–360°, cw from north</span></div>
+        </div>
+        <div class="fld" style="grid-template-columns:92px minmax(0,1fr)">
+          <label>Edge along line</label>
+          <div class="seg" id="edgeSeg">
+            <button data-edge="auto" class="on">Auto (decided)</button>
+            <button data-edge="long">Force long</button>
+            <button data-edge="short">Force short</button>
+          </div>
+        </div>
+        <div class="note" id="edgeNote"></div>
+        <div class="remark" style="margin-top:6px">How to measure: hold the phone compass flat and sight along the line toward the far end. The reading is just the rope's orientation — it cannot tell the long edge from the short edge. Which quilt edge goes on the line, and where to fold, are decisions the tool computes from the day's sun and your line conditions (see the conclusion at top right). Phone compasses read magnetic north, which may differ from true north by a few degrees (e.g. about 7° west in Beijing); the orientation verdict is deliberately insensitive to that much error.</div>
+      </section>
+
+      <section class="card">
+        <h2>Quilt &amp; folding <span class="h2n">03</span></h2>
+        <div class="fld">
+          <label>Length</label>
+          <div class="inb"><input type="number" id="qL" value="2.0" step="0.05" min="0.5"><span class="unit">m</span></div>
+        </div>
+        <div class="fld">
+          <label>Width</label>
+          <div class="inb"><input type="number" id="qW" value="1.5" step="0.05" min="0.5"><span class="unit">m</span></div>
+        </div>
+        <div class="fld">
+          <label>Folded thickness</label>
+          <div class="inb"><input type="number" id="tCm" value="6" step="0.5" min="0.5"><span class="unit">cm (stacked on the line)</span></div>
+        </div>
+        <div class="chips">
+          <button data-l="2.0" data-w="1.5">Single 2.0×1.5</button>
+          <button data-l="2.2" data-w="1.8">Double 2.2×1.8</button>
+          <button data-l="2.4" data-w="2.2">King 2.4×2.2</button>
+        </div>
+        <div class="fld" style="margin-top:10px">
+          <label>Fold position</label>
+          <div class="inb"><input type="range" id="fold" min="10" max="90" value="66" step="1"><span class="unit" id="foldVal">66 / 34</span></div>
+        </div>
+        <div class="foldScale" id="foldScale"></div>
+        <div class="chips">
+          <button id="btnFollowRec">Use recommended fold</button>
+          <button data-f="33">Fold at 1/3</button>
+          <button data-f="50">Fold at 1/2</button>
+          <button data-f="67">Fold at 2/3</button>
+          <button data-f="70">About 7:3</button>
+        </div>
+        <div class="kv"><span>Both-side drop</span><b id="hangTxt">-- / --</b></div>
+        <div class="note" id="foldNote">The fold point splits the two layers across the line (measured along the edge perpendicular to it). Ticks mark the friction and ground-clearance limits and the recommended spot. The recommended fold usually sits right at the friction-safety limit (about 66% with the defaults); it does not depend on location or date — the sun only decides which side the longer layer faces; it moves only when you change the friction or the line height.</div>
+      </section>
+
+      <section class="card">
+        <h2>Line conditions <span class="h2n">04</span></h2>
+        <div class="fld">
+          <label>Line length</label>
+          <div class="inb"><input type="number" id="ropeLen" value="3.2" step="0.1" min="0.5"><span class="unit">m (between posts)</span></div>
+        </div>
+        <div class="fld">
+          <label>Line height</label>
+          <div class="inb"><input type="number" id="ropeH" value="1.8" step="0.05" min="0.5"><span class="unit">m (above ground)</span></div>
+        </div>
+        <div class="fld">
+          <label>Friction μ</label>
+          <div class="inb"><input type="number" id="mu" value="0.30" step="0.02" min="0.05" max="1"><span class="unit">quilt/line, ~0.2–0.5</span></div>
+        </div>
+        <details>
+          <summary>Sky clarity (affects energy estimate)</summary>
+          <div class="fld">
+            <label>Clarity kc</label>
+            <div class="inb"><input type="number" id="kc" value="0.9" step="0.05" min="0.1" max="1"><span class="unit">1.0 = clear sky</span></div>
+          </div>
+        </details>
+        <div class="remark" id="fricNote"></div>
+      </section>
+
+    </aside>
+
+    <!-- ======================= Main ======================= -->
+    <main class="main">
+
+      <section class="card emptycard" id="emptyCard">
+        <h2>Getting started · 3 steps <span class="h2n">no personal data pre-filled</span></h2>
+        <div id="emptySteps"></div>
+        <div class="recActions" style="margin-top:14px">
+          <button class="btn pri" id="btnGeo2">Use my location</button>
+          <button class="btn" id="btnExample2">Load demo (Beijing)</button>
+        </div>
+        <div class="note" id="emptyMissing" style="margin-top:12px"></div>
+        <div class="remark" style="margin-top:8px">You can also type everything by hand: latitude / longitude accept DMS (39°54′15″ / 116°24′27″) or decimal (39.904 / 116.407) formats; for azimuth, hold the phone compass flat and sight along the line (magnetic north is fine — a few degrees of error will not change the verdict). The demo uses Beijing coordinates and a north–south line — just to try the flow; for real use, replace the azimuth with your own reading. Quilt and line parameters come with common defaults and can be edited on the left at any time.</div>
+      </section>
+
+      <section class="card rec">
+        <h2>Recommendation <span class="h2n" id="scoreDateTag"></span></h2>
+        <div class="err" id="errBar"></div>
+        <div class="recWrap">
+          <div class="recMain">
+            <div class="recHead" id="recHead">Computing…</div>
+            <ul class="recBullets" id="recBullets"></ul>
+            <div class="recBadges" id="recBadges"></div>
+            <div class="recActions">
+              <button class="btn pri" id="btnApplyRec">Apply recommendation</button>
+              <span class="remark" id="recState"></span>
+            </div>
+          </div>
+          <div class="recDiag" id="foldDiag"></div>
+        </div>
+        <div class="gaugeWrap">
+          <svg id="gaugeSvg" viewBox="0 0 240 176">
+            <defs>
+              <linearGradient id="sunGrad" x1="0" y1="1" x2="1" y2="0">
+                <stop offset="0" stop-color="#ff8a3c"/><stop offset="1" stop-color="#ffd98a"/>
+              </linearGradient>
+            </defs>
+            <path d="M 43.8 164 A 88 88 0 1 1 196.2 164" fill="none" stroke="#22304d" stroke-width="13" stroke-linecap="round"/>
+            <path id="gaugeVal" d="M 43.8 164 A 88 88 0 1 1 196.2 164" fill="none" stroke="url(#sunGrad)"
+                  stroke-width="13" stroke-linecap="round" stroke-dasharray="368.6" stroke-dashoffset="368.6"
+                  style="transition:stroke-dashoffset .55s cubic-bezier(.4,.1,.2,1)"/>
+            <text x="28" y="172" font-size="10.5" fill="#67779c" text-anchor="middle">0</text>
+            <text x="212" y="172" font-size="10.5" fill="#67779c" text-anchor="middle">100</text>
+            <text id="gaugeNum" x="120" y="122" font-size="46" font-weight="700" fill="#e9eefb" text-anchor="middle"
+                  style="font-variant-numeric:tabular-nums">--</text>
+            <text id="gaugeGrade" x="120" y="148" font-size="13" fill="#93a2c4" text-anchor="middle">Computing</text>
+          </svg>
+          <div class="tiles">
+            <div class="tile"><div class="k">Sunlit exposure G</div><div class="v" id="tG">--<small>m²·h</small></div><div class="s">area × time, cosine-weighted</div></div>
+            <div class="tile"><div class="k">Equivalent full-sun hours</div><div class="v" id="tTeq">--<small>h</small></div><div class="s">G ÷ total quilt area</div></div>
+            <div class="tile"><div class="k">Estimated absorbed energy</div><div class="v" id="tQ">--<small>MJ</small></div><div class="s">direct beam, clear sky</div></div>
+            <div class="tile"><div class="k">Effective sunlit time</div><div class="v" id="tTef">--<small>h</small></div><div class="s">accumulated where cos-incidence &gt; 0.2</div></div>
+          </div>
+        </div>
+        <div class="metaChips" id="metaChips"></div>
+      </section>
+
+      <section class="card">
+        <h2>3D drying scene <span class="h2n">drag to rotate · drag the time cursor</span></h2>
+        <div id="scene"></div>
+        <div class="timeRow">
+          <button class="btn pri" id="playBtn">Play the day</button>
+          <div class="t" id="timeLabel">12:00</div>
+          <div class="rangeWrap">
+            <input type="range" id="timeRange" min="0" max="1439" value="720" step="1">
+            <div class="rangeEnds"><span id="riseL">Sunrise --</span><span id="setL">Sunset --</span></div>
+          </div>
+          <button class="btn" id="btnNoon">Noon</button>
+          <button class="btn" id="btnNow">Now</button>
+        </div>
+        <div class="instant" id="instant"></div>
+      </section>
+
+      <section class="card">
+        <h2>Scheme comparison · why <span class="h2n">click a row to preview</span></h2>
+        <div id="schemeTable"></div>
+      </section>
+
+      <div class="row2">
+        <section class="card">
+          <h2>Cross-section · will it hold <span class="h2n">forces &amp; friction</span></h2>
+          <div id="crossDiag"></div>
+        </section>
+        <section class="card">
+          <h2>Plan view <span class="h2n">line · normals · sun</span></h2>
+          <div id="plan"></div>
+          <div class="note" id="planNote"></div>
+        </section>
+      </div>
+
+      <div class="secDiv">Analysis · full picture &amp; evidence <span>(sun path · daily curve · full year · azimuth scan)</span></div>
+
+      <div class="row2">
+        <section class="card">
+          <h2>Sun path (today + monthly refs) <span class="h2n">azimuth × elevation</span></h2>
+          <div id="polar"></div>
+          <div class="legend">
+            <span><i style="border-color:#ffb454"></i>Today's path</span>
+            <span><i style="border-color:#4a6ea8"></i>Monthly 21st refs</span>
+            <span><i style="border-color:#e0b27a;border-top-width:3.5px"></i>Line orientation</span>
+            <span><i style="border-color:rgba(255,180,84,.55);border-top-style:dashed"></i>Lit half-plane</span>
+          </div>
+        </section>
+        <section class="card">
+          <h2>Daily exposure curve <span class="h2n">click / drag to move the cursor</span></h2>
+          <div id="dayC"></div>
+        </section>
+      </div>
+
+      <section class="card">
+        <h2>Full year (365 days) <span class="h2n" id="yearTitle"></span></h2>
+        <div id="yearC"></div>
+        <div class="mthGrid" id="monthChips"></div>
+        <div class="note" id="yearStats" style="margin-top:10px"></div>
+      </section>
+
+      <section class="card">
+        <h2>Azimuth scan · if the line can turn <span class="h2n">exposure vs line orientation</span></h2>
+        <div id="scanC"></div>
+        <div id="advice"></div>
+      </section>
+
+      <section class="card method">
+        <h2>Model, formulas &amp; assumptions <span class="h2n">folding decision · friction · orientation</span></h2>
+        <details>
+          <summary>1. Sun position (Spencer / NOAA)</summary>
+          <pre>γ = 2π(N−1)/365                                   N = day of year
+δ = 0.006918 − 0.399912cosγ + 0.070257sinγ − 0.006758cos2γ + 0.000907sin2γ − 0.002697cos3γ + 0.00148sin3γ     (declination, rad)
+EoT = 229.18×(0.000075 + 0.001868cosγ − 0.032077sinγ − 0.014615cos2γ − 0.040849sin2γ)                         (equation of time, min)
+solar time = clock time + 4×(longitude − 15×timezone) + EoT     hour angle ω = 15°×(solar time − 12)
+s = (E, N, U): E = −cosδ·sinω,  N = sinδ·cosφ − cosδ·cosω·sinφ,  U = sinφ·sinδ + cosφ·cosδ·cosω
+elevation h = asin(U), azimuth A = atan2(E, N), clockwise from north</pre>
+        </details>
+        <details>
+          <summary>2. Sunrise, sunset &amp; altitude correction</summary>
+          <p>cosω₀ = (sin h₀ − sinφ·sinδ) / (cosφ·cosδ), h₀ = −(0.833° + 0.0293·√altitude). The 0.833° term is atmospheric refraction; the altitude term is the horizon dip (earlier sunrise, later sunset). Higher latitudes mean more extreme seasonal swings; if cosω₀ leaves [−1,1] you get polar day or polar night.</p>
+        </details>
+        <details>
+          <summary>3. Drying geometry &amp; sunlit area</summary>
+          <p>The quilt is a rectangle L × W draped over the line with folded thickness t. The crease runs parallel to the line; the fold point splits the "edge perpendicular to the line" into f and (1−f), so the two hanging depths are f·D and (1−f)·D (D = length of the perpendicular edge).</p>
+          <p>The two layers shade each other; at any instant the sunward "silhouette" is governed by the longer layer (with an under-edge leakage approximation). The instantaneous effective sunlit area is:</p>
+          <pre>A(t) = S × [ Lmax × cos h(t) × |cos(A(t) − β)| + t × sin h(t) ]
+S = length unfolded along the line (L if the long edge is on the line, W otherwise)
+Lmax = max(f, 1−f) × D        β = line azimuth ± 90° (the two layer normals)
+The first term is the projected light on the panels; the second is light on the crest over the line</pre>
+        </details>
+        <details open>
+          <summary>4. Fold decision (scheme search) &amp; safety constraints</summary>
+          <p>The tool treats the along-line edge and the fold fraction as decision variables and searches all combinations for the highest daily exposure:</p>
+          <pre>scheme = (edge along line ∈ {long, short}) × (fold = big-side fraction f ∈ [0.5, 0.9])
+exposure G(scheme) = S × [ f × D × Icos + t × Isin ]      (S and D follow the chosen edge)
+constraint 1 · friction: f/(1−f) ≤ κ/1.3     (κ=e^(μπ), 1.3 = safety factor)
+constraint 2 · clearance: f × D ≤ line height − 0.06 m (lowest point at least 6 cm above ground)
+constraint 3 · line length: S + 0.2 m ≤ available line (tying margin included)
+Among all constraint-satisfying schemes, the largest G is recommended</pre>
+          <p><b>A notable property</b>: at the same fold fraction, "long edge on the line" and "short edge on the line" collect almost the same total light (both equal fold fraction × quilt area); only the crest length differs. The real differences are the line length required and the hanging-depth limit. With a long line and a low line height the long edge usually wins (the shallower drop allows a more asymmetric fold); with a short line, hang the short edge.</p>
+          <p><b>Why is the recommended fold almost always 66:34?</b> The sunlit area is proportional to the longer layer's drop length (with the two layers mutually shadowing, the silhouette decides), so more asymmetry always means more light — the optimum therefore sits at the maximum the constraints allow: with the defaults (μ=0.30 plus a 1.3× safety margin) that is the friction limit of 66.4%. It does not change with location, date or line direction — the sun only decides which side the longer layer faces, and the value of G. It moves only if you change the friction μ, or lower the line height until the ground-clearance constraint binds first.</p>
+          <p><b>Orientation verdict (morning / afternoon)</b>: for a north–south line the two sides are theoretically exactly symmetric (0.0 min apart when due N–S); for an east–west line the gap is huge (hours). Rule: if the two lit integrals differ by less than 0.6 h (the scale of compass error and magnetic declination), the sides are declared "equivalent" and no orientation is forced; 0.6–1.5 h is reported as "slightly better"; only larger gaps get a firm verdict. Phone compasses read magnetic north, which may differ from true north by a few degrees — this rule is deliberately desensitized to that.</p>
+        </details>
+        <details>
+          <summary>5. Exposure score (area × time)</summary>
+          <p><b>G = ∫ A(t) dt</b>(sunrise to sunset, unit m²·h) accumulates "how much area is sunlit at each moment" over time — the total sunlit area-time. The on-screen score = current G ÷ the best G* reachable that day by turning the line × 100.</p>
+          <p>Note: the score uses geometric exposure (cosine-weighted area × time); the energy estimate (MJ) additionally weights beam power and low-sun atmospheric attenuation — same trend, different magnitudes.</p>
+        </details>
+        <details>
+          <summary>6. Uniform-mass assumption &amp; "will it slip"</summary>
+          <p>The quilt is treated as uniform in mass: the weight ratio across the crease is f : (1−f). The fabric wraps the line over about π radians; under the capstan friction model the no-slip condition is:</p>
+          <pre>T₁/T₂ ≤ e^(μ·π)   →   f/(1−f) ≤ κ, κ = e^(μ·π)   →   fold limit f ≤ κ/(1+κ)</pre>
+          <p>At the default μ = 0.30 the theoretical limit is about 72:28; the recommended fold keeps a 1.3× safety margin (about 66:34). In practice, wrap anti-slip tape at the crease or add clothespins to further reduce slipping.</p>
+        </details>
+        <details>
+          <summary>7. Energy estimate (air mass &amp; beam intensity)</summary>
+          <pre>AM = 1 / [cos z + 0.50572·(96.07995 − z)^(−1.6364)] × (P/P₀), z = zenith angle
+P/P₀ = (1 − 2.25577×10⁻⁵ × altitude)^5.25588
+DNI = 1353 × 0.7^(AM^0.678) × kc      (W/m², kc = sky clarity)
+Q = ∫ DNI(t) × A(t) dt                (energy, assuming full absorption)</pre>
+        </details>
+        <details>
+          <summary>8. Location, altitude &amp; compass reading</summary>
+          <p><b>Latitude, longitude and altitude</b> describe the drying site and determine the sun's path (elevation, azimuth, sunrise/sunset, atmospheric attenuation). They have nothing to do with the quilt's long or short edge.</p>
+          <p><b>The compass reading</b> (e.g. 90°) only describes the rope's orientation. Which quilt edge lies along the line and where to fold are "how to dry" decisions this tool computes (top conclusion); you can also pin an edge in the sidebar for comparison. Hold the phone level, sight along the line and read; pointing the opposite way gives a reading 180° apart, which is equivalent.</p>
+        </details>
+        <details>
+          <summary>9. Assumptions &amp; limitations</summary>
+          <ul>
+            <li>Direct sunlight only. Diffuse sky light, ground reflection, clouds, humidity and wind are not modeled — they strongly affect real drying speed on overcast and cold days.</li>
+            <li>The quilt is idealized as rigid flat panels, ignoring bulging, draping curvature and layer contact; mutual shading uses a silhouette approximation with under-edge leakage.</li>
+            <li>No buildings, trees or railings; assumed open ground with no reflection.</li>
+            <li>Energy assumes full absorption (no fabric reflectance) — magnitude reference only.</li>
+            <li>The friction model is an idealized uniform-contact capstan approximation; real rope and fabric vary, and wind load is not included.</li>
+            <li>Results compare drying methods, windows and seasons — they are not a measured drying time.</li>
+          </ul>
+        </details>
+      </section>
+
+      <footer class="foot">
+        Quilt Sun-Drying Simulator · single file, fully local, no external dependencies · for relative comparison and magnitude only, not a measurement guarantee.
+      </footer>
+
+    </main>
+  </div>
+</div>
+<div class="tip" id="tip"></div>
+
+<script>
+/*===CORE-START===*/
+const D2R=Math.PI/180, R2D=180/Math.PI;
+const clamp=(v,a,b)=>v<a?a:(v>b?b:v);
+const norm360=a=>((a%360)+360)%360;
+function isLeap(y){return (y%4===0&&y%100!==0)||y%400===0;}
+function dayOfYear(y,m,d){const t=[31,28,31,30,31,30,31,31,30,31,30,31];let n=d;for(let i=0;i<m-1;i++)n+=t[i];if(m>2&&isLeap(y))n++;return n;}
+function doyToMD(y,n){const t=[31,28,31,30,31,30,31,31,30,31,30,31];if(isLeap(y))t[1]=29;let m=1;while(n>t[m-1]){n-=t[m-1];m++;}return{m,d:n};}
+function monthDays(y){const t=[31,28,31,30,31,30,31,31,30,31,30,31];if(isLeap(y))t[1]=29;return t;}
+function spencer(n){
+  const g=2*Math.PI*(n-1)/365;
+  const decl=0.006918-0.399912*Math.cos(g)+0.070257*Math.sin(g)-0.006758*Math.cos(2*g)+0.000907*Math.sin(2*g)-0.002697*Math.cos(3*g)+0.00148*Math.sin(3*g);
+  const eot=229.18*(0.000075+0.001868*Math.cos(g)-0.032077*Math.sin(g)-0.014615*Math.cos(2*g)-0.040849*Math.sin(2*g));
+  return {decl,eot};
+}
+function sunAt(tMin,lat,decl,eot,lon,tz){
+  const solar=tMin+4*(lon-15*tz)+eot;
+  const w=(solar-720)/4*D2R;
+  const E=-Math.cos(decl)*Math.sin(w);
+  const N=Math.sin(decl)*Math.cos(lat)-Math.cos(decl)*Math.cos(w)*Math.sin(lat);
+  const U=Math.sin(lat)*Math.sin(decl)+Math.cos(lat)*Math.cos(decl)*Math.cos(w);
+  const elev=Math.asin(clamp(U,-1,1));
+  let az=Math.atan2(E,N); if(az<0)az+=2*Math.PI;
+  return {elev,az,w};
+}
+function sunTimesP(decl,lat,lon,tz,alt,eot){
+  const dip=0.0293*Math.sqrt(Math.max(0,alt));
+  const h0=-(0.833+dip)*D2R;
+  const c=(Math.sin(h0)-Math.sin(lat)*Math.sin(decl))/(Math.cos(lat)*Math.cos(decl));
+  if(c<=-1)return{polarDay:true,polarNight:false,rise:0,set:1440,w0:180};
+  if(c>=1)return{polarDay:false,polarNight:true,rise:NaN,set:NaN,w0:0};
+  const w0=Math.acos(c)*R2D;
+  const off=4*(lon-15*tz)+eot;
+  return {polarDay:false,polarNight:false,rise:720-4*w0-off,set:720+4*w0-off,w0};
+}
+function airMassDNI(elevDeg,alt,kc){
+  if(elevDeg<=0)return{am:NaN,dni:0};
+  const z=90-elevDeg;
+  let am=1/(Math.cos(z*D2R)+0.50572*Math.pow(96.07995-z,-1.6364));
+  const pr=Math.pow(1-2.25577e-5*Math.max(-400,alt),5.25588);
+  am=clamp(am*pr,1,40);
+  const dni=1353*Math.pow(0.7,Math.pow(am,0.678))*kc;
+  return {am,dni};
+}
+const DIR8=['N','NE','E','SE','S','SW','W','NW'];
+function dirName8(az){return DIR8[Math.round(norm360(az)/45)%8];}
+function dirName16(az){
+  const n=['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+  return n[Math.round(norm360(az)/22.5)%16];
+}
+function foldLimit(mu){const kappa=Math.exp(mu*Math.PI);return {kappa,fMax:kappa/(1+kappa)};}
+function geomFromEdge(edge,L,W,f){
+  const span=(edge==='long')?L:W;
+  const D=(edge==='long')?W:L;
+  return {span,D,hA:f*D,hB:(1-f)*D,hBig:Math.max(f,1-f)*D,hLow:Math.min(f,1-f)*D};
+}
+function parseAngle(raw,isLat){
+  if(raw==null)return {ok:false};
+  let s=String(raw).trim(); if(!s)return {ok:false};
+  let sign=1;
+  s=s.replace(/[NSEWnsew]/g,mm=>{const c=mm.toUpperCase();if(c==='S'||c==='W')sign=-1;return ' ';});
+  let neg=false;
+  if(/^\s*[-\u2212]/.test(s)){neg=true;s=s.replace(/[-\u2212]/,' ');}
+  const parts=s.split(/[^0-9.]+/).filter(x=>x.length>0).map(Number);
+  if(!parts.length||parts.some(v=>!isFinite(v)))return {ok:false};
+  let v=(parts[0]||0)+((parts[1]||0)/60)+((parts[2]||0)/3600);
+  if(neg)v=-v; v*=sign;
+  if(isLat&&(Math.abs(v)>90||Math.abs(v)<0.0001))return {ok:false,range:true};
+  if(!isLat&&Math.abs(v)>180)return {ok:false,range:true};
+  return {ok:true,v};
+}
+function fmtDMS(v,isLat){
+  const hemi=isLat?(v>=0?'N':'S'):(v>=0?'E':'W');
+  let a=Math.abs(v);let d=Math.floor(a);let mf=(a-d)*60;let m=Math.floor(mf);let sec=Math.round((mf-m)*60);
+  if(sec>=60){sec-=60;m++;} if(m>=60){m-=60;d++;}
+  return d+'°'+String(m).padStart(2,'0')+'′'+String(sec).padStart(2,'0')+'″ '+hemi;
+}
+function fmtHM(tmin){
+  if(!isFinite(tmin))return '--:--';
+  let t=Math.round(tmin); t=((t%1440)+1440)%1440;
+  return String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0');
+}
+function integrateDay(par){
+  const {decl,eot}=spencer(par.n);
+  const lat=par.lat*D2R;
+  const st=sunTimesP(decl,lat,par.lon,par.tz,par.alt,eot);
+  const out={decl:decl*R2D,eot,rise:st.rise,set:st.set,polarDay:!!st.polarDay,polarNight:!!st.polarNight,
+    G:0,Q:0,Icos:0,Isin:0,tEff:0,peak:{area:0,t:0},curve:[],
+    dayLen:st.polarNight?0:(st.set-st.rise)/60};
+  if(st.polarNight)return out;
+  const step=par.step||2;
+  const t0=Math.max(0,Math.floor(st.rise-8)),t1=Math.min(1440,Math.ceil(st.set+8));
+  const bR=(par.ropeAz+90)*D2R;
+  let G=0,Q=0,Icos=0,Isin=0,tEff=0,peakA=0,peakT=0;
+  for(let tm=t0;tm<=t1;tm+=step){
+    const sp=sunAt(tm,lat,decl,eot,par.lon,par.tz);
+    let area=0,p=0,dni=0,side=0,elevD=sp.elev*R2D;
+    if(sp.elev>0){
+      const cE=Math.cos(sp.elev),sE=Math.sin(sp.elev);
+      const cU=Math.cos(sp.az-bR);
+      p=cE*Math.abs(cU);
+      area=par.span*(par.hBig*p+par.t*sE);
+      side=cU>=0?1:-1;
+      Icos+=p*step/60; Isin+=sE*step/60; G+=area*step/60;
+      if(p>0.2&&elevD>3)tEff+=step/60;
+      if(area>peakA){peakA=area;peakT=tm;}
+      if(par.withEnergy){Q+=airMassDNI(elevD,par.alt,par.kc).dni*area*step/60;}
+    }
+    if(par.withCurve){out.curve.push({t:tm,area,elev:elevD,az:norm360(sp.az*R2D),p,dni,side});}
+  }
+  out.G=G; out.Q=Q; out.Icos=Icos; out.Isin=Isin; out.tEff=tEff; out.peak={area:peakA,t:peakT};
+  return out;
+}
+function scanAzimuths(par){
+  const {decl,eot}=spencer(par.n);
+  const lat=par.lat*D2R;
+  const st=sunTimesP(decl,lat,par.lon,par.tz,par.alt,eot);
+  if(st.polarNight)return {arr:new Array(180).fill(0),bestAz:0,bestG:0,Isin:0};
+  const step=par.step||2;
+  const t0=Math.max(0,Math.floor(st.rise-8)),t1=Math.min(1440,Math.ceil(st.set+8));
+  const samples=[];
+  for(let tm=t0;tm<=t1;tm+=step){
+    const sp=sunAt(tm,lat,decl,eot,par.lon,par.tz);
+    if(sp.elev<=0)continue;
+    samples.push({cE:Math.cos(sp.elev),az:sp.az,sE:Math.sin(sp.elev),dt:step/60});
+  }
+  const arr=new Array(180); let bestG=-1,bestAz=0,Isin=0;
+  for(const s of samples)Isin+=s.sE*s.dt;
+  for(let k=0;k<180;k++){
+    const bR=(k+90)*D2R; let Icos=0;
+    for(const s of samples)Icos+=s.cE*Math.abs(Math.cos(s.az-bR))*s.dt;
+    const G=par.span*(par.hBig*Icos+par.t*Isin);
+    arr[k]=G;
+    if(G>bestG){bestG=G;bestAz=k;}
+  }
+  return {arr,bestAz,bestG,Isin};
+}
+function yearScan(par){
+  const y=par.year; const N=isLeap(y)?366:365;
+  const arr=new Array(N);
+  for(let i=0;i<N;i++){
+    const p=Object.assign({},par,{n:i+1,step:3,withEnergy:false,withCurve:false});
+    arr[i]=integrateDay(p).G;
+  }
+  return arr;
+}
+/* ---- Scheme search: edge × fold fraction, maximizing exposure within constraints ---- */
+function litIntegrals(par){
+  const {decl,eot}=spencer(par.n);
+  const lat=par.lat*D2R;
+  const st=sunTimesP(decl,lat,par.lon,par.tz,par.alt,eot);
+  if(st.polarNight)return {Lp:0,Lm:0,Icos:0,Isin:0,rise:st.rise,set:st.set,polarNight:true};
+  const step=par.step||2;
+  const t0=Math.max(0,Math.floor(st.rise-8)),t1=Math.min(1440,Math.ceil(st.set+8));
+  const bp=(par.ropeAz+90)*D2R, bm=(par.ropeAz-90)*D2R;
+  let Lp=0,Lm=0,Isin=0;
+  for(let tm=t0;tm<=t1;tm+=step){
+    const sp=sunAt(tm,lat,decl,eot,par.lon,par.tz);
+    if(sp.elev<=0)continue;
+    const cE=Math.cos(sp.elev), dt=step/60;
+    const cp=Math.cos(sp.az-bp), cm=Math.cos(sp.az-bm);
+    if(cp>0)Lp+=cE*cp*dt;
+    if(cm>0)Lm+=cE*cm*dt;
+    Isin+=Math.sin(sp.elev)*dt;
+  }
+  return {Lp,Lm,Icos:Lp+Lm,Isin,rise:st.rise,set:st.set,polarNight:false};
+}
+function schemeG(par,hist,edge,fBig){
+  const span=(edge==='long')?par.L:par.W;
+  const D=(edge==='long')?par.W:par.L;
+  return span*(fBig*D*hist.Icos+par.t*hist.Isin);
+}
+function optimizeScheme(par,pref,safety){
+  safety=safety||1.3;
+  const CLEAR=0.06, ROPE_MARGIN=0.2;
+  const hist=litIntegrals(par);
+  const kappa=Math.exp(par.mu*Math.PI);
+  const fFricLim=kappa/(1+kappa);
+  const ks=kappa/safety;
+  const fFricSafe=ks/(1+ks);
+  const opts=[];
+  for(const edge of ['long','short']){
+    const span=(edge==='long')?par.L:par.W;
+    const D=(edge==='long')?par.W:par.L;
+    const clearLim=(par.ropeH-CLEAR)/D;           // deepest drop limit (line height − clearance margin)
+    const fMax=clamp(Math.min(fFricLim,clearLim),0.5,0.95);
+    const fRec=clamp(Math.min(fFricSafe,clearLim),0.5,0.9);
+    const ropeNeed=span+ROPE_MARGIN;
+    const ropeOK=par.ropeLen>=ropeNeed;
+    const deepest=fRec*D;
+    const clear=par.ropeH-deepest;
+    const slipMargin=kappa/Math.max(1e-6,fRec/(1-fRec));
+    const dragSymmetric=clearLim<0.5-1e-9;        // even a center fold would drag
+    const G=schemeG(par,hist,edge,fRec);
+    const G50=schemeG(par,hist,edge,0.5);
+    const Gmax=schemeG(par,hist,edge,fMax);
+    opts.push({edge,span,D,ropeNeed,ropeOK,clearLim,fRec,fMax,fFricLim,fFricSafe,
+      deepest,clear,slipMargin,G,G50,Gmax,dragSymmetric,
+      infeasible:(!ropeOK)||dragSymmetric});
+  }
+  let rec=null;
+  const cand=opts.filter(o=>!o.infeasible);
+  if(cand.length){
+    rec=cand.reduce((a,b)=>b.G>a.G+1e-9?b:a);
+  }else{
+    rec=opts[0].G>=opts[1].G?opts[0]:opts[1];
+  }
+  // morning/afternoon verdict: N–S lines are symmetric; gap below 0.6 h counts as equal
+  // (scale of compass error + magnetic declination) → "equivalent sides"
+  const dL=Math.abs(hist.Lp-hist.Lm);
+  const maxL=Math.max(hist.Lp,hist.Lm);
+  const tie=(maxL<0.02)||(dL<0.6);
+  const soft=(!tie)&&(dL<1.5);
+  const sunnier=tie?0:((hist.Lp>hist.Lm)?1:-1);
+  const bigDir=(sunnier===0)?null:norm360(par.ropeAz+(sunnier>0?90:-90));
+  // afternoon-sun side (for the empirical-preference note)
+  let afterDir=null;
+  {
+    const spn=spencer(par.n);
+    const lat2=par.lat*D2R;
+    const st2=sunTimesP(spn.decl,lat2,par.lon,par.tz,par.alt,spn.eot);
+    if(!st2.polarNight){
+      const bp2=(par.ropeAz+90)*D2R;
+      const sA=sunAt((st2.rise+st2.set)/2+180,lat2,spn.decl,spn.eot,par.lon,par.tz);
+      const aSide=(Math.cos(sA.az-bp2)>0)?1:-1;
+      afterDir=norm360(par.ropeAz+(aSide>0?90:-90));
+    }
+  }
+  return {hist,kappa,fFricLim,fFricSafe,opts,rec,sunnier,bigDir,tie,soft,dL,afterDir,pref};
+}
+/*===CORE-END===*/
+
+/* ======================================================================
+   UI layer
+   ====================================================================== */
+const $=id=>document.getElementById(id);
+const f1=n=>n.toFixed(1);
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+function lnS(a,b,st){return '<line x1="'+f1(a[0])+'" y1="'+f1(a[1])+'" x2="'+f1(b[0])+'" y2="'+f1(b[1])+'" '+st+'/>';}
+function pgS(pts,st){return '<polygon points="'+pts.map(p=>f1(p[0])+','+f1(p[1])).join(' ')+'" '+st+'/>';}
+function txS(p,s,st){return '<text x="'+f1(p[0])+'" y="'+f1(p[1])+'" '+st+'>'+s+'</text>';}
+function cjkW(s,fs){
+  let cjk=0,tot=0;
+  for(const ch of s){tot++; if(/[\u3000-\u9fff\uff00-\uffef]/.test(ch))cjk++;}
+  return cjk*fs*1.02+(tot-cjk)*fs*0.6;
+}
+function pillS(x,y,text,color,fs){
+  fs=fs||11; color=color||'#d8e4fb';
+  const w=cjkW(text,fs)+16;
+  return '<g><rect x="'+f1(x-w/2)+'" y="'+f1(y-fs*1.05)+'" width="'+f1(w)+'" height="'+f1(fs*1.95)+'" rx="'+(fs*0.9)+'" fill="rgba(10,15,26,.78)" stroke="#2a3a58" stroke-width="1"/>'+
+         '<text x="'+f1(x)+'" y="'+f1(y+fs*0.36)+'" text-anchor="middle" font-size="'+fs+'" fill="'+color+'">'+text+'</text></g>';
+}
+function ptS(p){return [p[0],p[1]];}
+
+function makeCam(azDeg,elDeg,scale,cx,cy){
+  const a=azDeg*D2R,e=elDeg*D2R;
+  const u=[Math.cos(e)*Math.sin(a),Math.cos(e)*Math.cos(a),Math.sin(e)];   // origin -> camera
+  const f=[-u[0],-u[1],-u[2]];                                             // forward
+  let r=[f[1],-f[0],0]; const rl=Math.hypot(r[0],r[1])||1; r=[r[0]/rl,r[1]/rl,0];
+  const t=[r[1]*f[2]-r[2]*f[1], r[2]*f[0]-r[0]*f[2], r[0]*f[1]-r[1]*f[0]];
+  const proj=p=>{
+    const X=p[0]*r[0]+p[1]*r[1]+p[2]*r[2];
+    const Y=p[0]*t[0]+p[1]*t[1]+p[2]*t[2];
+    return [cx+X*scale, cy-Y*scale];
+  };
+  proj.depth=p=>p[0]*f[0]+p[1]*f[1]+p[2]*f[2];
+  proj.u=u;
+  return proj;
+}
+
+/* ---------------- state ---------------- */
+const state={
+  lat:null, lon:null, alt:null, tz:8,
+  ropeAz:null, edgePref:'auto', edge:'long', fold:0.66, foldManual:null,
+  L:2.0, W:1.5, tCm:6, ropeH:1.8, ropeLen:3.2, mu:0.30, kc:0.90,
+  y:2026, m:10, d:11, scrub:720, playing:false,
+  view:{az:228, el:24}, anno:true,
+  cal:null,
+  demoNote:null
+};
+function isReady(){return state.lat!=null&&state.lon!=null&&state.ropeAz!=null;}
+let computeTimer=null;
+
+/* ---------------- input sync ---------------- */
+function fmtDMSIn(v,isLat){
+  let a=Math.abs(v);let d=Math.floor(a);let mf=(a-d)*60;let m=Math.floor(mf);let sec=Math.round((mf-m)*60);
+  if(sec>=60){sec-=60;m++;} if(m>=60){m-=60;d++;}
+  const suf=isLat?(v>=0?'N':'S'):(v>=0?'E':'W');
+  return d+'°'+String(m).padStart(2,'0')+'′'+String(sec).padStart(2,'0')+'″'+suf;
+}
+function syncInputsFromState(){
+  $('lat').value=state.lat==null?'':fmtDMSIn(state.lat,true);
+  $('lon').value=state.lon==null?'':fmtDMSIn(state.lon,false);
+  $('alt').value=state.alt==null?'':String(state.alt);
+  $('tz').value=String(state.tz);
+  $('ropeAz').value=state.ropeAz==null?'':String(Math.round(state.ropeAz));
+  $('qL').value=String(state.L);
+  $('qW').value=String(state.W);
+  $('tCm').value=String(state.tCm);
+  $('fold').value=String(Math.round(state.fold*100));
+  $('ropeH').value=String(state.ropeH);
+  $('ropeLen').value=String(state.ropeLen);
+  $('mu').value=String(state.mu);
+  $('kc').value=String(state.kc);
+  [].forEach.call($('edgeSeg').children,x=>x.classList.toggle('on',x.dataset.edge===state.edgePref));
+  const n=dayOfYear(state.y,state.m,state.d);
+  $('dateInput').value=state.y+'-'+String(state.m).padStart(2,'0')+'-'+String(state.d).padStart(2,'0');
+  $('daySlider').max=isLeap(state.y)?366:365;
+  $('daySlider').value=String(n);
+  $('dayNo').textContent=n+' d';
+  $('timeRange').value=String(Math.round(state.scrub));
+}
+function pullUI(){
+  const latRaw=$('lat').value.trim(), lonRaw=$('lon').value.trim();
+  const lp=latRaw?parseAngle(latRaw,true):{ok:false,blank:true};
+  const lo=lonRaw?parseAngle(lonRaw,false):{ok:false,blank:true};
+  $('lat').classList.toggle('bad',latRaw!==''&&!lp.ok);
+  $('lon').classList.toggle('bad',lonRaw!==''&&!lo.ok);
+  if(lp.ok)state.lat=lp.v; else if(latRaw==='')state.lat=null;
+  if(lo.ok)state.lon=lo.v; else if(lonRaw==='')state.lon=null;
+  if(latRaw==='')$('latShow').innerHTML='<span style="color:#67779c">Not filled — accepts 39°54′15″ or 39.904</span>';
+  else if(lp.ok)$('latShow').innerHTML='= '+state.lat.toFixed(5)+'°, '+fmtDMS(state.lat,true);
+  else $('latShow').innerHTML='<span style="color:#ff9c9c">Cannot parse latitude — use 39°54′15″ or 39.904</span>';
+  if(lonRaw==='')$('lonShow').innerHTML='<span style="color:#67779c">Not filled — accepts 116°24′27″ or 116.407</span>';
+  else if(lo.ok)$('lonShow').innerHTML='= '+state.lon.toFixed(5)+'°, '+fmtDMS(state.lon,false);
+  else $('lonShow').innerHTML='<span style="color:#ff9c9c">Cannot parse longitude — use 116°24′27″ or 116.407</span>';
+  const altRaw=$('alt').value.trim();
+  if(altRaw===''){state.alt=0;$('altShow').innerHTML='<span style="color:#67779c">Blank counts as 0 m — negligible effect</span>';}
+  else{const alt=Number(altRaw); if(isFinite(alt)){state.alt=clamp(alt,-400,9000);$('altShow').innerHTML='';}}
+  const tz=Number($('tz').value); if(isFinite(tz))state.tz=clamp(tz,-12,14);
+  const azRaw=$('ropeAz').value.trim();
+  if(azRaw==='')state.ropeAz=null;
+  else{const az=Number(azRaw); if(isFinite(az))state.ropeAz=norm360(az);}
+  const L=Number($('qL').value); if(isFinite(L)&&L>0.3)state.L=clamp(L,0.3,5);
+  const W=Number($('qW').value); if(isFinite(W)&&W>0.3)state.W=clamp(W,0.3,5);
+  const t=Number($('tCm').value); if(isFinite(t))state.tCm=clamp(t,0.5,40);
+  const rh=Number($('ropeH').value); if(isFinite(rh))state.ropeH=clamp(rh,0.5,3.5);
+  const rl=Number($('ropeLen').value); if(isFinite(rl))state.ropeLen=clamp(rl,0.5,30);
+  const mu=Number($('mu').value); if(isFinite(mu))state.mu=clamp(mu,0.05,1);
+  const kc=Number($('kc').value); if(isFinite(kc))state.kc=clamp(kc,0.1,1);
+  $('dayNo').textContent=dayOfYear(state.y,state.m,state.d)+' d';
+}
+function scheduleCompute(delay){
+  if(computeTimer)clearTimeout(computeTimer);
+  computeTimer=setTimeout(()=>{computeTimer=null;recompute();},delay==null?130:delay);
+}
+
+/* ---------------- compute ---------------- */
+function computeAll(){
+  const n=dayOfYear(state.y,state.m,state.d);
+  const base={lat:state.lat,lon:state.lon,alt:state.alt,tz:state.tz,ropeAz:state.ropeAz,
+    L:state.L,W:state.W,ropeH:state.ropeH,ropeLen:state.ropeLen,mu:state.mu,
+    t:state.tCm/100,kc:state.kc,n,year:state.y,step:2};
+  // scheme search (edge × fold), then resolve the adopted scheme
+  const scheme=optimizeScheme(base,state.edgePref,1.3);
+  const chosen=(state.edgePref==='auto')?scheme.rec:scheme.opts.find(o=>o.edge===state.edgePref);
+  state.edge=chosen.edge;
+  state.fold=(state.foldManual!=null)?clamp(state.foldManual,0.1,0.9):chosen.fRec;
+  // in auto mode put the longer side on the sunnier side (placement visuals only; totals unchanged)
+  let fGeom=state.fold;
+  if(state.edgePref==='auto'&&state.foldManual==null&&scheme.sunnier<0)fGeom=1-state.fold;
+  const g=geomFromEdge(state.edge,state.L,state.W,fGeom);
+  const par=Object.assign({},base,{span:g.span,hBig:g.hBig,withEnergy:true,withCurve:true});
+  const day=integrateDay(par);
+  const scan=scanAzimuths(par);
+  const yearArr=yearScan({lat:base.lat,lon:base.lon,alt:base.alt,tz:base.tz,ropeAz:base.ropeAz,
+    span:g.span,hBig:g.hBig,t:base.t,kc:base.kc,year:base.year,step:3});
+  const Gcur=day.G, kCur=((Math.round(state.ropeAz)%180)+180)%180;
+  const bestAz=scan.bestAz, bestG=Math.max(scan.bestG,1e-9);
+  const score=clamp(Gcur/bestG*100,0,100);
+  const Teq=Gcur/Math.max(0.01,state.L*state.W);
+  // energy at the best azimuth (for the energy-weighted comparison)
+  const parBest=Object.assign({},par,{ropeAz:norm360(bestAz)});
+  const dayBest=integrateDay(parBest);
+  // yearly stats
+  const N=yearArr.length;
+  let bestIdx=0,worstIdx=0,sum=0;
+  for(let i=0;i<N;i++){sum+=yearArr[i];if(yearArr[i]>yearArr[bestIdx])bestIdx=i;if(yearArr[i]<yearArr[worstIdx])worstIdx=i;}
+  const curIdx=par.n-1;
+  let rank=0; for(let i=0;i<N;i++)if(yearArr[i]<=yearArr[curIdx])rank++;
+  const monthAvg=[];
+  const md=monthDays(state.y); let acc=0;
+  for(let m=1;m<=12;m++){
+    let s=0; for(let k=0;k<md[m-1];k++)s+=yearArr[acc+k];
+    monthAvg.push(s/md[m-1]); acc+=md[m-1];
+  }
+  const solstice=(declDeg)=>{
+    const d=Math.abs(state.lat-declDeg);
+    return 90-d;
+  };
+  state.cal={par,g,day,scan,yearArr,bestAz,bestG,Gcur,kCur,score,Teq,dayBest,
+    bestIdx,worstIdx,rank,monthAvg,solstice,scheme,chosen,base,fGeom,
+    fError:(state.foldManual!=null)};
+}
+function recompute(){
+  try{
+    pullUI();
+    const main=document.querySelector('main');
+    if(!isReady()){
+      state.cal=null;
+      main.classList.add('notready');
+      renderEmpty();
+      renderCompass();
+      return;
+    }
+    main.classList.remove('notready');
+    computeAll();
+    if(!state.cal.day.polarNight){
+      if(!state._init){state.scrub=Math.round((state.cal.day.rise+state.cal.day.set)/2);state._init=true;}
+    }
+    renderAll();
+  }catch(err){
+    const eb=$('errBar'); eb.style.display='block'; eb.textContent='Compute error: '+(err&&err.message?err.message:err);
+    console.error(err);
+  }
+}
+/* Empty state: list the missing inputs */
+function renderEmpty(){
+  const hasLat=state.lat!=null, hasLon=state.lon!=null, hasAz=state.ropeAz!=null;
+  const st=(ok)=>'<span class="st '+(ok?'ok':'todo')+'">'+(ok?'✓':'○')+'</span>';
+  const li=[];
+  li.push('<li>'+st(hasLat&&hasLon)+'<div><b>Step 1 · Drying site</b><br>Latitude '+(hasLat?'filled':'missing')+', longitude '+(hasLon?'filled':'missing')+
+    '. Use the button below to auto-locate, or type it in; altitude is optional (0 m if blank).</div></li>');
+  li.push('<li><span class="st ok">✓</span><div><b>Step 2 · Time zone &amp; date</b><br>Time zone read from this device (UTC'+((state.tz>=0?'+':'')+state.tz)+'); date defaults to today ('+state.y+'-'+String(state.m).padStart(2,'0')+'-'+String(state.d).padStart(2,'0')+'). Both editable.</div></li>');
+  li.push('<li>'+st(hasAz)+'<div><b>Step 3 · Line orientation</b><br>'+(hasAz?'Azimuth set ('+Math.round(state.ropeAz)+'°).':'Read it with the phone compass along the line, or drag the compass dot on the left.')+'</div></li>');
+  $('emptySteps').innerHTML='<ul class="stepsList">'+li.join('')+'</ul>';
+  const missing=[];
+  if(!hasLat)missing.push('latitude'); if(!hasLon)missing.push('longitude'); if(!hasAz)missing.push('line azimuth');
+  $('emptyMissing').innerHTML=missing.length?('Missing: <b>'+missing.join(', ')+'</b> — once all three are set, the computation starts automatically.'):'Ready — computing…';
+}
+
+/* ---------------- Time cursor ---------------- */
+function sunAtScrub(){
+  const c=state.cal; if(!c)return null;
+  const {decl,eot}=spencer(c.par.n);
+  const sp=sunAt(state.scrub,state.lat*D2R,decl,eot,state.lon,state.tz);
+  const elev=sp.elev*R2D, az=norm360(sp.az*R2D);
+  const bR=(state.ropeAz+90)*D2R;
+  const cU=Math.cos(sp.az-bR);
+  const up=sp.elev>0;
+  const p=up?Math.cos(sp.elev)*Math.abs(cU):0;
+  const litOff=cU>=0?1:-1;
+  const dni=up?airMassDNI(elev,state.alt,state.kc).dni:0;
+  const area=c.par.span*(c.par.hBig*p+c.par.t*Math.max(0,Math.sin(sp.elev)));
+  const solarT=state.scrub+4*(state.lon-15*state.tz)+eot;
+  return {elev,az,p,litOff,dni,area,up,cU,solarT};
+}
+
+/* ---------------- Render: compass (sidebar) ---------------- */
+function renderCompass(){
+  const W=224,cx=112,cy=112,R=92;
+  const az=state.ropeAz;
+  const dir=(aDeg,r)=>{const a=aDeg*D2R;return [cx+r*Math.sin(a),cy-r*Math.cos(a)];};
+  const p=[];
+  p.push('<circle cx="'+cx+'" cy="'+cy+'" r="'+(R+6)+'" fill="#0b1322" stroke="#1f2c44"/>');
+  for(let a=0;a<360;a+=10){
+    const big=(a%45===0);
+    const p1=dir(a,R-2),p2=dir(a,R-(big?11:6));
+    p.push(lnS(p1,p2,'stroke="'+(big?'#4a6187':'#263651')+'" stroke-width="'+(big?1.6:1)+'"'));
+  }
+  if(az!=null){
+    // normals (−90/+90; "+90°" means az+90)
+    const b1=dir(az+90,R-26),b2=dir(az+270,R-26);
+    p.push(lnS(dir(az+90,R-2),b1,'stroke="#5aa7ff" stroke-dasharray="4 5" stroke-width="1.2" opacity=".65"'));
+    p.push(lnS(dir(az+270,R-2),b2,'stroke="#5aa7ff" stroke-dasharray="4 5" stroke-width="1.2" opacity=".65"'));
+    // rope
+    const r1=dir(az,R-14),r2=dir(az+180,R-14);
+    p.push(lnS(r1,r2,'stroke="#e0b27a" stroke-width="6" stroke-linecap="round"'));
+    p.push('<circle cx="'+f1(r1[0])+'" cy="'+f1(r1[1])+'" r="9" fill="url(#cg)" stroke="#151d30" stroke-width="2"/>');
+    p.push('<defs><radialGradient id="cg"><stop offset="0" stop-color="#ffe3ad"/><stop offset="1" stop-color="#ff9a3d"/></radialGradient></defs>');
+  }
+  // compass letters: dark pills drawn over the rope line
+  [['N',0,'#ffb3b3'],['E',90,'#93a2c4'],['S',180,'#93a2c4'],['W',270,'#93a2c4']].forEach(it=>{
+    const q=dir(it[1],R-32);
+    p.push(pillS(q[0],q[1],it[0],it[2],12));
+  });
+  if(az!=null){
+    p.push(txS([cx,cy-4],Math.round(az)+'°','text-anchor="middle" font-size="24" font-weight="700" fill="#e9eefb" style="font-variant-numeric:tabular-nums" stroke="#0b1322" stroke-width="4" paint-order="stroke"'));
+    p.push(txS([cx,cy+15],dirName8(az)+'–'+dirName8(norm360(az+180))+' line','text-anchor="middle" font-size="12" fill="#93a2c4" stroke="#0b1322" stroke-width="3" paint-order="stroke"'));
+  }else{
+    p.push(txS([cx,cy-4],'--','text-anchor="middle" font-size="24" font-weight="700" fill="#67779c"'));
+    p.push(txS([cx,cy+15],'not set','text-anchor="middle" font-size="12" fill="#67779c"'));
+  }
+  p.push(txS([cx,cy+52],az==null?'drag the dial or type an azimuth':'drag the dot to set direction','text-anchor="middle" font-size="10.5" fill="#67779c"'));
+  $('compassBox').innerHTML='<svg viewBox="0 0 '+W+' '+W+'" id="compassSvg" style="width:100%">'+p.join('')+'</svg>';
+}
+(function bindCompass(){
+  const box=$('compassBox');
+  let dragging=false;
+  const setFromEvent=(ev)=>{
+    const svg=$('compassSvg'); if(!svg)return;
+    const rect=svg.getBoundingClientRect();
+    const cx=rect.left+rect.width/2, cy=rect.top+rect.height/2;
+    const dx=ev.clientX-cx, dy=ev.clientY-cy;
+    if(Math.hypot(dx,dy)<8)return;
+    const az=norm360(Math.atan2(dx,-dy)*R2D);
+    state.ropeAz=az;
+    $('ropeAz').value=String(Math.round(az));
+    state.demoNote=null;
+    renderCompass();
+    scheduleCompute(160);
+  };
+  box.addEventListener('pointerdown',e=>{dragging=true;box.setPointerCapture(e.pointerId);setFromEvent(e);});
+  box.addEventListener('pointermove',e=>{if(dragging)setFromEvent(e);});
+  box.addEventListener('pointerup',e=>{dragging=false;});
+  box.addEventListener('pointercancel',e=>{dragging=false;});
+})();
+
+/* ---------------- Render: recommendation (hero) ---------------- */
+function renderRec(){
+  const c=state.cal; if(!c)return;
+  const sm=c.scheme, rec=sm.rec;
+  const nm=e=>e==='long'?'long edge':'short edge';
+  const fBig=rec.fRec, fSmall=1-fBig;
+  const ratio=fBig/fSmall, margin=sm.kappa/ratio;
+  const gain50=rec.G50>1e-9?(rec.G/rec.G50-1)*100:0;
+  const gainCur=(c.Gcur>1e-9)?(rec.G/c.Gcur-1)*100:0;
+  const sideA=norm360(state.ropeAz+90), sideB=norm360(state.ropeAz-90);
+  // headline: three tiers — equal / slightly better / clear
+  let dirSeg;
+  if(sm.tie){
+    dirSeg='bigger side ('+rec.deepest.toFixed(2)+' m) toward '+dirName8(sideA)+' or '+dirName8(sideB)+' — either works';
+  }else if(sm.soft){
+    dirSeg='bigger side ('+rec.deepest.toFixed(2)+' m) toward '+dirName8(sm.bigDir)+' — slightly better';
+  }else{
+    dirSeg='bigger side ('+rec.deepest.toFixed(2)+' m) hangs toward '+dirName8(sm.bigDir);
+  }
+  $('recHead').innerHTML='Recommended: <span class="hl">'+nm(rec.edge)+' on the line</span> | fold <span class="hl">'+Math.round(fBig*100)+':'+Math.round(fSmall*100)+
+    '</span> | '+dirSeg;
+  const bl=[];
+  bl.push('Along the line: <b>'+rec.span.toFixed(2)+' m</b> ('+nm(rec.edge)+' parallel to the line); needs a line of at least '+rec.ropeNeed.toFixed(2)+
+    ' m (incl. 0.2 m tying margin); your line is '+state.ropeLen.toFixed(1)+' m '+(rec.ropeOK?'<span class="good">✓ long enough</span>':'<span class="bad">✗ too short — pick another scheme below</span>'));
+  bl.push('Fold at '+(fSmall*100).toFixed(0)+'% of the '+(rec.edge==='long'?'width':'length')+' edge: hanging depths '+rec.deepest.toFixed(2)+' m and '+(rec.D-rec.deepest).toFixed(2)+
+    ' m; lowest point '+rec.clear.toFixed(2)+' m '+(rec.clear>=0.06?'<span class="good">✓ clear of ground</span>':'<span class="bad">✗ drags on ground</span>'));
+  bl.push('Weight ratio (uniform mass) <b>'+ratio.toFixed(2)+'</b>, friction limit '+sm.kappa.toFixed(2)+' (μ='+state.mu.toFixed(2)+'), margin <b>'+margin.toFixed(2)+'×</b>'+
+    (margin>=1.0?'<span class="good"> ✓ holds</span>':'<span class="bad"> ✗ may slip</span>')+'. If worried about slipping, wrap anti-slip tape at the crease or add two clothespins');
+  const dTxt=(sm.dL*60).toFixed(0);
+  if(sm.tie){
+    bl.push('Morning and afternoon light are <b>essentially equal</b> ('+dirName8(sideA)+' side '+sm.hist.Lp.toFixed(2)+' h vs '+dirName8(sideB)+' side '+sm.hist.Lm.toFixed(2)+
+      ' h; gap ≈ '+dTxt+' min — within compass error), so either side works for the bigger panel. Empirically afternoons are warmer and drier and things dry faster; if you prefer that, hang the bigger side toward '+dirName8(sm.afterDir)+
+      ' (the afternoon-sun side). The model neither rewards nor penalizes this choice.');
+  }else if(sm.soft){
+    bl.push('The two sides differ <b>slightly</b> ('+dirName8(sm.bigDir)+' side leads by ≈ '+dTxt+' min); prefer '+dirName8(sm.bigDir)+
+      ' slightly. The gap is small — if you prefer the afternoon side ('+dirName8(sm.afterDir)+'), the cost is minor.');
+  }else{
+    bl.push('Most light lands on the <b>'+dirName8(sm.bigDir)+'</b> side (lit integral '+Math.max(sm.hist.Lp,sm.hist.Lm).toFixed(1)+' h vs '+
+      Math.min(sm.hist.Lp,sm.hist.Lm).toFixed(1)+' h). Hang the bigger side toward '+dirName8(sm.bigDir)+' to sun the most fabric; the other side toward '+dirName8(norm360(sm.bigDir+180)));
+  }
+  if(gain50>0.5)bl.push('Exposure <b>'+rec.G.toFixed(2)+' m²·h</b> — <b>+'+gain50.toFixed(0)+'%</b> vs the same edge folded at center'+
+    (c.fError||state.edgePref!=='auto'?'; vs your manual setting '+(gainCur>=0?'+':'')+gainCur.toFixed(0)+'%':''));
+  $('recBullets').innerHTML=bl.map(t=>'<li>'+t+'</li>').join('');
+  const badges=[];
+  badges.push(['Line '+(rec.ropeOK?'OK':'too short')+' (needs '+rec.ropeNeed.toFixed(2)+' m)',rec.ropeOK?'ok':'bad']);
+  badges.push([(rec.dragSymmetric?'drags':'clears ground')+' (clearance '+rec.clear.toFixed(2)+' m)',(rec.dragSymmetric||rec.clear<0.06)?'bad':'ok']);
+  badges.push(['Friction margin '+margin.toFixed(2)+'×',margin>=1.3?'ok':(margin>=1?'warn':'bad')]);
+  if(gain50>0.5)badges.push(['Exposure +'+gain50.toFixed(0)+'%','ok']);
+  $('recBadges').innerHTML=badges.map(b=>'<span class="badge '+b[1]+'">'+b[0]+'</span>').join('');
+  const stt=[];
+  if(state.edgePref!=='auto')stt.push('Pinned to the '+nm(state.edgePref)+(sm.rec.edge!==state.edgePref?' (tool optimum: '+nm(sm.rec.edge)+')':''));
+  if(c.fError)stt.push('Manual fold '+(Math.max(state.fold,1-state.fold)*100).toFixed(0)+':'+((1-Math.max(state.fold,1-state.fold))*100).toFixed(0)+' (recommended '+Math.round(rec.fRec*100)+':'+Math.round((1-rec.fRec)*100)+')');
+  const base=stt.length?stt.join('; ')+'. Click "Apply recommendation" to reset.':'The scene shows the recommended scheme (auto mode).';
+  $('recState').textContent=(state.demoNote?state.demoNote+' ':'')+base;
+}
+
+/* ---------------- Render: fold diagram ---------------- */
+function renderFoldDiag(){
+  const c=state.cal; if(!c)return;
+  const rec=c.scheme.rec, sm=c.scheme;
+  const W=344,H=336;
+  const nm=e=>e==='long'?'long edge':'short edge';
+  const fBig=rec.fRec, fSmall=1-fBig;
+  const spanM=rec.span, depM=rec.D;
+  const scale=Math.min(210/spanM,178/depM,118);
+  const rw=spanM*scale, rh=depM*scale;
+  const x0=(W-rw)/2-4, y0=58;
+  const foldY=y0+fSmall*rh;              // top band = shorter side, bottom band = longer side
+  const p=[];
+  p.push('<defs>',
+    '<linearGradient id="fdgA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6e9d2"/><stop offset="1" stop-color="#e2c9a0"/></linearGradient>',
+    '<pattern id="fdgPat" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">',
+    '<rect width="14" height="14" fill="none"/><path d="M0 7h14M7 0v14" stroke="rgba(120,90,50,.18)" stroke-width="1"/></pattern>',
+    '</defs>');
+  p.push('<rect x="'+x0+'" y="'+y0+'" width="'+f1(rw)+'" height="'+f1(rh)+'" rx="9" fill="url(#fdgA)" stroke="#8a7359" stroke-width="1.2"/>');
+  p.push('<rect x="'+x0+'" y="'+y0+'" width="'+f1(rw)+'" height="'+f1(rh)+'" rx="9" fill="url(#fdgPat)"/>');
+  // two fold bands
+  p.push('<rect x="'+x0+'" y="'+y0+'" width="'+f1(rw)+'" height="'+f1(foldY-y0)+'" rx="9" fill="rgba(120,150,200,.13)"/>');
+  p.push('<rect x="'+x0+'" y="'+f1(foldY)+'" width="'+f1(rw)+'" height="'+f1(y0+rh-foldY)+'" rx="9" fill="rgba(255,200,110,.20)"/>');
+  // crease + rope
+  p.push(lnS([x0-10,foldY],[x0+rw+10,foldY],'stroke="#ffe2b0" stroke-width="8" stroke-linecap="round" opacity=".9"'));
+  p.push(lnS([x0-2,foldY],[x0+rw+2,foldY],'stroke="#4a3a1c" stroke-width="1" stroke-dasharray="5 4" opacity=".55"'));
+  // band labels
+  const cxM=x0+rw/2;
+  p.push(txS([cxM,y0+(foldY-y0)/2-4],'Shorter side  '+(fSmall*depM).toFixed(2)+' m','text-anchor="middle" font-size="11.5" fill="#4a5f8c"'));
+  const tieT=sm.tie, softT=sm.soft;
+  p.push(txS([cxM,y0+(foldY-y0)/2+13],tieT?'either side works':'toward '+dirName8(norm360(sm.bigDir+180)),'text-anchor="middle" font-size="10.5" fill="#5d6d92"'));
+  p.push(txS([cxM,foldY+(y0+rh-foldY)/2-3],'Longer side  '+rec.deepest.toFixed(2)+' m','text-anchor="middle" font-size="12" font-weight="600" fill="#6b4e1e"'));
+  p.push(txS([cxM,foldY+(y0+rh-foldY)/2+14],tieT?'either side (equal)':(softT?'toward '+dirName8(sm.bigDir)+' (slightly more)':'toward '+dirName8(sm.bigDir)+' (more sun today)'),'text-anchor="middle" font-size="10.5" fill="#7d5c28"'));
+  // fold arrow
+  p.push('<path d="M '+(x0-26)+' '+(y0+14)+' Q '+(x0-40)+' '+foldY+' '+(x0-26)+' '+(y0+rh-12)+'" fill="none" stroke="#ffb454" stroke-width="1.6" marker-end="url(#fdArr)" opacity=".8"/>');
+  p.push('<defs><marker id="fdArr" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto"><path d="M0 0L7 3.5L0 7Z" fill="#ffb454"/></marker></defs>');
+  p.push(txS([x0-52,(y0+rh)/2],'fold','text-anchor="middle" font-size="10.5" fill="#c9a06a"'));
+  // dimensions
+  p.push(lnS([x0+rw/2,y0+rh+16],[x0+rw/2,y0+rh+16],'stroke="none"'));
+  p.push(lnS([x0,y0+rh+20],[x0+rw,y0+rh+20],'stroke="#8fa5cf" stroke-width="1"'));
+  p.push(lnS([x0,y0+rh+15],[x0,y0+rh+25],'stroke="#8fa5cf" stroke-width="1"'));
+  p.push(lnS([x0+rw,y0+rh+15],[x0+rw,y0+rh+25],'stroke="#8fa5cf" stroke-width="1"'));
+  p.push(txS([cxM,y0+rh+36],'Along line '+spanM.toFixed(2)+' m (line ≥ '+rec.ropeNeed.toFixed(2)+' m)','text-anchor="middle" font-size="11" fill="#bcd0f2"'));
+  // fold fraction scale
+  p.push(lnS([x0+rw+22,y0],[x0+rw+22,y0+rh],'stroke="#8fa5cf" stroke-width="1"'));
+  p.push(lnS([x0+rw+17,y0],[x0+rw+27,y0],'stroke="#8fa5cf" stroke-width="1"'));
+  p.push(lnS([x0+rw+17,foldY],[x0+rw+27,foldY],'stroke="#ffd79a" stroke-width="1.4"'));
+  p.push(lnS([x0+rw+17,y0+rh],[x0+rw+27,y0+rh],'stroke="#8fa5cf" stroke-width="1"'));
+  p.push(pillS(clamp(x0+rw+62,60,W-52),y0+rh/2,'fold '+Math.round(fBig*100)+':'+Math.round(fSmall*100),'#ffd79a',11));
+  // top info
+  p.push(pillS(96,20,'Quilt flat '+state.L.toFixed(2)+'×'+state.W.toFixed(2)+' m','#bcd0f2',10.5));
+  p.push(pillS(W-88,20,'crease rests on the line (parallel)','#ffd79a',10.5));
+  $('foldDiag').innerHTML='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;display:block;max-width:400px;margin:0 auto">'+p.join('')+'</svg>';
+  const fn=$('foldNote');
+  if(fn)fn.innerHTML='The fold point splits the two layers across the line, measured along the '+(rec.edge==='long'?'width':'length')+' edge. Left and right are symmetric — 30% and 70% are the same fold. Ticks show the friction / clearance limits and the recommended spot. The recommended fold usually sits right at the friction-safety limit (about 66% with the defaults) and does not depend on location or date — the sun only decides which side the longer layer faces; it moves only when the friction or line height changes.';
+}
+
+/* ---------------- Render: scheme comparison ---------------- */
+function renderSchemeTable(){
+  const c=state.cal; if(!c)return;
+  const sm=c.scheme;
+  const nm=e=>e==='long'?'long edge':'short edge';
+  const rows=[];
+  sm.opts.forEach(o=>{
+    rows.push({rec:sm.rec===o,edge:o.edge,f:o.fRec,label:nm(o.edge)+' · recommended fold',
+      ropeNeed:o.ropeNeed,ropeOK:o.ropeOK,clear:o.clear,
+      margin:o.slipMargin,G:o.G});
+    rows.push({rec:false,edge:o.edge,f:0.5,label:nm(o.edge)+' · center fold',
+      ropeNeed:o.ropeNeed,ropeOK:o.ropeOK,clear:state.ropeH-0.5*o.D,
+      margin:sm.kappa/(1),G:o.G50});
+  });
+  const Gbest=Math.max.apply(null,rows.map(r=>r.G));
+  if(c.fError){
+    const fB=Math.max(state.fold,1-state.fold);
+    const D=(state.edge==='long')?state.W:state.L;
+    const span=(state.edge==='long')?state.L:state.W;
+    rows.push({rec:false,cur:true,edge:state.edge,f:fB,label:'Your manual setting',
+      ropeNeed:span+0.2,ropeOK:state.ropeLen>=span+0.2,clear:state.ropeH-fB*D,
+      margin:sm.kappa/(fB/(1-fB)),G:c.Gcur});
+  }
+  const th='<tr><th>Scheme</th><th>Fold</th><th>Exposure G (rel.)</th><th>Line needed</th><th>Clearance</th><th>Friction margin</th></tr>';
+  const trs=rows.map(r=>{
+    const fB=r.f,fS=1-fB;
+    const gcls=r.rec?'recRow':(r.cur?'curRow':'');
+    const rel=Gbest>1e-9?Math.round(r.G/Gbest*100):0;
+    const ropeCls=r.ropeOK?'ok':'bad';
+    const clearCls=r.clear>=0.06?(r.clear>=0.3?'ok':'warn'):'bad';
+    const mCls=r.margin>=1.3?'ok':(r.margin>=1.0?'warn':'bad');
+    const tag=r.rec?'<span class="tagRec">REC</span>':(r.cur?'<span class="tagCur">NOW</span>':'');
+    return '<tr class="rowc '+gcls+'" data-edge="'+r.edge+'" data-f="'+(r.f===0.5?'0.5':'rec')+'" title="click to load">'+
+      '<td>'+r.label+tag+'</td>'+
+      '<td>'+(Math.round(fB*100))+':'+(Math.round(fS*100))+'</td>'+
+      '<td><b>'+(r.G>1e-9?r.G.toFixed(2):'0.00')+'</b><span class="dim"> m²·h · '+rel+'%</span></td>'+
+      '<td class="'+ropeCls+'">'+r.ropeNeed.toFixed(2)+' m '+(r.ropeOK?'✓':'✗')+'</td>'+
+      '<td class="'+clearCls+'">'+r.clear.toFixed(2)+' m '+(r.clear>=0.06?'✓':'✗')+'</td>'+
+      '<td class="'+mCls+'">'+r.margin.toFixed(2)+'× '+(r.margin>=1.0?'✓':'✗')+'</td></tr>';
+  }).join('');
+  $('schemeTable').innerHTML='<table class="schemeTable">'+th+trs+'</table>'+
+    '<div class="remark" style="margin-top:8px">Click any row to load that scheme into the 3D scene above. The recommended row is chosen under a 1.3× friction margin and 6 cm ground clearance. '+
+    '"rel." is relative to the best exposure in the table. Note: at the same fold fraction both edge choices collect nearly equal total light (only crest length differs); the real differences are line length needed and hanging-depth limits.</div>';
+}
+
+/* ---------------- Render: cross-section & forces ---------------- */
+function renderCross(){
+  const c=state.cal; if(!c)return;
+  const sm=c.scheme, rec=sm.rec;
+  const W=380,H=336;
+  const px=Math.min(78,188/Math.max(state.ropeH,0.8));
+  const groundY=H-42;
+  const ropeY=groundY-state.ropeH*px;
+  const cx=190;
+  const bigF=rec.fRec, smallF=1-bigF;
+  const D=rec.D;
+  const hL=bigF*D, hR=smallF*D;          // left = longer (sunward)
+  const yL=ropeY+hL*px, yR=ropeY+hR*px;
+  const p=[];
+  p.push('<defs><linearGradient id="crFab" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe9c6"/><stop offset="1" stop-color="#e0bd8a"/></linearGradient></defs>');
+  // criterion box
+  const ratio=bigF/smallF, margin=sm.kappa/ratio;
+  const ok=margin>=1.0;
+  p.push('<rect x="10" y="8" width="'+(W-20)+'" height="46" rx="10" fill="'+(ok?'rgba(79,214,165,.08)':'rgba(255,122,122,.10)')+'" stroke="'+(ok?'#1f5c45':'#7c3540')+'"/>');
+  p.push(txS([W/2,28],'No-slip criterion (uniform mass + capstan friction): f/(1−f) ≤ e^(μθ)','text-anchor="middle" font-size="11.5" fill="#c8d4ec"'));
+  p.push(txS([W/2,45],ratio.toFixed(2)+'  ≤  '+sm.kappa.toFixed(2)+'     margin '+margin.toFixed(2)+'×  '+(ok?'✓ holds':'✗ slip risk'),'text-anchor="middle" font-size="12" font-weight="600" fill="'+(ok?'#8fe3bb':'#ff9c9c')+'"'));
+  // ground
+  p.push(lnS([16,groundY],[W-16,groundY],'stroke="#4a5c82" stroke-width="1.4"'));
+  for(let x=20;x<W-16;x+=14){p.push(lnS([x,groundY],[x-7,groundY+8],'stroke="#2a3a58" stroke-width="1"'));}
+  p.push(txS([W-18,groundY+18],'ground','text-anchor="end" font-size="10" fill="#67779c"'));
+  // layers
+  const lx=cx-30, rx=cx+30;
+  p.push('<path d="M '+(cx-7)+' '+(ropeY-3)+' Q '+(cx-26)+' '+(ropeY+16)+' '+lx+' '+(ropeY+40)+' L '+lx+' '+f1(yL)+'" fill="none" stroke="url(#crFab)" stroke-width="7" stroke-linecap="round"/>');
+  p.push('<path d="M '+(cx+7)+' '+(ropeY-3)+' Q '+(cx+26)+' '+(ropeY+16)+' '+rx+' '+(ropeY+40)+' L '+rx+' '+f1(yR)+'" fill="none" stroke="#b39a78" stroke-width="7" stroke-linecap="round"/>');
+  // rope
+  p.push('<circle cx="'+cx+'" cy="'+ropeY+'" r="9" fill="#d8c19a" stroke="#7a6350" stroke-width="1.6"/>');
+  p.push('<circle cx="'+cx+'" cy="'+ropeY+'" r="3.2" fill="#7a6350" opacity=".5"/>');
+  // wrap angle
+  p.push('<path d="M '+(cx-13)+' '+(ropeY-8)+' A 15 15 0 0 1 '+(cx+13)+' '+(ropeY-8)+'" fill="none" stroke="#7fc3ff" stroke-width="1.2" stroke-dasharray="3 3"/>');
+  p.push(pillS(cx,ropeY-42,'wrap θ≈π','#9dc8ff',10));
+  // weight arrows
+  function wArrow(x,y1,y2,txt,pct){
+    p.push(lnS([x,y1],[x,y2],'stroke="#7fc3ff" stroke-width="1.6"'));
+    p.push('<path d="M '+x+' '+y2+' l -4 -7 l 8 0 z" fill="#7fc3ff"/>');
+    p.push(txS([x,y2+14],txt,'text-anchor="middle" font-size="11" fill="#9dc8ff"'));
+    p.push(txS([x,y2+28],pct,'text-anchor="middle" font-size="10.5" fill="#67779c"'));
+  }
+  const Wy=Math.min(yL,yR)-6;
+  wArrow(lx-16,Wy-40,Wy,'weight ↓','≈ '+Math.round(bigF*100)+'%');
+  wArrow(rx+16,Wy-40,Wy,'weight ↓','≈ '+Math.round(smallF*100)+'%');
+  // drop labels
+  p.push(txS([lx-24,yL-6],'drop '+hL.toFixed(2)+' m','text-anchor="end" font-size="11" fill="#ffd79a"'));
+  p.push(txS([rx+24,yR-6],'drop '+hR.toFixed(2)+' m','text-anchor="start" font-size="11" fill="#9fb2d6"'));
+  const tieT=sm.tie, softT=sm.soft;
+  p.push(pillS(lx-30,ropeY-16,tieT?'longer side (either)':(dirName8(sm.bigDir)+(softT?' (slightly more)':' (more sun)')),'#ffd79a',10.5));
+  p.push(pillS(rx+34,ropeY-16,tieT?'shorter side':'toward '+dirName8(norm360(sm.bigDir+180)),'#8a98bb',10.5));
+  // clearance
+  const clr=state.ropeH-hL;
+  p.push(lnS([lx,Math.max(yL,yR)],[lx,groundY],'stroke="#6d80a8" stroke-width="1" stroke-dasharray="4 4"'));
+  p.push(pillS((lx+90),groundY-10,(clr>=0.03?'Clearance '+clr.toFixed(2)+' m':'Clearance '+clr.toFixed(2)+' m (dragging!)'),clr>=0.03?'#9fb2d6':'#ff9c9c',10.5));
+  $('crossDiag').innerHTML='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;display:block;max-width:430px;margin:0 auto">'+p.join('')+'</svg>'+
+    '<div class="remark" style="margin-top:6px">Cross-section drawn for the recommended scheme. Layer weights approximate the fold ratio under uniform mass; fabric wrap is estimated as π radians. '+
+    'The no-slip condition is the "friction margin" in the conclusion card. The less the quilt bulges, the closer reality matches this model.</div>';
+}
+
+/* ---------------- Render: score ---------------- */
+function renderScore(){
+  const c=state.cal; if(!c)return;
+  const s=c.score;
+  $('scoreDateTag').textContent=state.y+'-'+String(state.m).padStart(2,'0')+'-'+String(state.d).padStart(2,'0');
+  $('gaugeVal').setAttribute('stroke-dashoffset',String(368.6*(1-s/100)));
+  $('gaugeNum').textContent=Math.round(s);
+  let grade,color;
+  if(s>=92){grade='Excellent · azimuth near optimal';color='#4fd6a5';}
+  else if(s>=80){grade='Good · azimuth can improve';color='#7fc3ff';}
+  else if(s>=65){grade='Fair · see suggestion below';color='#ffc24b';}
+  else {grade='Poor · consider turning the line';color='#ff7a7a';}
+  const gt=$('gaugeGrade'); gt.textContent=grade; gt.setAttribute('fill',color);
+  $('tG').innerHTML=c.day.G.toFixed(2)+'<small>m²·h</small>';
+  $('tTeq').innerHTML=c.Teq.toFixed(2)+'<small>h</small>';
+  $('tQ').innerHTML=(c.day.Q*0.0036).toFixed(2)+'<small>MJ</small>';
+  $('tTef').innerHTML=c.day.tEff.toFixed(1)+'<small>h</small>';
+  // noon elevation
+  const d=c.day;
+  let noonElev=NaN;
+  if(!d.polarNight){
+    const off=4*(state.lon-15*state.tz)+d.eot;
+    const noonClock=720-off;
+    const sp=sunAt(noonClock,state.lat*D2R,spencer(c.par.n).decl,d.eot,state.lon,state.tz);
+    noonElev=sp.elev*R2D;
+  }
+  const chips=[];
+  chips.push(['Sunrise',fmtHM(d.rise)]);
+  chips.push(['Sunset',fmtHM(d.set)]);
+  chips.push(['Daylight',d.dayLen.toFixed(1)+' h']);
+  chips.push(['Noon elevation',isFinite(noonElev)?noonElev.toFixed(1)+'°':'--']);
+  chips.push(['Exposure peak',fmtHM(d.peak.t)]);
+  chips.push(['Best azimuth',norm360(c.bestAz)+'° / '+norm360(c.bestAz+180)+'°']);
+  chips.push(['Year best',(()=>{const md=doyToMD(state.y,c.bestIdx+1);return md.m+'/'+md.d+' '+c.yearArr[c.bestIdx].toFixed(1)+' m²·h';})()]);
+  $('metaChips').innerHTML=chips.map(x=>'<span class="pill">'+x[0]+' <b style="color:#ffd79a;margin-left:3px">'+x[1]+'</b></span>').join('');
+  $('riseL').textContent='Sunrise '+(d.polarNight?'--':fmtHM(d.rise));
+  $('setL').textContent='Sunset '+(d.polarNight?'--':fmtHM(d.set));
+}
+
+/* ---------------- Render: 3D scene ---------------- */
+function renderScene(){
+  const c=state.cal; if(!c)return;
+  const W=780,H=430;
+  const proj=makeCam(state.view.az,state.view.el,116,W/2,H*0.62);
+  const aR=state.ropeAz*D2R;
+  const d=[Math.sin(aR),Math.cos(aR),0];
+  const wv=[Math.sin(aR+Math.PI/2),Math.cos(aR+Math.PI/2),0];
+  const hs=c.g.span/2, t=c.par.t, zr=state.ropeH;
+  const hPlus=c.g.hA, hMinus=c.g.hB;
+  const plusNear=(wv[0]*proj.u[0]+wv[1]*proj.u[1])>0;
+  const P=(s,off,z)=>proj([s*d[0]+off*wv[0], s*d[1]+off*wv[1], z]);
+  const si=sunAtScrub();
+  const svg=[];
+  svg.push('<defs>',
+    '<linearGradient id="fabLit" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe9c6"/><stop offset="1" stop-color="#ffca82"/></linearGradient>',
+    '<linearGradient id="fabDim" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8d7c66"/><stop offset="1" stop-color="#5f5648"/></linearGradient>',
+    '<linearGradient id="fabCrest" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7ecd9"/><stop offset="1" stop-color="#d8bd94"/></linearGradient>',
+    '<radialGradient id="sunGlow"><stop offset="0" stop-color="rgba(255,214,138,.95)"/><stop offset=".45" stop-color="rgba(255,170,80,.5)"/><stop offset="1" stop-color="rgba(255,150,60,0)"/></radialGradient>',
+    '<filter id="shblur"><feGaussianBlur stdDeviation="5"/></filter>',
+    '<pattern id="quiltPat" width="16" height="16" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">',
+    '<rect width="16" height="16" fill="none"/><path d="M0 8h16M8 0v16" stroke="rgba(120,90,50,.16)" stroke-width="1"/></pattern>',
+    '</defs>');
+  // ground grid
+  const ext=2.6,stG=0.52;
+  for(let x=-ext;x<=ext+1e-6;x+=stG){
+    svg.push(lnS(proj([x,-ext,0]),proj([x,ext,0]),'stroke="#152034" stroke-width="1"'));
+  }
+  for(let y=-ext;y<=ext+1e-6;y+=stG){
+    svg.push(lnS(proj([-ext,y,0]),proj([ext,y,0]),'stroke="#152034" stroke-width="1"'));
+  }
+  const o=proj([0,0,0]);
+  svg.push('<ellipse cx="'+f1(o[0])+'" cy="'+f1(o[1])+'" rx="46" ry="20" fill="rgba(90,140,255,.05)"/>');
+  // ground compass ring
+  {
+    const rr=2.16;
+    const cir=[];
+    for(let k=0;k<=64;k++){
+      const a2=k/64*2*Math.PI;
+      cir.push(proj([Math.sin(a2)*rr,Math.cos(a2)*rr,0]));
+    }
+    svg.push('<polyline points="'+cir.map(q=>f1(q[0])+','+f1(q[1])).join(' ')+'" fill="none" stroke="#243354" stroke-width="1.2"/>');
+    for(let k=0;k<8;k++){
+      const a2=k*45;
+      const q1=proj([Math.sin(a2*D2R)*rr,Math.cos(a2*D2R)*rr,0]);
+      const q2=proj([Math.sin(a2*D2R)*(rr-0.14),Math.cos(a2*D2R)*(rr-0.14),0]);
+      svg.push(lnS(q1,q2,'stroke="'+(a2%90===0?'#3d5480':'#25355a')+'" stroke-width="'+(a2%90===0?2:1.2)+'"'));
+    }
+    [['N',0,'#ffb3b3'],['E',90,'#93a2c4'],['S',180,'#93a2c4'],['W',270,'#93a2c4']].forEach(it=>{
+      const q=proj([Math.sin(it[1]*D2R)*(rr+0.32),Math.cos(it[1]*D2R)*(rr+0.32),0]);
+      svg.push(txS(q,it[0],'text-anchor="middle" font-size="12" fill="'+it[2]+'" opacity=".9"'));
+    });
+  }
+  // shadow
+  if(si.up&&si.elev>2){
+    const sd=[-Math.sin(si.az*D2R),-Math.cos(si.az*D2R),0];
+    const Lsh=clamp(c.g.hBig/Math.max(0.14,Math.tan(si.elev*D2R)),0,3.4);
+    const b0=[-hs*d[0],-hs*d[1],0.01],b1=[hs*d[0],hs*d[1],0.01];
+    const q0=[b0[0]+sd[0]*Lsh,b0[1]+sd[1]*Lsh,0.01],q1=[b1[0]+sd[0]*Lsh,b1[1]+sd[1]*Lsh,0.01];
+    const op=clamp(Math.sin(si.elev*D2R)*0.42,0.04,0.34);
+    svg.push(pgS([proj(b0),proj(b1),proj(q1),proj(q0)],'fill="rgba(5,8,14,'+op.toFixed(2)+')" filter="url(#shblur)"'));
+  }
+  // posts (with knots and feet)
+  for(const s of [-(hs+0.34),hs+0.34]){
+    const pb=proj([s*d[0],s*d[1],0]),pt2=proj([s*d[0],s*d[1],zr+0.16]);
+    svg.push('<ellipse cx="'+f1(pb[0])+'" cy="'+f1(pb[1]+2)+'" rx="8" ry="3.4" fill="rgba(0,0,0,.35)"/>');
+    svg.push(lnS(pb,pt2,'stroke="#6d5a48" stroke-width="9" stroke-linecap="round"'));
+    svg.push(lnS(pb,pt2,'stroke="#8a7359" stroke-width="5" stroke-linecap="round"'));
+    svg.push('<circle cx="'+f1(pt2[0])+'" cy="'+f1(pt2[1])+'" r="4.6" fill="#d8c19a" stroke="#7a6350" stroke-width="1.2"/>');
+  }
+  // rope (slight sag)
+  const rA=proj([-(hs+0.3)*d[0],-(hs+0.3)*d[1],zr+0.14]);
+  const rB=proj([(hs+0.3)*d[0],(hs+0.3)*d[1],zr+0.14]);
+  const rM=proj([0,0,zr+0.02]);
+  svg.push('<path d="M '+f1(rA[0])+' '+f1(rA[1])+' Q '+f1(rM[0])+' '+f1(rM[1])+' '+f1(rB[0])+' '+f1(rB[1])+'" fill="none" stroke="#d8c19a" stroke-width="2.4" stroke-linecap="round"/>');
+  // quilt
+  const litSide=si.up?(si.litOff>0?1:-1):0;
+  function insetQuad(pts,k){
+    const cx4=(pts[0][0]+pts[1][0]+pts[2][0]+pts[3][0])/4;
+    const cy4=(pts[0][1]+pts[1][1]+pts[2][1]+pts[3][1])/4;
+    return pts.map(q=>[cx4+(q[0]-cx4)*k, cy4+(q[1]-cy4)*k]);
+  }
+  function drawPanel(h,off,lit){
+    const tp=P(hs,off,zr),tq=P(-hs,off,zr),bq=P(-hs,off,zr-h),bp=P(hs,off,zr-h);
+    const fill=lit?'url(#fabLit)':'url(#fabDim)';
+    svg.push(pgS([tp,tq,bq,bp],'fill="'+fill+'" stroke="rgba(255,255,255,.07)" stroke-width="1"'));
+    svg.push(pgS([tp,tq,bq,bp],'fill="url(#quiltPat)"'));
+    if(lit&&si.p>0.02){
+      svg.push(pgS([tp,tq,bq,bp],'fill="rgba(255,190,100,'+(0.10+0.30*si.p).toFixed(2)+')"'));
+    }
+    // stitching (inset dashed border) + bottom binding
+    const inQ=insetQuad([tp,tq,bq,bp],0.94);
+    svg.push('<polyline points="'+inQ.map(q=>f1(q[0])+','+f1(q[1])).join(' ')+' '+f1(inQ[0][0])+','+f1(inQ[0][1])+'" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="1" stroke-dasharray="4 4"/>');
+    svg.push(lnS(bq,bp,'stroke="rgba(255,255,255,.4)" stroke-width="2" stroke-linecap="round" opacity="'+(lit?0.8:0.45)+'"'));
+    return {tp,tq,bq,bp};
+  }
+  function drawCrest(){
+    const c1=P(hs,t/2,zr),c2=P(-hs,t/2,zr),c3=P(-hs,-t/2,zr),c4=P(hs,-t/2,zr);
+    const c5=P(hs,t/2,zr+t),c6=P(-hs,t/2,zr+t),c7=P(-hs,-t/2,zr+t),c8=P(hs,-t/2,zr+t);
+    // far face, near face, top
+    if(plusNear){
+      svg.push(pgS([c2,c3,c7,c6],'fill="#a08b6f"'));
+      svg.push(pgS([c1,c6,c7,c8],'fill="url(#fabCrest)"'));
+      svg.push(pgS([c4,c1,c8,c5],'fill="#c3aa86"'));
+    }else{
+      svg.push(pgS([c1,c6,c7,c8],'fill="url(#fabCrest)"'));
+      svg.push(pgS([c2,c3,c7,c6],'fill="#c3aa86"'));
+      svg.push(pgS([c4,c1,c8,c5],'fill="#a08b6f"'));
+    }
+    svg.push(pgS([c8,c7,c6,c5],'fill="url(#fabCrest)"'));
+    if(si.up&&si.elev>0){
+      svg.push(pgS([c5,c6,c7,c8],'fill="rgba(255,200,110,'+(0.10+0.25*Math.sin(si.elev*D2R)).toFixed(2)+')"'));
+    }
+  }
+  const panelPlus=()=>drawPanel(hPlus, t/2, litSide>0);
+  const panelMinus=()=>drawPanel(hMinus, -t/2, litSide<0);
+  if(plusNear){
+    svg.push('<g>'); panelMinus(); svg.push('</g>');
+    svg.push('<g>'); drawCrest(); svg.push('</g>');
+    svg.push('<g>'); panelPlus(); svg.push('</g>');
+  }else{
+    svg.push('<g>'); panelPlus(); svg.push('</g>');
+    svg.push('<g>'); drawCrest(); svg.push('</g>');
+    svg.push('<g>'); panelMinus(); svg.push('</g>');
+  }
+  // lit / shaded labels
+  if(si.up){
+    const litH=litSide>0?hPlus:hMinus;
+    const litOff=litSide>0?1:-1;
+    const lp=P(hs*0.22,litOff*(t/2+0.16),zr-litH*0.45);
+    svg.push(pillS(lp[0],lp[1],'Lit side · cos '+si.p.toFixed(2),'#ffd79a',11.5));
+    const shH=litSide>0?hMinus:hPlus;
+    const sp2=P(-hs*0.55,-litOff*(t/2+0.5),zr-shH*0.72);
+    svg.push(pillS(sp2[0],sp2[1],'Shaded (mutual)','#8a98bb',10.5));
+  }
+  // sun rays
+  if(si.up&&si.p>0.04){
+    const su=[Math.sin(si.az*D2R)*Math.cos(si.elev*D2R),Math.cos(si.az*D2R)*Math.cos(si.elev*D2R),Math.sin(si.elev*D2R)];
+    const R3=3.0;
+    const sunP=proj([su[0]*R3,su[1]*R3,Math.max(0.25,su[2]*R3)]);
+    const litH=litSide>0?hPlus:hMinus, litOff=litSide>0?t/2:-t/2;
+    for(let k=0;k<5;k++){
+      const sS=-hs*0.55+k*(hs*0.275);
+      const zt=zr-litH*(0.2+0.13*k);
+      const q=P(sS,litOff,zt);
+      svg.push('<line x1="'+f1(sunP[0])+'" y1="'+f1(sunP[1])+'" x2="'+f1(q[0])+'" y2="'+f1(q[1])+'" stroke="rgba(255,205,120,.55)" stroke-width="1.2" stroke-dasharray="6 8">'+
+        '<animate attributeName="stroke-dashoffset" from="0" to="-28" dur="1.6s" repeatCount="indefinite"/></line>');
+    }
+  }
+  // sun
+  if(si.up){
+    const su=[Math.sin(si.az*D2R)*Math.cos(si.elev*D2R),Math.cos(si.az*D2R)*Math.cos(si.elev*D2R),Math.sin(si.elev*D2R)];
+    const R3=3.0;
+    const sp3=proj([su[0]*R3,su[1]*R3,su[2]*R3]);
+    const gp=proj([su[0]/Math.max(1e-3,Math.hypot(su[0],su[1]))*2.3,su[1]/Math.max(1e-3,Math.hypot(su[0],su[1]))*2.3,0]);
+    svg.push('<g>');
+    svg.push('<circle cx="'+f1(sp3[0])+'" cy="'+f1(sp3[1])+'" r="32" fill="url(#sunGlow)"/>');
+    // rotating corona rays
+    let rays='';
+    for(let k=0;k<8;k++){
+      const aa=k*45*D2R;
+      rays+=lnS([16*Math.cos(aa),16*Math.sin(aa)],[25*Math.cos(aa),25*Math.sin(aa)],'stroke="rgba(255,205,120,.75)" stroke-width="1.6" stroke-linecap="round"');
+    }
+    svg.push('<g transform="translate('+f1(sp3[0])+','+f1(sp3[1])+')"><g>'+rays+
+      '<animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="70s" repeatCount="indefinite"/></g></g>');
+    svg.push('<circle cx="'+f1(sp3[0])+'" cy="'+f1(sp3[1])+'" r="13" fill="#ffd98a" stroke="rgba(255,255,255,.55)" stroke-width="1.2"/>');
+    svg.push('</g>');
+    svg.push(lnS(sp3,gp,'stroke="rgba(255,190,100,.28)" stroke-width="1" stroke-dasharray="3 5"'));
+    svg.push('<circle cx="'+f1(gp[0])+'" cy="'+f1(gp[1])+'" r="3" fill="rgba(255,190,100,.4)"/>');
+  }
+  // annotations
+  if(state.anno){
+    const offDim=(plusNear?1:-1)*(t/2+0.55);
+    const d1=P(-hs,offDim,0.07),d2=P(hs,offDim,0.07);
+    svg.push(lnS(d1,d2,'stroke="#8fa5cf" stroke-width="1"'));
+    svg.push(lnS([d1[0],d1[1]-4],[d1[0],d1[1]+4],'stroke="#8fa5cf" stroke-width="1"'));
+    svg.push(lnS([d2[0],d2[1]-4],[d2[0],d2[1]+4],'stroke="#8fa5cf" stroke-width="1"'));
+    const dm=[(d1[0]+d2[0])/2,(d1[1]+d2[1])/2+2];
+    svg.push(pillS(dm[0],dm[1]+13,'Along line '+c.g.span.toFixed(2)+' m · '+(state.edge==='long'?'long edge':'short edge')+' on line','#bcd0f2',11));
+    // both-side drop
+    const sDim=hs+0.5;
+    const ctrA=P(0,(plusNear?1:-1)*0.3,zr*0.5);
+    [['+',hPlus],['−',hMinus]].forEach((it,idx)=>{
+      const off=it[0]==='+'?t/2+0.16:-t/2-0.16;
+      const a=P(sDim,off,zr),b=P(sDim,off,zr-it[1]);
+      svg.push(lnS(a,b,'stroke="#8fa5cf" stroke-width="1"'));
+      svg.push(lnS([a[0]-4,a[1]],[a[0]+4,a[1]],'stroke="#8fa5cf" stroke-width="1"'));
+      svg.push(lnS([b[0]-4,b[1]],[b[0]+4,b[1]],'stroke="#8fa5cf" stroke-width="1"'));
+      const mA=[(a[0]+b[0])/2,(a[1]+b[1])/2];
+      let dx=mA[0]-ctrA[0],dy=mA[1]-ctrA[1]; const dl=Math.hypot(dx,dy)||1;
+      dx/=dl;dy/=dl;
+      svg.push(pillS(mA[0]+dx*52,mA[1]+dy*52+(idx===0?-9:11),'drop '+it[1].toFixed(2)+' m','#bcd0f2',10.5));
+    });
+    // thickness
+    const ta=P(-sDim,0,zr),tb=P(-sDim,0,zr+t);
+    svg.push(lnS(ta,tb,'stroke="#8fa5cf" stroke-width="1.4"'));
+    svg.push(pillS(tb[0],tb[1]-11,'thickness '+(t*100).toFixed(0)+' cm','#bcd0f2',10.5));
+    // crease position
+    const fB2=Math.max(state.fold,1-state.fold);
+    const fl=P(hs+0.28,0,zr+t+0.14);
+    svg.push(pillS(fl[0],fl[1],'crease: '+(state.edge==='long'?'width':'length')+' at '+Math.round(fB2*100)+'%','#ffd79a',10.5));
+    // clearance
+    const bigSide=c.g.hA>=c.g.hB?1:-1;
+    const gb=P(-hs*0.15,bigSide*t/2,zr-c.g.hBig), gg=P(-hs*0.15,bigSide*t/2,0);
+    svg.push(lnS(gb,gg,'stroke="#6d80a8" stroke-width="1" stroke-dasharray="4 4"'));
+    const clr=zr-c.g.hBig;
+    svg.push(pillS(gg[0],gg[1]+14,'Clearance '+clr.toFixed(2)+' m'+(clr<0.03?' (dragging!)':''),clr<0.03?'#ff9c9c':'#9fb2d6',10.5));
+  }
+  // corner badges
+  svg.push(pillS(84,22,'view '+Math.round(state.view.az)+'° / drag to rotate','#8a98bb',10.5));
+  svg.push('<svg x="'+(W-232)+'" y="12" width="220" height="26">'+pillS(110,13,'Line '+Math.round(state.ropeAz)+'° ('+(state.edge==='long'?'long edge':'short edge')+' on line)','#ffd79a',11)+'</svg>');
+  $('scene').innerHTML='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;display:block;touch-action:none;cursor:grab" id="sceneSvg">'+svg.join('')+'</svg>';
+}
+(function bindScene(){
+  const box=$('scene');
+  let drag=false,lx=0,ly=0;
+  box.addEventListener('pointerdown',e=>{drag=true;lx=e.clientX;ly=e.clientY;box.setPointerCapture(e.pointerId);});
+  box.addEventListener('pointermove',e=>{
+    if(!drag)return;
+    const dx=e.clientX-lx,dy=e.clientY-ly; lx=e.clientX;ly=e.clientY;
+    state.view.az=norm360(state.view.az+dx*0.45);
+    state.view.el=clamp(state.view.el+dy*0.22,8,74);
+    renderScene();
+  });
+  box.addEventListener('pointerup',()=>{drag=false;});
+  box.addEventListener('pointercancel',()=>{drag=false;});
+})();
+
+/* ---------------- Render: plan view ---------------- */
+function renderPlan(){
+  const c=state.cal; if(!c)return;
+  const S=380,cx=190,cy=190,R=150;
+  const dir=(aDeg,r)=>{const a=aDeg*D2R;return [cx+r*Math.sin(a),cy-r*Math.cos(a)];};
+  const si=sunAtScrub();
+  const p=[];
+  p.push('<circle cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="#0b1322" stroke="#1f2c44"/>');
+  for(let a=0;a<360;a+=10){
+    const big=(a%30===0);
+    p.push(lnS(dir(a,R),dir(a,R-(big?9:5)),'stroke="'+(big?'#42557c':'#263651')+'" stroke-width="1"'));
+  }
+  [['N',0],['E',90],['S',180],['W',270],['NE',45],['SE',135],['SW',225],['NW',315]].forEach(([t,a])=>{
+    const q=dir(a,R-22);
+    const main=t.length===1;
+    p.push(txS(q,t,'text-anchor="middle" font-size="'+(main?13:10)+'" fill="'+(t==='N'?'#ff9c9c':(main?'#93a2c4':'#5d6d92'))+'"'));
+  });
+  // lit half
+  if(si.up){
+    const bLit=(state.ropeAz+(si.litOff>0?90:-90));
+    const q1=dir(bLit-90,R*0.94),q2=dir(bLit+90,R*0.94);
+    p.push('<path d="M '+f1(cx)+' '+f1(cy)+' L '+f1(q1[0])+' '+f1(q1[1])+' A '+f1(R*0.94)+' '+f1(R*0.94)+' 0 0 1 '+f1(q2[0])+' '+f1(q2[1])+' Z" fill="rgba(255,180,84,.08)" stroke="rgba(255,180,84,.25)" stroke-dasharray="4 5"/>');
+    p.push(txS(dir(bLit,R*0.62),'lit half','text-anchor="middle" font-size="10.5" fill="rgba(255,200,130,.75)"'));
+  }
+  // normals
+  p.push(lnS([cx,cy],dir(state.ropeAz+90,R*0.78),'stroke="#5aa7ff" stroke-width="1.4" stroke-dasharray="5 5" opacity=".8"'));
+  p.push(lnS([cx,cy],dir(state.ropeAz-90,R*0.78),'stroke="#5aa7ff" stroke-width="1.4" stroke-dasharray="5 5" opacity=".8"'));
+  p.push(pillS(dir(state.ropeAz+90,R*0.78)[0],dir(state.ropeAz+90,R*0.78)[1]-10,'normal '+norm360(state.ropeAz+90)+'° '+dirName8(state.ropeAz+90),'#9dc8ff',10.5));
+  p.push(pillS(dir(state.ropeAz-90,R*0.78)[0],dir(state.ropeAz-90,R*0.78)[1]+18,'normal '+norm360(state.ropeAz-90)+'° '+dirName8(state.ropeAz-90),'#9dc8ff',10.5));
+  // rope + quilt bar
+  const r1=dir(state.ropeAz,R*0.92),r2=dir(state.ropeAz+180,R*0.92);
+  p.push(lnS(r1,r2,'stroke="#e0b27a" stroke-width="7" stroke-linecap="round" opacity=".92"'));
+  const half=R*0.74*clamp(c.g.span/2.4,0.3,1);
+  const b1=dir(state.ropeAz,half),b2=dir(state.ropeAz+180,half);
+  p.push(lnS(b1,b2,'stroke="#ffd79a" stroke-width="3.5" stroke-linecap="round" opacity=".9"'));
+  p.push(pillS(r1[0],r1[1]-11,'Line '+Math.round(state.ropeAz)+'°','#ffd79a',11));
+  p.push(pillS(dir(state.ropeAz+180,R*0.92)[0],dir(state.ropeAz+180,R*0.92)[1]+18,(state.edge==='long'?'long edge':'short edge')+' on line '+c.g.span.toFixed(2)+' m','#bcd0f2',10.5));
+  // sunrise / sunset
+  if(!c.day.polarNight){
+    const {decl,eot}=spencer(c.par.n);
+    const latR=state.lat*D2R;
+    const sr=sunAt(c.day.rise,latR,decl,eot,state.lon,state.tz);
+    const ss=sunAt(c.day.set,latR,decl,eot,state.lon,state.tz);
+    const azRise=norm360(sr.az*R2D),azSet=norm360(ss.az*R2D);
+    const qr=dir(azRise,R+8),qs=dir(azSet,R+8);
+    p.push('<circle cx="'+f1(qr[0])+'" cy="'+f1(qr[1])+'" r="4.5" fill="#ffb454" opacity=".85"/>');
+    p.push('<circle cx="'+f1(qs[0])+'" cy="'+f1(qs[1])+'" r="4.5" fill="#ff8a3c" opacity=".85"/>');
+    p.push(pillS(dir(azRise,R+26)[0],dir(azRise,R+26)[1],'Sunrise '+Math.round(azRise)+'°','#ffcf9a',9.5));
+    p.push(pillS(dir(azSet,R+26)[0],dir(azSet,R+26)[1],'Sunset '+Math.round(azSet)+'°','#ffcf9a',9.5));
+  }
+  // sun
+  if(si.up){
+    const q=dir(si.az,R*0.9);
+    p.push('<circle cx="'+f1(q[0])+'" cy="'+f1(q[1])+'" r="16" fill="url(#sgl)"/>');
+    p.push('<circle cx="'+f1(q[0])+'" cy="'+f1(q[1])+'" r="7.5" fill="#ffd98a" stroke="rgba(255,255,255,.5)"/>');
+    p.push(lnS(q,[cx,cy],'stroke="rgba(255,190,100,.35)" stroke-width="1" stroke-dasharray="3 6"'));
+    p.push(pillS(q[0],q[1]+24,'Sun '+Math.round(si.az)+'° el '+si.elev.toFixed(0)+'°','#ffd79a',10.5));
+  }else{
+    p.push(pillS(cx,cy+R+44,'Sun below horizon','#8a98bb',11));
+  }
+  p.push('<defs><radialGradient id="sgl"><stop offset="0" stop-color="rgba(255,214,138,.9)"/><stop offset="1" stop-color="rgba(255,150,60,0)"/></radialGradient></defs>');
+  $('plan').innerHTML='<svg viewBox="0 0 '+S+' '+S+'" style="width:100%;display:block;max-width:430px;margin:0 auto">'+p.join('')+'</svg>';
+  const edgeName=state.edge==='long'?'long edge':'short edge';
+  $('planNote').innerHTML='Compass reading <b>'+Math.round(state.ropeAz)+'°</b> — the heavy line is the shared direction of the rope and the '+edgeName+'. The two dashed blue lines are the layer normals: whichever side the sun is on gets lit while the other layer is shaded, with only the crest adding light.';
+}
+
+/* ---------------- Render: sun-path polar ---------------- */
+function renderPolar(){
+  const c=state.cal; if(!c)return;
+  const S=380,cx=190,cy=190,R=160;
+  const rad=elev=>R*(1-clamp(elev,0,90)/90);
+  const pos=(elev,az)=>{const a=az*D2R;const r=rad(elev);return [cx+r*Math.sin(a),cy-r*Math.cos(a)];};
+  const p=[];
+  p.push('<circle cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="#0b1322" stroke="#1f2c44"/>');
+  [30,60].forEach(el=>{p.push('<circle cx="'+cx+'" cy="'+cy+'" r="'+f1(rad(el))+'" fill="none" stroke="#22304d" stroke-dasharray="3 5"/>');});
+  p.push('<circle cx="'+cx+'" cy="'+cy+'" r="3.5" fill="#42557c"/>');
+  for(let a=0;a<360;a+=15){
+    const big=(a%45===0);
+    const pu=pos(0,a);
+    const q3=[cx+(R-(big?10:6))*Math.sin(a*D2R),cy-(R-(big?10:6))*Math.cos(a*D2R)];
+    p.push(lnS(pu,q3,'stroke="'+(big?'#42557c':'#263651')+'" stroke-width="1"'));
+  }
+  [['N',0],['E',90],['S',180],['W',270]].forEach(([t,a])=>{
+    const q=pos(0,a);const dx=(q[0]-cx),dy=(q[1]-cy);
+    const L=Math.hypot(dx,dy)||1;
+    p.push(txS([cx+dx/L*(R+16),cy+dy/L*(R+16)],t,'text-anchor="middle" font-size="12.5" fill="'+(t==='N'?'#ff9c9c':'#93a2c4')+'"'));
+  });
+  p.push(txS([cx,cy-rad(30)-3],'30°','text-anchor="middle" font-size="9.5" fill="#5d6d92"'));
+  p.push(txS([cx,cy-rad(60)-3],'60°','text-anchor="middle" font-size="9.5" fill="#5d6d92"'));
+  p.push(txS([cx,cy+11],'90°','text-anchor="middle" font-size="9.5" fill="#5d6d92"'));
+  // monthly references
+  for(let m=1;m<=12;m++){
+    const n21=dayOfYear(state.y,m,21);
+    const spm=spencer(n21);
+    const latR=state.lat*D2R;
+    const stm=sunTimesP(spm.decl,latR,state.lon,state.tz,state.alt,spm.eot);
+    if(stm.polarNight)continue;
+    const pts=[];
+    for(let tm=stm.rise;tm<=stm.set;tm+=8){
+      const s=sunAt(tm,latR,spm.decl,spm.eot,state.lon,state.tz);
+      if(s.elev*R2D<1)continue;
+      pts.push(pos(s.elev*R2D,norm360(s.az*R2D)));
+    }
+    if(pts.length>2){
+      p.push('<polyline points="'+pts.map(q=>f1(q[0])+','+f1(q[1])).join(' ')+'" fill="none" stroke="#4a6ea8" stroke-width="1.1" opacity="'+(m===state.m?0.5:0.30)+'"/>');
+    }
+  }
+  // today
+  if(!c.day.polarNight){
+    const pts=[];
+    const latR=state.lat*D2R;
+    const {decl,eot}=spencer(c.par.n);
+    for(let tm=c.day.rise;tm<=c.day.set;tm+=4){
+      const s=sunAt(tm,latR,decl,eot,state.lon,state.tz);
+      if(s.elev*R2D<0.8)continue;
+      pts.push(pos(s.elev*R2D,norm360(s.az*R2D)));
+    }
+    if(pts.length>2){
+      p.push('<polyline points="'+pts.map(q=>f1(q[0])+','+f1(q[1])).join(' ')+'" fill="none" stroke="#ffb454" stroke-width="2.2"/>');
+    }
+    for(let hh=Math.ceil(c.day.rise/60);hh<=Math.floor(c.day.set/60);hh++){
+      const s=sunAt(hh*60,latR,decl,eot,state.lon,state.tz);
+      if(s.elev*R2D<2)continue;
+      const q=pos(s.elev*R2D,norm360(s.az*R2D));
+      if(hh%2===0){
+        p.push('<circle cx="'+f1(q[0])+'" cy="'+f1(q[1])+'" r="2.6" fill="#ffd79a"/>');
+        const dx=q[0]-cx,dy=q[1]-cy,L=Math.hypot(dx,dy)||1;
+        p.push(txS([q[0]+dx/L*13,q[1]+dy/L*13+3],hh+'h','text-anchor="middle" font-size="9.5" fill="#c9a06a"'));
+      }
+    }
+    // noon
+    const off=4*(state.lon-15*state.tz)+eot;
+    const spn=sunAt(720-off,latR,decl,eot,state.lon,state.tz);
+    if(spn.elev>0){
+      const q=pos(spn.elev*R2D,norm360(spn.az*R2D));
+      p.push('<circle cx="'+f1(q[0])+'" cy="'+f1(q[1])+'" r="3.4" fill="#fff6df"/>');
+      p.push(pillS(q[0],q[1]-12,'Noon '+(spn.elev*R2D).toFixed(1)+'°','#ffe9c6',10));
+    }
+    // lit half
+    const si=sunAtScrub();
+    if(si.up){
+      const bLit=(state.ropeAz+(si.litOff>0?90:-90));
+      const q1=pos(0,bLit-90),q2=pos(0,bLit+90);
+      p.push('<path d="M '+f1(cx)+' '+f1(cy)+' L '+f1(q1[0])+' '+f1(q1[1])+' A '+f1(R)+' '+f1(R)+' 0 0 1 '+f1(q2[0])+' '+f1(q2[1])+' Z" fill="rgba(255,180,84,.07)" stroke="rgba(255,180,84,.22)" stroke-dasharray="4 5"/>');
+    }
+  }
+  // line orientation
+  const aR=state.ropeAz*D2R;
+  const qa=pos(0,state.ropeAz),qb=pos(0,state.ropeAz+180);
+  p.push(lnS(qa,qb,'stroke="#e0b27a" stroke-width="4.5" stroke-linecap="round" opacity=".95"'));
+  p.push(pillS(qa[0],qa[1],Math.round(state.ropeAz)+'°','#ffd79a',10.5));
+  p.push(pillS(qb[0],qb[1],Math.round(norm360(state.ropeAz+180))+'°','#ffd79a',10.5));
+  // current sun
+  const si=sunAtScrub();
+  if(si.up){
+    const q=pos(si.elev,si.az);
+    p.push('<circle cx="'+f1(q[0])+'" cy="'+f1(q[1])+'" r="15" fill="url(#spg)"/>');
+    p.push('<circle cx="'+f1(q[0])+'" cy="'+f1(q[1])+'" r="6.5" fill="#ffd98a" stroke="rgba(255,255,255,.5)"/>');
+    p.push('<defs><radialGradient id="spg"><stop offset="0" stop-color="rgba(255,214,138,.9)"/><stop offset="1" stop-color="rgba(255,150,60,0)"/></radialGradient></defs>');
+  }
+  $('polar').innerHTML='<svg viewBox="0 0 '+S+' '+S+'" style="width:100%;display:block;max-width:430px;margin:0 auto">'+p.join('')+'</svg>';
+}
+
+/* ---------------- Render: daily curve ---------------- */
+function renderDay(){
+  const c=state.cal; if(!c)return;
+  const W=780,H=272,mL=52,mR=50,mT=20,mB=34;
+  const p=[];
+  const d=c.day;
+  if(d.polarNight){
+    $('dayC').innerHTML='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%"><text x="'+(W/2)+'" y="'+(H/2)+'" text-anchor="middle" font-size="14" fill="#67779c">Polar night — no sunlight today</text></svg>';
+    return;
+  }
+  const x0=d.rise-25,x1=d.set+25;
+  const X=t=>mL+(t-x0)/(x1-x0)*(W-mL-mR);
+  const yMax=Math.max(0.02,Math.max.apply(null,d.curve.map(q=>q.area))*1.18);
+  const Y=a=>mT+(1-a/yMax)*(H-mT-mB);
+  const Y2=e=>mT+(1-e/90)*(H-mT-mB);
+  // grid
+  for(let h=Math.ceil(x0/120)*120;h<=x1;h+=120){
+    p.push(lnS([X(h),mT],[X(h),H-mB],'stroke="#182338" stroke-width="1"'));
+    p.push(txS([X(h),H-mB+16],fmtHM(h),'text-anchor="middle" font-size="10.5" fill="#67779c"'));
+  }
+  for(let k=0;k<=4;k++){
+    const v=yMax*k/4;
+    p.push(lnS([mL,Y(v)],[W-mR,Y(v)],'stroke="#182338" stroke-width="1"'));
+    p.push(txS([mL-8,Y(v)+3.5],v.toFixed(1),'text-anchor="end" font-size="10" fill="#67779c"'));
+  }
+  [0,45,90].forEach(e=>{
+    p.push(txS([W-mR+8,Y2(e)+3.5],e+'°','text-anchor="start" font-size="10" fill="#4a6ea8"'));
+  });
+  // effective-window shading
+  const effSegs=[];
+  let cur=null;
+  d.curve.forEach(q=>{
+    if(q.p>0.2&&q.elev>3){if(!cur)cur=[q.t,q.t];else cur[1]=q.t;}
+    else if(cur){effSegs.push(cur);cur=null;}
+  });
+  if(cur)effSegs.push(cur);
+  effSegs.forEach(sg=>{
+    p.push('<rect x="'+f1(X(sg[0]))+'" y="'+mT+'" width="'+f1(X(sg[1])-X(sg[0]))+'" height="'+f1(H-mT-mB)+'" fill="rgba(90,167,255,.06)"/>');
+  });
+  // area curve
+  const pts=d.curve.map(q=>[X(q.t),Y(q.area)]);
+  if(pts.length>2){
+    const areaPath='M '+f1(pts[0][0])+' '+f1(H-mB)+' '+'L '+pts.map(q=>f1(q[0])+' '+f1(q[1])).join(' L ')+' L '+f1(pts[pts.length-1][0])+' '+f1(H-mB)+' Z';
+    p.push('<defs><linearGradient id="dayFill" x1="0" y1="0" x2="0" y2="1">'+
+      '<stop offset="0" stop-color="rgba(255,180,84,.42)"/><stop offset="1" stop-color="rgba(255,180,84,.03)"/></linearGradient></defs>');
+    p.push('<path d="'+areaPath+'" fill="url(#dayFill)"/>');
+    p.push('<polyline points="'+pts.map(q=>f1(q[0])+','+f1(q[1])).join(' ')+'" fill="none" stroke="#ffb454" stroke-width="2"/>');
+  }
+  // elevation
+  const epts=d.curve.map(q=>[X(q.t),Y2(q.elev)]);
+  if(epts.length>2){
+    p.push('<polyline points="'+epts.map(q=>f1(q[0])+','+f1(q[1])).join(' ')+'" fill="none" stroke="#4a6ea8" stroke-width="1.4" stroke-dasharray="5 5" opacity=".9"/>');
+  }
+  // sunrise / noon / sunset
+  const off=4*(state.lon-15*state.tz)+d.eot;
+  const noonT=720-off;
+  [[d.rise,'Sunrise'],[noonT,'Noon'],[d.set,'Sunset']].forEach(([tt,tt2])=>{
+    if(tt<x0||tt>x1)return;
+    p.push(lnS([X(tt),mT],[X(tt),H-mB],'stroke="#31426a" stroke-width="1" stroke-dasharray="3 5"'));
+    p.push(txS([X(tt),mT-6],tt2,'text-anchor="middle" font-size="10" fill="#8a98bb"'));
+  });
+  // current cursor
+  if(state.scrub>=x0&&state.scrub<=x1){
+    const near=d.curve.reduce((a,b)=>Math.abs(b.t-state.scrub)<Math.abs(a.t-state.scrub)?b:a);
+    p.push(lnS([X(state.scrub),mT],[X(state.scrub),H-mB],'stroke="#ffd79a" stroke-width="1.4"'));
+    p.push('<circle cx="'+f1(X(state.scrub))+'" cy="'+f1(Y(near.area))+'" r="4.5" fill="#ffd79a" stroke="#4a3a1c"/>');
+    p.push(pillS(X(state.scrub),mT+12,'area '+near.area.toFixed(2)+' m²','#ffd79a',10.5));
+  }
+  // area annotation
+  p.push(txS([mL+6,Y(yMax)+16],'Area under curve = exposure G = '+d.G.toFixed(2)+' m²·h','font-size="11.5" fill="#ffd79a"'));
+  p.push(txS([W-mR+8,mT+4],'elevation','text-anchor="start" font-size="10" fill="#4a6ea8"'));
+  p.push(txS([mL-8,mT-6],'m²','text-anchor="end" font-size="10" fill="#8a98bb"'));
+  $('dayC').innerHTML='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;display:block;touch-action:none" id="daySvg">'+p.join('')+'</svg>';
+}
+(function bindDayChart(){
+  const box=$('dayC');
+  let drag=false;
+  const setFromEvent=e=>{
+    const c=state.cal; if(!c||c.day.polarNight)return;
+    const svg=$('daySvg'); if(!svg)return;
+    const rect=svg.getBoundingClientRect();
+    const W=780,mL=52,mR=50;
+    const px=(e.clientX-rect.left)/rect.width*W;
+    const x0=c.day.rise-25,x1=c.day.set+25;
+    const t=x0+(px-mL)/(W-mL-mR)*(x1-x0);
+    state.scrub=clamp(Math.round(t),0,1439);
+    $('timeRange').value=String(state.scrub);
+    renderLive();
+  };
+  box.addEventListener('pointerdown',e=>{drag=true;box.setPointerCapture(e.pointerId);setFromEvent(e);});
+  box.addEventListener('pointermove',e=>{if(drag)setFromEvent(e);});
+  box.addEventListener('pointerup',()=>{drag=false;});
+  box.addEventListener('pointercancel',()=>{drag=false;});
+})();
+
+/* ---------------- Render: year curve ---------------- */
+function renderYear(){
+  const c=state.cal; if(!c)return;
+  const W=780,H=238,mL=52,mR=18,mT=18,mB=30;
+  const arr=c.yearArr,N=arr.length;
+  const X=i=>mL+(i/(N-1))*(W-mL-mR);
+  const yMax=Math.max(0.01,Math.max.apply(null,arr)*1.12);
+  const Y=v=>mT+(1-v/yMax)*(H-mT-mB);
+  const p=[];
+  const md=monthDays(state.y);
+  let acc=0;
+  for(let m=1;m<=12;m++){
+    p.push(lnS([X(acc),mT],[X(acc),H-mB],'stroke="#182338" stroke-width="1"'));
+    if(m===state.m){
+      p.push('<rect x="'+f1(X(acc))+'" y="'+mT+'" width="'+f1(X(acc+md[m-1]-1)-X(acc))+'" height="'+f1(H-mT-mB)+'" fill="rgba(255,180,84,.05)"/>');
+    }
+    p.push(txS([(X(acc)+X(Math.min(N-1,acc+md[m-1]-1)))/2,H-mB+16],['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m-1],'text-anchor="middle" font-size="10" fill="#67779c"'));
+    acc+=md[m-1];
+  }
+  for(let k=0;k<=3;k++){
+    const v=yMax*k/3;
+    p.push(lnS([mL,Y(v)],[W-mR,Y(v)],'stroke="#182338" stroke-width="1"'));
+    p.push(txS([mL-8,Y(v)+3.5],v.toFixed(1),'text-anchor="end" font-size="10" fill="#67779c"'));
+  }
+  const pts=arr.map((v,i)=>[X(i),Y(v)]);
+  const areaPath='M '+f1(pts[0][0])+' '+f1(H-mB)+' L '+pts.map(q=>f1(q[0])+' '+f1(q[1])).join(' L ')+' L '+f1(pts[N-1][0])+' '+f1(H-mB)+' Z';
+  p.push('<defs><linearGradient id="yearFill" x1="0" y1="0" x2="0" y2="1">'+
+    '<stop offset="0" stop-color="rgba(120,190,255,.30)"/><stop offset="1" stop-color="rgba(120,190,255,.02)"/></linearGradient></defs>');
+  p.push('<path d="'+areaPath+'" fill="url(#yearFill)"/>');
+  p.push('<polyline points="'+pts.map(q=>f1(q[0])+','+f1(q[1])).join(' ')+'" fill="none" stroke="#7fc3ff" stroke-width="1.8"/>');
+  // solstice references
+  [[172,'Jun solstice'],[355,'Dec solstice']].forEach(([n0,lab])=>{
+    if(n0<N){p.push(lnS([X(n0-1),mT],[X(n0-1),H-mB],'stroke="#22304d" stroke-width="1" stroke-dasharray="2 6"'));
+      p.push(txS([X(n0-1),mT-2],lab,'text-anchor="middle" font-size="9.5" fill="#5d6d92"'));}
+  });
+  // best day
+  const bx=X(c.bestIdx);
+  p.push('<circle cx="'+f1(bx)+'" cy="'+f1(Y(arr[c.bestIdx]))+'" r="4.5" fill="#4fd6a5" stroke="#0c1424" stroke-width="1.5"/>');
+  p.push(pillS(bx,Y(arr[c.bestIdx])-14,'Year best','#9fd6b8',10));
+  // selected day & today
+  const curIdx=c.par.n-1;
+  p.push(lnS([X(curIdx),mT],[X(curIdx),H-mB],'stroke="#ffd79a" stroke-width="1.5"'));
+  p.push('<circle cx="'+f1(X(curIdx))+'" cy="'+f1(Y(arr[curIdx]))+'" r="4.5" fill="#ffb454" stroke="#4a3a1c" stroke-width="1.5"/>');
+  p.push(pillS(X(curIdx),mT+13,'Selected '+state.m+'/'+state.d,'#ffd79a',10.5));
+  const td=(()=>{const t=new Date();return {y:t.getFullYear(),m:t.getMonth()+1,d:t.getDate()};})();
+  if(td.y===state.y){
+    const ti=dayOfYear(td.y,td.m,td.d)-1;
+    p.push('<circle cx="'+f1(X(ti))+'" cy="'+f1(Y(arr[ti]))+'" r="3" fill="none" stroke="#7fc3ff" stroke-width="1.6"/>');
+  }
+  p.push(txS([mL-8,mT-6],'m²·h','text-anchor="end" font-size="10" fill="#8a98bb"'));
+  $('yearC').innerHTML='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;display:block;touch-action:none" id="yearSvg">'+p.join('')+'</svg>';
+  $('yearTitle').textContent=state.y+' · daily exposure';
+  // month chips
+  $('monthChips').innerHTML=c.monthAvg.map((v,i)=>'<button data-m="'+(i+1)+'" class="'+(state.m===i+1?'on':'')+'">'+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][i]+'<b>'+v.toFixed(1)+'</b></button>').join('');
+  const mdBest=doyToMD(state.y,c.bestIdx+1),mdWorst=doyToMD(state.y,c.worstIdx+1);
+  const pct=Math.round(c.rank/c.yearArr.length*100);
+  $('yearStats').innerHTML='Strongest <b>'+mdBest.m+'/'+mdBest.d+'</b> ('+c.yearArr[c.bestIdx].toFixed(1)+' m²·h) · weakest <b>'+mdWorst.m+'/'+mdWorst.d+'</b> ('+c.yearArr[c.worstIdx].toFixed(1)+' m²·h) · the selected date sits at the <b>'+pct+'th percentile</b> of the year. Click a date in the chart or a month above to switch.';
+}
+(function bindYearChart(){
+  const box=$('yearC');
+  const tip=$('tip');
+  const idxFromEvent=e=>{
+    const svg=$('yearSvg'); if(!svg)return -1;
+    const rect=svg.getBoundingClientRect();
+    const W=780,mL=52,mR=18;
+    const px=(e.clientX-rect.left)/rect.width*W;
+    const c=state.cal; const N=c.yearArr.length;
+    const fi=(px-mL)/(W-mL-mR)*(N-1);
+    return clamp(Math.round(fi),0,N-1);
+  };
+  box.addEventListener('pointermove',e=>{
+    const c=state.cal; if(!c)return;
+    const i=idxFromEvent(e);
+    if(i<0){tip.style.opacity=0;return;}
+    const md=doyToMD(state.y,i+1);
+    const v=c.yearArr[i];
+    tip.textContent=state.y+'/'+md.m+'/'+md.d+' · G='+v.toFixed(2)+' m²·h · full-sun '+(v/Math.max(0.01,state.L*state.W)).toFixed(2)+' h';
+    tip.style.left=(e.clientX+14)+'px';
+    tip.style.top=(e.clientY-34)+'px';
+    tip.style.opacity=1;
+  });
+  box.addEventListener('pointerleave',()=>{tip.style.opacity=0;});
+  box.addEventListener('click',e=>{
+    const i=idxFromEvent(e); if(i<0)return;
+    const md=doyToMD(state.y,i+1);
+    state.m=md.m;state.d=md.d;
+    syncInputsFromState();
+    scheduleCompute(30);
+  });
+})();
+
+/* ---------------- Render: azimuth scan ---------------- */
+function renderScan(){
+  const c=state.cal; if(!c)return;
+  const W=760,H=170,mL=52,mR=16,mT=16,mB=30;
+  const arr=c.scan.arr;
+  const X=k=>mL+(k/179)*(W-mL-mR);
+  const yMax=Math.max(0.01,Math.max.apply(null,arr)*1.12);
+  const Y=v=>mT+(1-v/yMax)*(H-mT-mB);
+  const p=[];
+  for(let k=0;k<180;k+=45){
+    p.push(lnS([X(k),mT],[X(k),H-mB],'stroke="#182338" stroke-width="1"'));
+  }
+  const ticks=[[0,'0°'],[45,'45°'],[90,'90°'],[135,'135°'],[179,'180°']];
+  ticks.forEach(([k,t])=>{
+    p.push(txS([X(k),H-mB+16],t,'text-anchor="middle" font-size="10" fill="#67779c"'));
+  });
+  p.push(txS([X(0),H-mB+30],'N–S line','text-anchor="middle" font-size="9.5" fill="#5d6d92"'));
+  p.push(txS([X(90),H-mB+30],'E–W line','text-anchor="middle" font-size="9.5" fill="#5d6d92"'));
+  p.push(txS([X(179),H-mB+30],'N–S line','text-anchor="middle" font-size="9.5" fill="#5d6d92"'));
+  const pts=arr.map((v,k)=>[X(k),Y(v)]);
+  const areaPath='M '+f1(pts[0][0])+' '+f1(H-mB)+' L '+pts.map(q=>f1(q[0])+' '+f1(q[1])).join(' L ')+' L '+f1(pts[179][0])+' '+f1(H-mB)+' Z';
+  p.push('<defs><linearGradient id="scanFill" x1="0" y1="0" x2="0" y2="1">'+
+    '<stop offset="0" stop-color="rgba(120,214,184,.30)"/><stop offset="1" stop-color="rgba(120,214,184,.02)"/></linearGradient></defs>');
+  p.push('<path d="'+areaPath+'" fill="url(#scanFill)"/>');
+  p.push('<polyline points="'+pts.map(q=>f1(q[0])+','+f1(q[1])).join(' ')+'" fill="none" stroke="#4fd6a5" stroke-width="1.8"/>');
+  // current & best
+  const kc2=c.kCur;
+  p.push(lnS([X(kc2),mT],[X(kc2),H-mB],'stroke="#5aa7ff" stroke-width="1.4" stroke-dasharray="4 4"'));
+  p.push('<circle cx="'+f1(X(kc2))+'" cy="'+f1(Y(arr[kc2]))+'" r="4.2" fill="#5aa7ff" stroke="#0c1424" stroke-width="1.4"/>');
+  p.push(pillS(clamp(X(kc2),mL+50,W-mR-50),Y(arr[kc2])-13,'now '+kc2+'°','#9dc8ff',10.5));
+  if(Math.abs(c.bestAz-kc2)>1.5){
+    p.push('<circle cx="'+f1(X(c.bestAz))+'" cy="'+f1(Y(arr[c.bestAz]))+'" r="4.2" fill="#4fd6a5" stroke="#0c1424" stroke-width="1.4"/>');
+    p.push(pillS(clamp(X(c.bestAz),mL+50,W-mR-50),Y(arr[c.bestAz])-13,'best '+c.bestAz+'°','#9fd6b8',10.5));
+  }
+  for(let k=0;k<=3;k++){
+    const v=yMax*k/3;
+    p.push(txS([mL-8,Y(v)+3.5],v.toFixed(1),'text-anchor="end" font-size="10" fill="#67779c"'));
+  }
+  p.push(txS([mL-8,mT-4],'m²·h','text-anchor="end" font-size="10" fill="#8a98bb"'));
+  p.push(txS([W-mR,mT+2],'Daily exposure as the line is turned to different orientations','text-anchor="end" font-size="11" fill="#8a98bb"'));
+  $('scanC').innerHTML='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;display:block">'+p.join('')+'</svg>';
+}
+
+/* ---------------- Render: advice ---------------- */
+function renderAdvice(){
+  const c=state.cal; if(!c)return;
+  const items=[];
+  const sm=c.scheme, rec=sm.rec;
+  const G=c.Gcur,Ga=c.bestG;
+  const gainGeom=(Ga/G-1)*100;
+  const gainEnergy=(c.dayBest.Q/Math.max(1e-6,c.day.Q)-1)*100;
+  const fB=Math.max(state.fold,1-state.fold),fS=1-fB;
+  const ratio=fB/fS;
+  const manual=(c.fError||state.edgePref!=='auto');
+  // safety notes for the current setting (manual / pinned modes)
+  if(manual){
+    const D=c.g.D;
+    const clr=state.ropeH-fB*D;
+    const ropeNeed=c.g.span+0.2;
+    if(ratio>sm.kappa){
+      items.push({tone:'bad',tag:'Friction',txt:'The current weight ratio '+ratio.toFixed(2)+' exceeds the friction limit '+sm.kappa.toFixed(2)+' (μ='+state.mu.toFixed(2)+'); under uniform mass the quilt would slide toward a more balanced position. Reduce the asymmetry, raise friction (anti-slip tape), or click "Apply recommendation" above.'});
+    }else if(ratio>sm.fFricSafe){
+      items.push({tone:'warn',tag:'Friction',txt:'The current setting is close to the friction limit (margin '+(sm.kappa/ratio).toFixed(2)+'×; the recommendation keeps 1.3×). With wind or a slippery quilt, return to the recommended fold.'});
+    }
+    if(clr<0.06){
+      items.push({tone:'bad',tag:'Clearance',txt:'With the current setting the longer side drops '+(fB*D).toFixed(2)+' m from a line height of '+state.ropeH.toFixed(2)+' m — the lowest point is at or near the ground, and the touching part gets almost no direct sun.'});
+    }
+    if(state.ropeLen<ropeNeed){
+      items.push({tone:'bad',tag:'Line length',txt:'This scheme needs '+ropeNeed.toFixed(2)+' m of line; you entered only '+state.ropeLen.toFixed(1)+' m. See the comparison table above for a more frugal arrangement.'});
+    }
+    const gain=(rec.G/c.Gcur-1)*100;
+    if(gain>2){
+      items.push({tone:'warn',tag:'Tip',txt:'Compared with the current setting, the recommended scheme ('+((rec.edge==='long')?'long':'short')+' edge · '+Math.round(rec.fRec*100)+':'+Math.round((1-rec.fRec)*100)+') gains about '+gain.toFixed(0)+'% exposure while satisfying all safety constraints.',delta:'+'+gain.toFixed(0)+'%'});
+    }
+  }
+  // line orientation
+  if(gainGeom>4){
+    const b1=c.bestAz,b2=norm360(c.bestAz+180);
+    items.push({tone:'warn',tag:'Azimuth',
+      txt:'Ignore this if the line cannot be moved. The current azimuth '+Math.round(state.ropeAz)+'° is short of the day\'s optimum: turning to about '+b1+'° (or '+b2+'°, i.e. a '+dirName8(b1)+'–'+dirName8(b2)+' line) raises geometric exposure by about '+gainGeom.toFixed(0)+'%. No folding tweak can recover the azimuth gap.',
+      delta:'+'+gainGeom.toFixed(0)+'%'});
+    if(gainEnergy>0&&Math.abs(gainGeom-gainEnergy)>5){
+      items.push({tone:'info',tag:'Metric',
+        txt:'The figure above is geometric exposure (area × time); weighted by beam energy (including low-sun atmospheric attenuation) it is about '+gainEnergy.toFixed(0)+'%. Low dawn/dusk light matters a lot to area × time and little to energy.'});
+    }
+  }else if(gainGeom>0.5){
+    items.push({tone:'good',tag:'Azimuth',txt:'The current azimuth is close to the day\'s optimum ('+gainGeom.toFixed(1)+'% off) — no change needed.'});
+  }
+  // evenness
+  items.push({tone:'info',tag:'Flip',txt:'The model counts total area × time; which layer faces where does not change the total, but it does affect evenness: flip the quilt around noon so both faces get direct sun (the recommendation already puts the longer side toward the sunnier side).'});
+  // window
+  if(c.day.curve.length>4){
+    const tot=c.day.G; let acc=0,w1=null,w2=null;
+    for(const q of c.day.curve){
+      acc+=q.area*2/60;
+      if(w1===null&&acc>=tot*0.2)w1=q.t;
+      if(w2===null&&acc>=tot*0.8){w2=q.t;break;}
+    }
+    if(w1!==null&&w2!==null){
+      items.push({tone:'info',tag:'Window',txt:'80% of the day\'s exposure arrives between '+fmtHM(w1)+'–'+fmtHM(w2)+', peaking at '+fmtHM(c.day.peak.t)+' (instant area '+c.day.peak.area.toFixed(2)+' m²). If you only have half a day, pick this window.'});
+    }
+  }
+  // season
+  const wN=90-Math.abs(state.lat-(-23.44));
+  const sN=90-Math.abs(state.lat-23.44);
+  items.push({tone:'info',tag:'Season',txt:'Local noon sun elevation: about '+(sN>0?sN.toFixed(1):'--')+'° at the June solstice and '+(wN>0?wN.toFixed(1):'--')+'° at the December solstice. The seasonal incidence swing drives the yearly curve; the current date is at the '+Math.round(c.rank/c.yearArr.length*100)+'th percentile of the year.'});
+  $('advice').innerHTML=items.map(it=>{
+    const tones={good:'#4fd6a5',warn:'#ffc24b',bad:'#ff7a7a',info:'#5aa7ff'};
+    return '<div class="adv" style="border-left-color:'+tones[it.tone]+'"><span class="dot" style="--c:'+tones[it.tone]+'"></span><div><b>'+it.tag+'</b> '+it.txt+(it.delta?'<span class="delta">'+it.delta+'</span>':'')+'</div></div>';
+  }).join('');
+}
+
+/* ---------------- Render: instant readout & sidebar live values ---------------- */
+function renderInstant(){
+  const si=sunAtScrub(); if(!si||!state.cal)return;
+  const name=(off)=>'the '+dirName8(state.ropeAz+(off>0?90:-90))+'-side layer';
+  if(si.up){
+    $('instant').innerHTML='<b>'+fmtHM(state.scrub)+'</b><span class="sep">|</span>solar time '+fmtHM(si.solarT)+
+      '<span class="sep">|</span>elevation '+si.elev.toFixed(1)+'°<span class="sep">|</span>azimuth '+si.az.toFixed(0)+'° ('+dirName8(si.az)+')'+
+      '<span class="sep">|</span>lit '+name(si.litOff)+'<span class="sep">|</span>cos-incidence '+si.p.toFixed(2)+
+      '<span class="sep">|</span>instant area <b>'+si.area.toFixed(2)+' m²</b><span class="sep">|</span>beam '+si.dni.toFixed(0)+' W/m²'+
+      (si.p<0.03?'<span class="sep">|</span>sun nearly parallel to the panels — almost no light':'');
+  }else{
+    $('instant').innerHTML='<b>'+fmtHM(state.scrub)+'</b><span class="sep">|</span>sun below the horizon — no direct light (night drying).';
+  }
+}
+function renderLive(){
+  renderScene(); renderPlan(); renderPolar(); renderDay(); renderInstant();
+  $('timeLabel').textContent=fmtHM(state.scrub);
+}
+function renderEdgeNote(){
+  const c=state.cal; if(!c)return;
+  const sm=c.scheme, ch=c.chosen;
+  const nm=e=>e==='long'?'long edge':'short edge';
+  const fB=Math.max(state.fold,1-state.fold), fS=1-fB;
+  const D=ch.D;
+  let t;
+  if(state.edgePref==='auto'){
+    t='Along-line edge (tool pick): <b>'+nm(ch.edge)+'</b>. ';
+  }else{
+    t='Pinned to the <b>'+nm(state.edgePref)+'</b>'+(sm.rec.edge!==state.edgePref?'<span style="color:#ffd08a"> (tool optimum: '+nm(sm.rec.edge)+')</span>':' (matches tool optimum)')+'. ';
+  }
+  $('edgeNote').innerHTML=t+'Unfolded along line '+ch.span.toFixed(2)+' m; the fold splits the edge perpendicular to the line ('+D.toFixed(2)+
+    ' m); hanging depths '+(fB*D).toFixed(2)+' m and '+(fS*D).toFixed(2)+' m.';
+  $('hangTxt').textContent=(fB*D).toFixed(2)+' m / '+(fS*D).toFixed(2)+' m';
+  const lim=foldLimit(state.mu);
+  $('foldVal').textContent=Math.round(fB*100)+' / '+Math.round(fS*100);
+  // scale marks: de-duplicated, labels staggered over two rows
+  const marks=[];
+  marks.push({v:0.5,cls:'cur',lab:'Center 50',title:'Center fold'});
+  if(Math.abs(ch.fRec-0.5)>0.015)marks.push({v:ch.fRec,cls:'rec',lab:'Rec '+Math.round(ch.fRec*100),title:'Recommended fold'});
+  if(sm.fFricLim<0.97&&Math.abs(sm.fFricLim-ch.fRec)>0.03)marks.push({v:sm.fFricLim,cls:'limit',lab:'Fric. limit '+Math.round(sm.fFricLim*100),title:'Theoretical friction limit'});
+  if(ch.clearLim<0.95&&Math.abs(ch.clearLim-ch.fRec)>0.03)marks.push({v:ch.clearLim,cls:'drag',lab:'Drag limit '+Math.round(ch.clearLim*100),title:'Ground-clearance limit'});
+  if(state.foldManual!=null&&Math.abs(state.fold-ch.fRec)>0.015)marks.push({v:state.fold,cls:'cur',lab:'Now '+Math.round(state.fold*100),title:'Current manual fold'});
+  marks.sort((a,b)=>a.v-b.v);
+  let scale='',labHtml='',lastRow0=-1,lastRow1=-1;
+  marks.forEach(mk2=>{
+    scale+='<div class="mk '+(mk2.cls||'cur')+'" style="left:calc('+(mk2.v*100)+'% - 1px)" title="'+mk2.title+'"></div>';
+    let row=0;
+    if(lastRow0>=0&&mk2.v-lastRow0<0.15)row=1;
+    if(row===1&&lastRow1>=0&&mk2.v-lastRow1<0.15)row=0;
+    if(row===0)lastRow0=mk2.v;else lastRow1=mk2.v;
+    labHtml+='<div class="lab" style="left:'+(mk2.v*100)+'%;top:'+(row===0?10:24)+'px">'+mk2.lab+'</div>';
+  });
+  $('foldScale').innerHTML=scale+labHtml;
+  const ratio=fB/fS;
+  const drag=(state.ropeH-fB*D);
+  $('fricNote').innerHTML='Uniform mass + capstan model (wrap π): no-slip requires weight ratio ≤ e^(μ·π) = '+lim.kappa.toFixed(2)+
+    ', i.e. fold ≤ '+Math.round(sm.fFricLim*100)+' ('+Math.round(sm.fFricSafe*100)+' with a 1.3× margin). '+
+    'Current ratio '+ratio.toFixed(2)+(ratio>lim.kappa?', <span style="color:#ff9c9c">over the limit — slip risk</span>':(ratio>lim.kappa/1.3?', <span style="color:#ffd08a">between limit and recommendation</span>':', safe'))+'. '+
+    'Clearance '+drag.toFixed(2)+' m'+(drag<0.03?' (<span style="color:#ff9c9c">dragging!</span>)':'.');
+}
+function renderAll(){
+  renderCompass();
+  renderRec();
+  renderFoldDiag();
+  renderSchemeTable();
+  renderCross();
+  renderEdgeNote();
+  renderScore();
+  renderScan();
+  renderAdvice();
+  renderYear();
+  renderLive();
+}
+
+/* ---------------- Event bindings ---------------- */
+function bindAll(){
+  ['lat','lon','alt','tz','ropeAz','qL','qW','tCm','ropeH','ropeLen','mu','kc'].forEach(id=>{
+    $(id).addEventListener('input',()=>{state.demoNote=null;scheduleCompute(180);});
+  });
+  $('fold').addEventListener('input',()=>{
+    let v=Number($('fold').value);
+    if(v<50){v=100-v;$('fold').value=String(v);}
+    state.foldManual=clamp(v/100,0.5,0.9);
+    scheduleCompute(60);
+  });
+  $('btnFollowRec').addEventListener('click',()=>{
+    state.foldManual=null;scheduleCompute(30);
+  });
+  $('btnApplyRec').addEventListener('click',()=>{
+    state.edgePref='auto';state.foldManual=null;
+    syncInputsFromState();scheduleCompute(30);
+  });
+  $('schemeTable').addEventListener('click',e=>{
+    const tr=e.target.closest('tr[data-edge]'); if(!tr)return;
+    const edge=tr.dataset.edge, f=tr.dataset.f;
+    state.edgePref=edge;
+    state.foldManual=(f==='rec')?null:clamp(Number(f),0.5,0.9);
+    syncInputsFromState();scheduleCompute(30);
+  });
+  $('dateInput').addEventListener('change',()=>{
+    const v=$('dateInput').value; if(!v)return;
+    const [y,m,d]=v.split('-').map(Number);
+    if(y&&m&&d){state.y=y;state.m=m;state.d=d;syncInputsFromState();scheduleCompute(30);}
+  });
+  $('daySlider').addEventListener('input',()=>{
+    const n=Number($('daySlider').value);
+    const md=doyToMD(state.y,n);
+    state.m=md.m;state.d=md.d;
+    $('dayNo').textContent=n+' d';
+    syncInputsFromState();scheduleCompute(40);
+  });
+  $('edgeSeg').addEventListener('click',e=>{
+    const b=e.target.closest('button'); if(!b)return;
+    state.edgePref=b.dataset.edge;
+    [].forEach.call($('edgeSeg').children,x=>x.classList.toggle('on',x===b));
+    scheduleCompute(40);
+  });
+  document.querySelectorAll('.chips button[data-l]').forEach(b=>{
+    b.addEventListener('click',()=>{
+      state.L=Number(b.dataset.l);state.W=Number(b.dataset.w);
+      syncInputsFromState();scheduleCompute(30);
+    });
+  });
+  document.querySelectorAll('.chips button[data-f]').forEach(b=>{
+    b.addEventListener('click',()=>{
+      const v=clamp(Number(b.dataset.f)/100,0.1,0.9);
+      state.foldManual=clamp(Math.max(v,1-v),0.5,0.9);
+      syncInputsFromState();scheduleCompute(30);
+    });
+  });
+  $('monthChips').addEventListener('click',e=>{
+    const b=e.target.closest('button'); if(!b)return;
+    const m=Number(b.dataset.m);
+    const md=monthDays(state.y);
+    state.m=m;state.d=Math.min(state.d,md[m-1]);
+    syncInputsFromState();scheduleCompute(30);
+  });
+  $('btnExample').addEventListener('click',()=>{
+    state.lat=39.9042;state.lon=116.4074;state.alt=44;state.tz=8;
+    state.ropeAz=0;state.edgePref='auto';state.foldManual=null;state.ropeLen=3.2;state.ropeH=1.8;
+    state.demoNote='Demo data (Beijing · north–south line) — trial only; for real use, replace the azimuth with your own reading.';
+    syncInputsFromState();scheduleCompute(30);
+  });
+  $('btnToday').addEventListener('click',()=>{
+    const t=new Date();
+    state.y=t.getFullYear();state.m=t.getMonth()+1;state.d=t.getDate();
+    syncInputsFromState();scheduleCompute(30);
+  });
+  $('btnGeo').addEventListener('click',()=>{
+    if(!navigator.geolocation){alert('Geolocation is not supported here — please type the coordinates.');return;}
+    navigator.geolocation.getCurrentPosition(pos=>{
+      state.lat=pos.coords.latitude;state.lon=pos.coords.longitude;
+      if(isFinite(pos.coords.altitude))state.alt=Math.round(pos.coords.altitude*10)/10;
+      state.tz=-new Date().getTimezoneOffset()/60;
+      state.demoNote=null;
+      syncInputsFromState();scheduleCompute(30);
+    },err=>{alert('Location failed ('+(err.message||'unknown reason')+') — please type the coordinates.');},{enableHighAccuracy:true,timeout:9000});
+  });
+  $('btnGeo2').addEventListener('click',()=>$('btnGeo').click());
+  $('btnExample2').addEventListener('click',()=>$('btnExample').click());
+  // time cursor
+  $('timeRange').addEventListener('input',()=>{
+    state.scrub=Number($('timeRange').value);
+    renderLive();
+  });
+  $('btnNoon').addEventListener('click',()=>{
+    const c=state.cal; if(!c||c.day.polarNight)return;
+    state.scrub=Math.round((c.day.rise+c.day.set)/2);
+    $('timeRange').value=String(state.scrub);
+    renderLive();
+  });
+  $('btnNow').addEventListener('click',()=>{
+    const t=new Date();
+    state.y=t.getFullYear();state.m=t.getMonth()+1;state.d=t.getDate();
+    state.scrub=t.getHours()*60+t.getMinutes();
+    syncInputsFromState();scheduleCompute(30);
+    $('timeRange').value=String(state.scrub);
+    setTimeout(renderLive,80);
+  });
+  let raf=null;
+  $('playBtn').addEventListener('click',()=>{
+    const c=state.cal; if(!c)return;
+    if(state.playing){state.playing=false;$('playBtn').textContent='Play the day';if(raf)cancelAnimationFrame(raf);return;}
+    state.playing=true;$('playBtn').textContent='Pause';
+    const dayLen=c.day.polarNight?1440:(c.day.set-c.day.rise+30);
+    const t0=c.day.polarNight?0:Math.max(0,c.day.rise-15),t1=c.day.polarNight?1439:Math.min(1439,c.day.set+15);
+    state.scrub=t0;
+    let last=performance.now();
+    const step=(now)=>{
+      if(!state.playing)return;
+      const dt=now-last;last=now;
+      const speed=(t1-t0)/12000; // one day in 12 seconds
+      state.scrub+=dt*speed;
+      if(state.scrub>=t1){state.scrub=t1;state.playing=false;$('playBtn').textContent='Play the day';}
+      $('timeRange').value=String(Math.round(state.scrub));
+      renderLive();
+      if(state.playing)raf=requestAnimationFrame(step);
+    };
+    raf=requestAnimationFrame(step);
+  });
+  window.addEventListener('resize',()=>{},{passive:true});
+}
+
+/* ---------------- Boot ---------------- */
+(function init(){
+  const t=new Date();
+  state.y=t.getFullYear();state.m=t.getMonth()+1;state.d=t.getDate();
+  state.tz=clamp(-t.getTimezoneOffset()/60,-12,14);   // time zone read from this device
+  bindAll();
+  syncInputsFromState();
+  recompute();
+  // on first ready load, park the time cursor at noon
+  if(state.cal&&!state.cal.day.polarNight){
+    state.scrub=Math.round((state.cal.day.rise+state.cal.day.set)/2);
+    $('timeRange').value=String(state.scrub);
+    renderLive();
+  }
+})();
+</script>
+</body>
+</html>
